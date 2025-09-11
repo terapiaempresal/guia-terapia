@@ -35,6 +35,37 @@ export async function POST(request: NextRequest) {
             })
         }
 
+        else if (type === 'password_reset') {
+            const { managerName, resetUrl } = data
+
+            success = await emailService.sendEmail({
+                to,
+                subject: '🔐 Redefinição de senha - Guia de Terapia',
+                html: `
+                    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+                        <h2 style="color: #1f2937;">Redefinição de senha</h2>
+                        <p>Olá ${managerName},</p>
+                        <p>Você solicitou a redefinição de sua senha no Guia de Terapia.</p>
+                        <p>Clique no botão abaixo para redefinir sua senha:</p>
+                        <div style="text-align: center; margin: 30px 0;">
+                            <a href="${resetUrl}" style="display: inline-block; background-color: #3b82f6; color: white; padding: 15px 30px; text-decoration: none; border-radius: 8px; font-weight: bold;">
+                                Redefinir senha
+                            </a>
+                        </div>
+                        <p style="color: #6b7280; font-size: 14px;">
+                            <strong>Este link expira em 1 hora.</strong><br>
+                            Se você não solicitou esta redefinição, ignore este email.
+                        </p>
+                        <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 20px 0;">
+                        <p style="color: #6b7280; font-size: 12px;">
+                            Se o botão não funcionar, copie e cole este link no seu navegador:<br>
+                            <a href="${resetUrl}" style="color: #3b82f6;">${resetUrl}</a>
+                        </p>
+                    </div>
+                `
+            })
+        }
+
         else if (type === 'test') {
             success = await emailService.sendEmail({
                 to,

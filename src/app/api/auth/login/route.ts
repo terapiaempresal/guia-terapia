@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
+import bcrypt from 'bcryptjs'
 
 const supabase = createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -31,9 +32,16 @@ export async function POST(request: NextRequest) {
             }, { status: 401 })
         }
 
-        // Em um ambiente real, você compararia a senha com hash
-        // Por simplicidade, vamos usar uma senha padrão ou a senha no banco
-        const validPassword = password === '123456' || password === manager.password
+        // Verificar senha
+        let validPassword = false
+
+        if (manager.password) {
+            // Se há uma senha com hash (da redefinição), usar bcrypt
+            validPassword = await bcrypt.compare(password, manager.password)
+        } else {
+            // Senha padrão para gestores sem senha definida
+            validPassword = password === '123456'
+        }
 
         if (!validPassword) {
             return NextResponse.json({

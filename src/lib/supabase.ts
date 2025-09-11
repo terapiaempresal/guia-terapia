@@ -4,7 +4,7 @@ import { MockDB } from './mock-db'
 // No cliente, usar as variáveis expostas pelo Next.js
 const supabaseUrl = process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL || ''
 const supabaseAnonKey = process.env.SUPABASE_ANON_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || ''
-const supabaseServiceRole = process.env.SUPABASE_SERVICE_ROLE || ''
+const supabaseServiceRole = process.env.SUPABASE_SERVICE_ROLE_KEY || ''
 
 // Verificar se as variáveis do Supabase estão configuradas
 const isSupabaseConfigured = supabaseUrl && supabaseAnonKey
@@ -30,7 +30,7 @@ export const supabase = isSupabaseConfigured
     ? createClient(supabaseUrl, supabaseAnonKey)
     : mockClient as any
 
-export const supabaseAdmin = isSupabaseConfigured
+export const supabaseAdmin = isSupabaseConfigured && supabaseServiceRole
     ? createClient(supabaseUrl, supabaseServiceRole)
     : mockClient as any
 

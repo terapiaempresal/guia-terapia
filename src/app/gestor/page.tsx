@@ -36,7 +36,7 @@ interface Manager {
 }
 
 export default function ManagerDashboard() {
-    const { user, logout, isManager } = useAuth()
+    const { user, logout, isManager, loading: authLoading } = useAuth()
     const [employees, setEmployees] = useState<Employee[]>([])
     const [company, setCompany] = useState<Company | null>(null)
     const [manager, setManager] = useState<Manager | null>(null)
@@ -52,14 +52,25 @@ export default function ManagerDashboard() {
 
     // Verificar autenticação e carregar dados
     useEffect(() => {
+        console.log('🔍 Verificando autenticação no gestor...')
+        console.log('👤 User:', user)
+        console.log('🔐 isManager:', isManager)
+        console.log('⏳ authLoading:', authLoading)
+
+        if (authLoading) {
+            console.log('⏳ Ainda carregando dados de autenticação...')
+            return
+        }
+
         if (!isManager && !user) {
+            console.log('❌ Usuário não autenticado ou não é gestor, fazendo logout...')
             logout() // Redireciona para login
             return
         }
-        loadManagerData()
-    }, [isManager, user])
 
-    // Carregar funcionários quando a empresa for carregada
+        console.log('✅ Usuário autenticado como gestor, carregando dados...')
+        loadManagerData()
+    }, [isManager, user, authLoading])    // Carregar funcionários quando a empresa for carregada
     useEffect(() => {
         if (company?.id) {
             loadEmployees()
@@ -68,28 +79,38 @@ export default function ManagerDashboard() {
 
     const loadManagerData = async () => {
         try {
+            console.log('📊 Carregando dados do gestor...')
+
             // Buscar dados da sessão primeiro
             const managerEmail = sessionStorage.getItem('manager_email')
+            console.log('📧 Email do gestor:', managerEmail)
 
             if (!managerEmail) {
+                console.log('❌ Email não encontrado no sessionStorage')
                 alert('Sessão expirada. Faça login novamente.')
                 window.location.href = '/'
                 return
             }
 
+            console.log('🔍 Fazendo requisição para /api/companies...')
             const response = await fetch(`/api/companies?manager_email=${managerEmail}`)
+            console.log('📡 Status da resposta:', response.status)
+
             const data = await response.json()
+            console.log('📋 Dados recebidos:', data)
 
             if (response.ok) {
+                console.log('✅ Dados carregados com sucesso')
                 setManager(data.manager)
                 setCompany(data.company)
             } else {
-                console.error('Erro ao carregar dados:', data.error)
+                console.error('❌ Erro ao carregar dados:', data.error)
                 alert('Erro ao carregar dados do gestor')
             }
         } catch (error) {
-            console.error('Erro ao carregar gestor:', error)
+            console.error('❌ Erro ao carregar gestor:', error)
         } finally {
+            console.log('🏁 Finalizando carregamento, setLoading(false)')
             setLoading(false)
         }
     }

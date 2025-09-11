@@ -2,11 +2,11 @@
 require('dotenv').config({ path: '.env.local' })
 
 const supabaseUrl = process.env.SUPABASE_URL
-const supabaseServiceRole = process.env.SUPABASE_SERVICE_ROLE
+const supabaseServiceRole = process.env.SUPABASE_SERVICE_ROLE_KEY
 
 if (!supabaseUrl || !supabaseServiceRole) {
-    console.error('❌ Variáveis SUPABASE_URL e SUPABASE_SERVICE_ROLE são necessárias')
-    process.exit(1)
+  console.error('❌ Variáveis SUPABASE_URL e SUPABASE_SERVICE_ROLE_KEY são necessárias')
+  process.exit(1)
 }
 
 const sql = `
@@ -81,29 +81,29 @@ ON CONFLICT DO NOTHING;
 `
 
 async function createDatabase() {
-    console.log('🚀 Criando banco de dados no Supabase...')
+  console.log('🚀 Criando banco de dados no Supabase...')
 
-    try {
-        const response = await fetch(`${supabaseUrl}/rest/v1/rpc/exec_sql`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${supabaseServiceRole}`,
-                'apikey': supabaseServiceRole
-            },
-            body: JSON.stringify({ query: sql })
-        })
+  try {
+    const response = await fetch(`${supabaseUrl}/rest/v1/rpc/exec_sql`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${supabaseServiceRole}`,
+        'apikey': supabaseServiceRole
+      },
+      body: JSON.stringify({ query: sql })
+    })
 
-        if (response.ok) {
-            console.log('✅ Banco de dados criado com sucesso!')
-        } else {
-            const error = await response.text()
-            console.error('❌ Erro na resposta:', error)
-        }
-
-    } catch (error) {
-        console.error('❌ Erro ao criar banco:', error.message)
+    if (response.ok) {
+      console.log('✅ Banco de dados criado com sucesso!')
+    } else {
+      const error = await response.text()
+      console.error('❌ Erro na resposta:', error)
     }
+
+  } catch (error) {
+    console.error('❌ Erro ao criar banco:', error.message)
+  }
 }
 
 createDatabase()

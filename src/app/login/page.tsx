@@ -44,17 +44,38 @@ export default function LoginPage() {
             })
 
             const data = await response.json()
+            console.log('🔍 Resposta da API:', data)
 
             if (data.success) {
-                // Salvar token e dados do usuário
+                console.log('✅ Login bem-sucedido, salvando dados...')
+
+                // Salvar token e dados do usuário no localStorage
                 localStorage.setItem('authToken', data.token)
                 localStorage.setItem('userType', 'gestor')
                 localStorage.setItem('userId', data.user.id)
                 localStorage.setItem('userEmail', data.user.email)
                 localStorage.setItem('userName', data.user.name)
-                
-                router.push('/gestor')
+
+                // Também salvar no sessionStorage (usado pela página do gestor)
+                sessionStorage.setItem('manager_email', data.user.email)
+
+                console.log('💾 Dados salvos no localStorage e sessionStorage')
+                console.log('🔄 Redirecionando para /gestor...')
+
+                // Aguardar um pouco para garantir que os dados foram salvos
+                await new Promise(resolve => setTimeout(resolve, 100))
+
+                // Usar window.location como fallback
+                try {
+                    await router.push('/gestor')
+                    console.log('✅ Router.push executado')
+                } catch (routerError) {
+                    console.error('❌ Erro no router.push:', routerError)
+                    console.log('🔄 Tentando redirecionamento manual...')
+                    window.location.href = '/gestor'
+                }
             } else {
+                console.log('❌ Erro no login:', data.error)
                 alert(data.error || 'Erro ao fazer login')
             }
         } catch (error) {
@@ -70,7 +91,7 @@ export default function LoginPage() {
 
             if (data.success) {
                 // Procurar funcionário pelo CPF
-                const employee = data.employees.find((emp: any) => 
+                const employee = data.employees.find((emp: any) =>
                     emp.cpf?.replace(/\D/g, '') === formData.cpf.replace(/\D/g, '')
                 )
 
@@ -80,7 +101,7 @@ export default function LoginPage() {
                     localStorage.setItem('employeeId', employee.id)
                     localStorage.setItem('employeeName', employee.full_name)
                     localStorage.setItem('employeeEmail', employee.email)
-                    
+
                     router.push('/funcionario/videos')
                 } else {
                     alert('CPF não encontrado. Verifique se você está cadastrado.')
@@ -103,7 +124,7 @@ export default function LoginPage() {
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target
-        
+
         if (name === 'cpf') {
             setFormData(prev => ({ ...prev, [name]: formatCPF(value) }))
         } else {
@@ -129,22 +150,20 @@ export default function LoginPage() {
                         <button
                             type="button"
                             onClick={() => setLoginType('gestor')}
-                            className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
-                                loginType === 'gestor'
-                                    ? 'bg-white text-primary-600 shadow-sm'
-                                    : 'text-gray-600 hover:text-gray-900'
-                            }`}
+                            className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${loginType === 'gestor'
+                                ? 'bg-white text-primary-600 shadow-sm'
+                                : 'text-gray-600 hover:text-gray-900'
+                                }`}
                         >
                             Gestor
                         </button>
                         <button
                             type="button"
                             onClick={() => setLoginType('funcionario')}
-                            className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
-                                loginType === 'funcionario'
-                                    ? 'bg-white text-primary-600 shadow-sm'
-                                    : 'text-gray-600 hover:text-gray-900'
-                            }`}
+                            className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${loginType === 'funcionario'
+                                ? 'bg-white text-primary-600 shadow-sm'
+                                : 'text-gray-600 hover:text-gray-900'
+                                }`}
                         >
                             Funcionário
                         </button>
@@ -182,6 +201,15 @@ export default function LoginPage() {
                                         placeholder="Sua senha"
                                         required
                                     />
+                                </div>
+
+                                <div className="text-right">
+                                    <Link
+                                        href="/login/esqueci-senha"
+                                        className="text-sm text-primary-600 hover:text-primary-700"
+                                    >
+                                        Esqueci minha senha
+                                    </Link>
                                 </div>
                             </>
                         ) : (

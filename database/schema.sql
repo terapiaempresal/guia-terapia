@@ -106,6 +106,19 @@ create table if not exists app.clarity_map_status (
   updated_at timestamptz not null default now()
 );
 
+-- Tokens de redefinição de senha
+create table if not exists app.password_reset_tokens (
+  id uuid primary key default gen_random_uuid(),
+  manager_id uuid not null references app.managers(id) on delete cascade,
+  token text not null unique,
+  expires_at timestamptz not null,
+  used boolean not null default false,
+  created_at timestamptz not null default now()
+);
+
+create index if not exists password_reset_tokens_token_idx on app.password_reset_tokens(token);
+create index if not exists password_reset_tokens_manager_idx on app.password_reset_tokens(manager_id);
+
 -- Auditoria básica de webhooks
 create table if not exists app.webhook_logs (
   id uuid primary key default gen_random_uuid(),
@@ -130,6 +143,7 @@ alter table app.videos enable row level security;
 alter table app.video_progress enable row level security;
 alter table app.clarity_map_status enable row level security;
 alter table app.webhook_logs enable row level security;
+alter table app.password_reset_tokens enable row level security;
 
 -- Helpers: função para obter company_id do manager/employee logado
 create or replace function app.current_user_company_ids()
