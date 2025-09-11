@@ -373,17 +373,6 @@ export default function ManagerDashboard() {
                                 {company?.name || 'Carregando...'}
                             </p>
                         </div>
-                        <div className="flex items-center space-x-4">
-                            <span className="text-sm text-gray-600">
-                                Olá, {user?.name || user?.email}
-                            </span>
-                            <button
-                                onClick={logout}
-                                className="bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700 transition-colors"
-                            >
-                                Sair
-                            </button>
-                        </div>
 
                         <div className="flex items-center space-x-4">
                             <button
