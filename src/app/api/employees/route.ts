@@ -50,17 +50,40 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
     try {
         const body = await request.json()
+
         const {
             company_id,
             manager_id,
             name,
-            email
+            email,
+            full_name,
+            cpf,
+            birth_date,
+            whatsapp
         } = body
 
+        // Se é auto-cadastro (sem manager_id), buscar o manager da empresa
+        let finalManagerId = manager_id
+        if (!manager_id && company_id) {
+            // Buscar o manager através da tabela managers filtrado por company_id
+            const { data: manager } = await supabase
+                .from('managers')
+                .select('id')
+                .eq('company_id', company_id)
+                .single()
+
+            if (manager) {
+                finalManagerId = manager.id
+            }
+        }
+
+        // Usar full_name se fornecido, senão usar name
+        const finalName = full_name || name
+
         // Validações
-        if (!company_id || !manager_id || !name || !email) {
+        if (!company_id || !finalManagerId || !finalName || !email) {
             return NextResponse.json(
-                { error: 'Campos obrigatórios: company_id, manager_id, name, email' },
+                { error: 'Campos obrigatórios: company_id, name/full_name, email' },
                 { status: 400 }
             )
         }
@@ -81,15 +104,26 @@ export async function POST(request: NextRequest) {
         }
 
         // Criar funcionário
+        const employeeData: any = {
+            company_id,
+            manager_id: finalManagerId,
+            name: finalName,
+            email,
+            invited_at: new Date().toISOString()
+        }
+
+        // Adicionar campos opcionais se fornecidos
+        if (cpf) {
+            // Salvar CPF apenas com números (limpo)
+            employeeData.cpf = cpf.replace(/\D/g, '')
+        }
+        if (birth_date) employeeData.birth_date = birth_date
+        if (whatsapp) employeeData.whatsapp = whatsapp
+        if (full_name) employeeData.full_name = full_name
+
         const { data: employee, error } = await supabase
             .from('employees')
-            .insert({
-                company_id,
-                manager_id,
-                name,
-                email,
-                invited_at: new Date().toISOString()
-            })
+            .insert(employeeData)
             .select()
             .single()
 

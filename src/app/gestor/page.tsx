@@ -583,37 +583,83 @@ export default function ManagerDashboard() {
                                 </button>
                             </div>
 
-                            <div className="space-y-4">
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                                        Nome Completo *
-                                    </label>
-                                    <input
-                                        type="text"
-                                        required
-                                        className="input"
-                                        value={newEmployee.full_name}
-                                        onChange={(e) => setNewEmployee(prev => ({
-                                            ...prev,
-                                            full_name: e.target.value
-                                        }))}
-                                    />
+                            <div className="space-y-6">
+                                {/* Opção 1: Link genérico da empresa */}
+                                <div className="bg-blue-50 p-4 rounded-lg">
+                                    <h4 className="text-sm font-medium text-blue-900 mb-2">
+                                        💡 Opção 1: Link de convite genérico
+                                    </h4>
+                                    <p className="text-xs text-blue-700 mb-3">
+                                        Compartilhe este link para que funcionários façam seu próprio cadastro
+                                    </p>
+                                    <div className="flex space-x-2">
+                                        <input
+                                            type="text"
+                                            readOnly
+                                            value={`${window.location.origin}/cadastro-funcionario?empresa=${company?.id}`}
+                                            className="flex-1 text-xs p-2 bg-white border border-blue-200 rounded-md"
+                                        />
+                                        <button
+                                            onClick={() => {
+                                                navigator.clipboard.writeText(`${window.location.origin}/cadastro-funcionario?empresa=${company?.id}`)
+                                                alert('Link copiado!')
+                                            }}
+                                            className="bg-blue-600 text-white px-3 py-2 rounded-md hover:bg-blue-700 text-xs"
+                                        >
+                                            Copiar
+                                        </button>
+                                    </div>
                                 </div>
 
+                                {/* Divisor */}
+                                <div className="relative">
+                                    <div className="absolute inset-0 flex items-center">
+                                        <div className="w-full border-t border-gray-300" />
+                                    </div>
+                                    <div className="relative flex justify-center text-sm">
+                                        <span className="px-2 bg-white text-gray-500">OU</span>
+                                    </div>
+                                </div>
+
+                                {/* Opção 2: Adicionar específico */}
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                                        E-mail *
-                                    </label>
-                                    <input
-                                        type="email"
-                                        required
-                                        className="input"
-                                        value={newEmployee.email}
-                                        onChange={(e) => setNewEmployee(prev => ({
-                                            ...prev,
-                                            email: e.target.value
-                                        }))}
-                                    />
+                                    <h4 className="text-sm font-medium text-gray-900 mb-3">
+                                        👤 Opção 2: Adicionar funcionário específico
+                                    </h4>
+
+                                    <div className="space-y-4">
+                                        <div>
+                                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                                                Nome Completo *
+                                            </label>
+                                            <input
+                                                type="text"
+                                                required
+                                                className="input"
+                                                value={newEmployee.full_name}
+                                                onChange={(e) => setNewEmployee(prev => ({
+                                                    ...prev,
+                                                    full_name: e.target.value
+                                                }))}
+                                            />
+                                        </div>
+
+                                        <div>
+                                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                                                E-mail *
+                                            </label>
+                                            <input
+                                                type="email"
+                                                required
+                                                className="input"
+                                                value={newEmployee.email}
+                                                onChange={(e) => setNewEmployee(prev => ({
+                                                    ...prev,
+                                                    email: e.target.value
+                                                }))}
+                                            />
+                                        </div>
+                                    </div>
                                 </div>
 
                                 <div className="flex space-x-3 pt-4">

@@ -85,30 +85,38 @@ export default function LoginPage() {
     }
 
     const handleEmployeeLogin = async () => {
+        if (!formData.cpf) {
+            alert('Por favor, digite seu CPF')
+            return
+        }
+
         try {
-            const response = await fetch('/api/employees')
+            const response = await fetch('/api/employees/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    cpf: formData.cpf
+                })
+            })
+
             const data = await response.json()
 
-            if (data.success) {
-                // Procurar funcionário pelo CPF
-                const employee = data.employees.find((emp: any) =>
-                    emp.cpf?.replace(/\D/g, '') === formData.cpf.replace(/\D/g, '')
-                )
+            if (data.success && data.employee) {
+                // Salvar dados do funcionário na sessão
+                localStorage.setItem('userType', 'funcionario')
+                localStorage.setItem('employeeId', data.employee.id)
+                localStorage.setItem('employeeName', data.employee.full_name || data.employee.name)
+                localStorage.setItem('employeeEmail', data.employee.email)
+                localStorage.setItem('companyId', data.employee.company_id)
+                localStorage.setItem('companyName', data.employee.company?.name || '')
 
-                if (employee) {
-                    // Salvar dados do funcionário na sessão
-                    localStorage.setItem('userType', 'funcionario')
-                    localStorage.setItem('employeeId', employee.id)
-                    localStorage.setItem('employeeName', employee.full_name)
-                    localStorage.setItem('employeeEmail', employee.email)
-
-                    router.push('/funcionario/videos')
-                } else {
-                    alert('CPF não encontrado. Verifique se você está cadastrado.')
-                }
+                alert(`Bem-vindo, ${data.employee.full_name || data.employee.name}!`)
+                router.push('/funcionario/videos')
+            } else {
+                alert(data.error || 'CPF não encontrado. Verifique se você está cadastrado.')
             }
         } catch (error) {
-            console.error('Erro ao buscar funcionário:', error)
+            console.error('Erro ao verificar CPF:', error)
             alert('Erro ao verificar CPF. Tente novamente.')
         }
     }
