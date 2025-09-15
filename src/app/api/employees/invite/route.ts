@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { requireFeatureFlag } from '@/lib/feature-flags'
 import { generateEmployeeLoginToken } from '@/lib/utils'
-import EmailService from '@/lib/email'
+import { EmailService } from '@/lib/email'
 
 export async function POST(request: NextRequest) {
     // Verificar se e-mails estão habilitados

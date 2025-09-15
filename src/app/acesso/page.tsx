@@ -1,10 +1,10 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { cpfValidator, formatCPF } from '@/lib/utils'
 
-export default function EmployeeFirstAccessPage() {
+function EmployeeFirstAccessContent() {
     const router = useRouter()
     const searchParams = useSearchParams()
     const [loading, setLoading] = useState(false)
@@ -236,5 +236,13 @@ export default function EmployeeFirstAccessPage() {
                 </div>
             </div>
         </div>
+    )
+}
+
+export default function EmployeeFirstAccessPage() {
+    return (
+        <Suspense fallback={<div>Carregando...</div>}>
+            <EmployeeFirstAccessContent />
+        </Suspense>
     )
 }

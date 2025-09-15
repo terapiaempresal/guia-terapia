@@ -1,15 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@supabase/supabase-js'
-
-const supabase = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE!
-)
+import { supabaseAdmin } from '@/lib/supabase'
 
 export async function POST(request: NextRequest) {
     try {
         // Verificar se já existe um gestor teste
-        const { data: existingManager } = await supabase
+        const { data: existingManager } = await supabaseAdmin
             .from('managers')
             .select('*')
             .eq('email', 'gestor@teste.com')
@@ -27,7 +22,7 @@ export async function POST(request: NextRequest) {
         }
 
         // Criar empresa teste
-        const { data: company, error: companyError } = await supabase
+        const { data: company, error: companyError } = await supabaseAdmin
             .from('companies')
             .insert({
                 name: 'Empresa Teste'
@@ -43,7 +38,7 @@ export async function POST(request: NextRequest) {
         }
 
         // Criar gestor teste
-        const { data: manager, error: managerError } = await supabase
+        const { data: manager, error: managerError } = await supabaseAdmin
             .from('managers')
             .insert({
                 name: 'Gestor Teste',

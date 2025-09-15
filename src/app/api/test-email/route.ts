@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import EmailService from '@/lib/EmailService';
+import { EmailService } from '@/lib/email';
 
 export async function POST(request: NextRequest) {
     try {
@@ -9,13 +9,19 @@ export async function POST(request: NextRequest) {
             return NextResponse.json({ error: 'Email é obrigatório' }, { status: 400 });
         }
 
-        // Enviar email de teste
-        const emailSent = await EmailService.sendWelcomeManager(
-            email,
-            'Teste do Sistema',
-            'Sistema de Terapia',
-            'teste123'
-        );
+        // Criar instância do serviço de email
+        const emailService = new EmailService();
+
+        // Enviar email de teste usando o template de boas-vindas
+        const emailSent = await emailService.sendEmail({
+            to: email,
+            subject: 'Teste do Sistema - Guia de Terapia',
+            html: EmailService.getWelcomeManagerTemplate(
+                'Teste do Sistema',
+                'Sistema de Terapia',
+                `${process.env.NEXT_PUBLIC_BASE_URL}/gestor`
+            )
+        });
 
         if (emailSent) {
             return NextResponse.json({

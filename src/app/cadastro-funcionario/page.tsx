@@ -1,9 +1,9 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, Suspense } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
 
-export default function CadastroFuncionarioPage() {
+function CadastroFuncionarioContent() {
     const searchParams = useSearchParams()
     const router = useRouter()
     const empresaId = searchParams.get('empresa')
@@ -265,5 +265,13 @@ export default function CadastroFuncionarioPage() {
                 </div>
             </div>
         </div>
+    )
+}
+
+export default function CadastroFuncionarioPage() {
+    return (
+        <Suspense fallback={<div>Carregando...</div>}>
+            <CadastroFuncionarioContent />
+        </Suspense>
     )
 }
