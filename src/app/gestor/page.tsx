@@ -264,24 +264,29 @@ export default function ManagerDashboard() {
             return
         }
 
+        console.log('🗑️ [Delete] Iniciando exclusão do funcionário:', employeeId)
+
         try {
-            const response = await fetch('/api/employees', {
+            const response = await fetch(`/api/employees?employee_id=${employeeId}`, {
                 method: 'DELETE',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ employeeId })
+                headers: { 'Content-Type': 'application/json' }
             })
 
             const data = await response.json()
 
+            console.log('🗑️ [Delete] Resposta da API:', { status: response.status, data })
+
             if (response.ok) {
+                console.log('✅ [Delete] Funcionário removido com sucesso!')
                 alert('Funcionário removido com sucesso!')
                 await loadEmployees() // Recarregar lista
             } else {
+                console.error('❌ [Delete] Erro na API:', data)
                 alert('Erro ao remover funcionário: ' + (data.error || 'Erro desconhecido'))
             }
         } catch (error) {
-            console.error('Erro ao remover funcionário:', error)
-            alert('Erro ao remover funcionário')
+            console.error('❌ [Delete] Erro de rede:', error)
+            alert('Erro ao remover funcionário: Problema de conexão')
         }
     }
 

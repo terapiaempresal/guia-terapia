@@ -269,7 +269,7 @@ export default function CheckoutPage() {
 
                                     <div>
                                         <label className="block text-sm font-medium text-gray-700 mb-2">
-                                            Quantidade de Funcionários
+                                            Quantidade de Funcionários (mínimo 5 funcionários)
                                         </label>
                                         <input
                                             type="number"

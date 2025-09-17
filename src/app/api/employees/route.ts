@@ -155,7 +155,10 @@ export async function DELETE(request: NextRequest) {
         const { searchParams } = new URL(request.url)
         const employeeId = searchParams.get('employee_id')
 
+        console.log('🗑️ [API Delete] Recebida requisição para excluir funcionário:', employeeId)
+
         if (!employeeId) {
+            console.error('❌ [API Delete] employee_id não fornecido')
             return NextResponse.json(
                 { error: 'employee_id é obrigatório' },
                 { status: 400 }
@@ -163,36 +166,50 @@ export async function DELETE(request: NextRequest) {
         }
 
         // Verificar se funcionário existe
-        const { data: employee } = await supabase
+        console.log('🔍 [API Delete] Verificando se funcionário existe...')
+        const { data: employee, error: fetchError } = await supabase
             .from('employees')
-            .select('id, name')
+            .select('id, name, full_name')
             .eq('id', employeeId)
             .single()
 
+        if (fetchError) {
+            console.error('❌ [API Delete] Erro ao buscar funcionário:', fetchError)
+            return NextResponse.json(
+                { error: 'Erro ao buscar funcionário' },
+                { status: 500 }
+            )
+        }
+
         if (!employee) {
+            console.error('❌ [API Delete] Funcionário não encontrado:', employeeId)
             return NextResponse.json(
                 { error: 'Funcionário não encontrado' },
                 { status: 404 }
             )
         }
 
+        console.log('✅ [API Delete] Funcionário encontrado:', employee.name || employee.full_name)
+
         // Excluir funcionário (CASCADE vai excluir progresso automaticamente)
+        console.log('🗑️ [API Delete] Executando exclusão...')
         const { error } = await supabase
             .from('employees')
             .delete()
             .eq('id', employeeId)
 
         if (error) {
-            console.error('Erro ao excluir funcionário:', error)
+            console.error('❌ [API Delete] Erro ao excluir funcionário:', error)
             return NextResponse.json(
-                { error: 'Erro ao excluir funcionário' },
+                { error: 'Erro ao excluir funcionário: ' + error.message },
                 { status: 500 }
             )
         }
 
+        console.log('✅ [API Delete] Funcionário excluído com sucesso!')
         return NextResponse.json({
             success: true,
-            message: `Funcionário ${employee.name} excluído com sucesso`
+            message: `Funcionário ${employee.name || employee.full_name} excluído com sucesso`
         })
 
     } catch (error) {
