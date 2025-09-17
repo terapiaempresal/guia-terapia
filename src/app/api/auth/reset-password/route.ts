@@ -1,15 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@supabase/supabase-js'
+import { supabaseAdmin } from '@/lib/supabase'
 import bcrypt from 'bcryptjs'
-
-const supabase = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!
-)
 
 export async function POST(request: NextRequest) {
     try {
         const { token, password } = await request.json()
+
+        console.log('🔑 [ResetPassword] Iniciando reset de senha...')
+        console.log('🎫 [ResetPassword] Token recebido:', token ? '***' : 'NONE')
+        console.log('🔒 [ResetPassword] Password recebido:', password ? '***' : 'NONE')
 
         if (!token || !password) {
             return NextResponse.json({
@@ -26,7 +25,7 @@ export async function POST(request: NextRequest) {
         }
 
         // Verificar se o token existe e não expirou
-        const { data: resetToken, error: tokenError } = await supabase
+        const { data: resetToken, error: tokenError } = await supabaseAdmin
             .from('password_reset_tokens')
             .select('*')
             .eq('token', token)
@@ -45,7 +44,7 @@ export async function POST(request: NextRequest) {
         const hashedPassword = await bcrypt.hash(password, 12)
 
         // Atualizar a senha do gestor
-        const { error: updateError } = await supabase
+        const { error: updateError } = await supabaseAdmin
             .from('managers')
             .update({ password: hashedPassword })
             .eq('id', resetToken.manager_id)
@@ -59,7 +58,7 @@ export async function POST(request: NextRequest) {
         }
 
         // Marcar token como usado
-        const { error: markUsedError } = await supabase
+        const { error: markUsedError } = await supabaseAdmin
             .from('password_reset_tokens')
             .update({ used: true })
             .eq('token', token)

@@ -1,57 +1,109 @@
 import nodemailer from 'nodemailer'
 
 interface EmailConfig {
-    to: string
-    subject: string
-    html: string
-    text?: string
+  to: string
+  subject: string
+  html: string
+  text?: string
 }
 
 export class EmailService {
-    private transporter: nodemailer.Transporter
+  private transporter: nodemailer.Transporter
 
-    constructor() {
-        this.transporter = nodemailer.createTransport({
-            host: process.env.SMTP_HOST,
-            port: parseInt(process.env.SMTP_PORT || '587'),
-            secure: process.env.SMTP_PORT === '465', // true para 465, false para outras portas
-            auth: {
-                user: process.env.SMTP_USER,
-                pass: process.env.SMTP_PASS,
-            },
-            tls: {
-                // Não verificar certificados para desenvolvimento
-                rejectUnauthorized: false
-            }
-        })
+  constructor() {
+    this.transporter = nodemailer.createTransport({
+      host: process.env.SMTP_HOST,
+      port: parseInt(process.env.SMTP_PORT || '587'),
+      secure: process.env.SMTP_PORT === '465', // true para 465, false para outras portas
+      auth: {
+        user: process.env.SMTP_USER,
+        pass: process.env.SMTP_PASS,
+      },
+      tls: {
+        // Não verificar certificados para desenvolvimento
+        rejectUnauthorized: false
+      }
+    })
+  }
+
+  async sendEmail(config: EmailConfig): Promise<boolean> {
+    try {
+      console.log('🔧 [EmailService] Iniciando envio de email...')
+      console.log('📧 [EmailService] Destinatário:', config.to)
+      console.log('📝 [EmailService] Assunto:', config.subject)
+      console.log('🏃 [EmailService] Ambiente:', process.env.NODE_ENV)
+
+      // Verificar configurações SMTP
+      console.log('🔑 [EmailService] SMTP Host:', process.env.SMTP_HOST)
+      console.log('🔑 [EmailService] SMTP Port:', process.env.SMTP_PORT)
+      console.log('🔑 [EmailService] SMTP User configurado:', !!process.env.SMTP_USER)
+      console.log('🔑 [EmailService] SMTP Pass configurado:', !!process.env.SMTP_PASS)
+      console.log('📨 [EmailService] Email remetente:', process.env.EMAIL_FROM)
+
+      if (!process.env.SMTP_HOST) {
+        console.error('❌ [EmailService] SMTP_HOST não configurado!')
+        return false
+      }
+
+      if (!process.env.SMTP_USER) {
+        console.error('❌ [EmailService] SMTP_USER não configurado!')
+        return false
+      }
+
+      if (!process.env.SMTP_PASS) {
+        console.error('❌ [EmailService] SMTP_PASS não configurado!')
+        return false
+      }
+
+      if (!process.env.EMAIL_FROM) {
+        console.error('❌ [EmailService] EMAIL_FROM não configurado!')
+        return false
+      }
+
+      const mailOptions = {
+        from: process.env.EMAIL_FROM,
+        to: config.to,
+        subject: config.subject,
+        html: config.html,
+        text: config.text || this.htmlToText(config.html)
+      }
+
+      console.log('📤 [EmailService] Configurações do email:', {
+        from: mailOptions.from,
+        to: mailOptions.to,
+        subject: mailOptions.subject,
+        hasHtml: !!mailOptions.html,
+        hasText: !!mailOptions.text
+      })
+
+      console.log('🚀 [EmailService] Enviando email via SMTP...')
+      const result = await this.transporter.sendMail(mailOptions)
+
+      console.log('✅ [EmailService] Email enviado com sucesso!')
+      console.log('📋 [EmailService] Message ID:', result.messageId)
+      console.log('📋 [EmailService] Response:', result.response)
+      return true
+    } catch (error) {
+      console.error('❌ [EmailService] Erro ao enviar email:', error)
+      console.error('❌ [EmailService] Tipo do erro:', typeof error)
+      console.error('❌ [EmailService] Stack trace:', error instanceof Error ? error.stack : 'N/A')
+
+      if (error instanceof Error) {
+        console.error('❌ [EmailService] Mensagem do erro:', error.message)
+        console.error('❌ [EmailService] Nome do erro:', error.name)
+      }
+
+      return false
     }
+  }
 
-    async sendEmail(config: EmailConfig): Promise<boolean> {
-        try {
-            const mailOptions = {
-                from: process.env.EMAIL_FROM,
-                to: config.to,
-                subject: config.subject,
-                html: config.html,
-                text: config.text || this.htmlToText(config.html)
-            }
+  private htmlToText(html: string): string {
+    return html.replace(/<[^>]*>/g, '').replace(/\s+/g, ' ').trim()
+  }
 
-            const result = await this.transporter.sendMail(mailOptions)
-            console.log('E-mail enviado com sucesso:', result.messageId)
-            return true
-        } catch (error) {
-            console.error('Erro ao enviar e-mail:', error)
-            return false
-        }
-    }
-
-    private htmlToText(html: string): string {
-        return html.replace(/<[^>]*>/g, '').replace(/\s+/g, ' ').trim()
-    }
-
-    // Templates de e-mail
-    static getWelcomeManagerTemplate(managerName: string, companyName: string, dashboardUrl: string): string {
-        return `
+  // Templates de e-mail
+  static getWelcomeManagerTemplate(managerName: string, companyName: string, dashboardUrl: string): string {
+    return `
       <!DOCTYPE html>
       <html>
       <head>
@@ -100,10 +152,10 @@ export class EmailService {
       </body>
       </html>
     `
-    }
+  }
 
-    static getEmployeeInviteTemplate(employeeName: string, companyName: string, loginUrl: string): string {
-        return `
+  static getEmployeeInviteTemplate(employeeName: string, companyName: string, loginUrl: string): string {
+    return `
       <!DOCTYPE html>
       <html>
       <head>
@@ -157,7 +209,7 @@ export class EmailService {
       </body>
       </html>
     `
-    }
+  }
 }
 
 export default EmailService
