@@ -32,9 +32,34 @@ export async function GET(request: NextRequest) {
             )
         }
 
+        // Para cada funcionário, buscar o progresso de vídeos
+        const employeesWithProgress = await Promise.all(
+            (employees || []).map(async (employee: any) => {
+                // Buscar progresso de vídeos do funcionário
+                const { data: progress, error: progressError } = await supabase
+                    .from('employee_progress')
+                    .select('video_id, completed')
+                    .eq('employee_id', employee.id)
+                    .eq('completed', true)
+
+                if (progressError) {
+                    console.error(`Erro ao buscar progresso do funcionário ${employee.id}:`, progressError)
+                    return {
+                        ...employee,
+                        videosWatched: 0
+                    }
+                }
+
+                return {
+                    ...employee,
+                    videosWatched: progress?.length || 0
+                }
+            })
+        )
+
         return NextResponse.json({
             success: true,
-            employees: employees || []
+            employees: employeesWithProgress
         })
 
     } catch (error) {
@@ -193,10 +218,18 @@ export async function DELETE(request: NextRequest) {
 
         // Excluir funcionário (CASCADE vai excluir progresso automaticamente)
         console.log('🗑️ [API Delete] Executando exclusão...')
-        const { error } = await supabase
+        const { data: deletedData, error, count } = await supabase
             .from('employees')
             .delete()
             .eq('id', employeeId)
+            .select()
+
+        console.log('🔍 [API Delete] Resultado da exclusão:', {
+            error: error,
+            deletedData: deletedData,
+            count: count,
+            employeeId: employeeId
+        })
 
         if (error) {
             console.error('❌ [API Delete] Erro ao excluir funcionário:', error)
@@ -204,6 +237,17 @@ export async function DELETE(request: NextRequest) {
                 { error: 'Erro ao excluir funcionário: ' + error.message },
                 { status: 500 }
             )
+        }
+
+        if (!deletedData || deletedData.length === 0) {
+            console.error('❌ [API Delete] Nenhum registro foi excluído - funcionário pode já ter sido removido')
+            // Se o funcionário não existe mais, consideramos como sucesso
+            // pois o objetivo (não ter o funcionário) foi alcançado
+            return NextResponse.json({
+                success: true,
+                message: 'Funcionário já foi removido anteriormente',
+                alreadyDeleted: true
+            })
         }
 
         console.log('✅ [API Delete] Funcionário excluído com sucesso!')

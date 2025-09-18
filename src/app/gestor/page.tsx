@@ -44,6 +44,8 @@ export default function ManagerDashboard() {
     const [company, setCompany] = useState<Company | null>(null)
     const [manager, setManager] = useState<Manager | null>(null)
     const [loading, setLoading] = useState(true)
+    const [employeesLoading, setEmployeesLoading] = useState(false)
+    const [totalVideos, setTotalVideos] = useState(0)
     const [showAddEmployee, setShowAddEmployee] = useState(false)
     const [showLinkModal, setShowLinkModal] = useState(false)
     const [showLogoutConfirm, setShowLogoutConfirm] = useState(false)
@@ -53,7 +55,8 @@ export default function ManagerDashboard() {
     const [selectedEmployee, setSelectedEmployee] = useState<Employee | null>(null)
     const [newEmployee, setNewEmployee] = useState({
         full_name: '',
-        email: ''
+        email: '',
+        whatsapp: ''
     })
 
     // Verificar autenticação e carregar dados
@@ -79,9 +82,15 @@ export default function ManagerDashboard() {
     }, [isManager, user, authLoading])    // Carregar funcionários quando a empresa for carregada
     useEffect(() => {
         if (company?.id) {
+            console.log('🔄 [UseEffect] Company carregada, chamando loadEmployees automaticamente...')
             loadEmployees()
         }
     }, [company])
+
+    // Carregar total de vídeos uma vez
+    useEffect(() => {
+        loadTotalVideos()
+    }, [])
 
     const loadManagerData = async () => {
         try {
@@ -122,19 +131,75 @@ export default function ManagerDashboard() {
     }
 
     const loadEmployees = async () => {
-        if (!company?.id) return
+        if (!company?.id) {
+            console.log('⚠️ [LoadEmployees] Company ID não disponível')
+            return
+        }
+
+        console.log('🔄 [LoadEmployees] Carregando funcionários da empresa:', company.id)
+        setEmployeesLoading(true)
 
         try {
-            const response = await fetch(`/api/employees?company_id=${company.id}&_t=${Date.now()}`)
+            // Força clear de qualquer cache usando timestamp e random
+            const url = `/api/employees?company_id=${company.id}&_t=${Date.now()}&_r=${Math.random()}`
+            console.log('🌐 [LoadEmployees] Fazendo requisição para:', url)
+
+            const response = await fetch(url, {
+                method: 'GET',
+                headers: {
+                    'Cache-Control': 'no-cache, no-store, must-revalidate',
+                    'Pragma': 'no-cache',
+                    'Expires': '0'
+                }
+            })
             const data = await response.json()
 
+            console.log('📝 [LoadEmployees] Resposta recebida:', {
+                status: response.status,
+                ok: response.ok,
+                employeesCount: data.employees?.length || 0,
+                employees: data.employees?.map((emp: Employee) => ({ id: emp.id, name: emp.name || emp.full_name })) || []
+            })
+
             if (response.ok) {
-                setEmployees(data.employees || [])
+                const newEmployees = data.employees || []
+                console.log('📊 [LoadEmployees] Dados recebidos:', {
+                    previousCount: employees.length,
+                    newCount: newEmployees.length,
+                    newEmployees: newEmployees.map((emp: Employee) => ({ id: emp.id, name: emp.name || emp.full_name }))
+                })
+
+                // Força um delay para garantir que o estado seja limpo
+                setEmployees([])
+                setTimeout(() => {
+                    setEmployees(newEmployees)
+                    console.log('✅ [LoadEmployees] Lista de funcionários atualizada')
+                }, 100)
             } else {
-                console.error('Erro ao carregar funcionários:', data.error)
+                console.error('❌ [LoadEmployees] Erro ao carregar funcionários:', data.error)
             }
         } catch (error) {
-            console.error('Erro ao carregar funcionários:', error)
+            console.error('❌ [LoadEmployees] Erro de rede:', error)
+        } finally {
+            setEmployeesLoading(false)
+        }
+    }
+
+    const loadTotalVideos = async () => {
+        try {
+            const response = await fetch('/api/videos')
+            const data = await response.json()
+
+            if (response.ok && data.videos) {
+                setTotalVideos(data.videos.length)
+                console.log('📺 Total de vídeos carregado:', data.videos.length)
+            } else {
+                console.error('Erro ao carregar vídeos:', data.error)
+                setTotalVideos(10) // Fallback
+            }
+        } catch (error) {
+            console.error('Erro ao carregar total de vídeos:', error)
+            setTotalVideos(10) // Fallback
         }
     }
 
@@ -199,7 +264,7 @@ export default function ManagerDashboard() {
     }
 
     const handleAddEmployee = async () => {
-        if (!newEmployee.full_name || !newEmployee.email) {
+        if (!newEmployee.full_name || !newEmployee.email || !newEmployee.whatsapp) {
             showWarning('Por favor, preencha todos os campos obrigatórios')
             return
         }
@@ -218,7 +283,8 @@ export default function ManagerDashboard() {
                     company_id: company.id,
                     manager_id: manager.id,
                     name: newEmployee.full_name,
-                    email: newEmployee.email
+                    email: newEmployee.email,
+                    whatsapp: newEmployee.whatsapp
                 })
             })
 
@@ -261,7 +327,7 @@ export default function ManagerDashboard() {
             showError('Erro ao adicionar funcionário')
         }
 
-        setNewEmployee({ full_name: '', email: '' })
+        setNewEmployee({ full_name: '', email: '', whatsapp: '' })
         setShowAddEmployee(false)
     }
 
@@ -290,12 +356,17 @@ export default function ManagerDashboard() {
             })
 
             if (response.ok && data.success) {
-                console.log('✅ [Delete] Funcionário removido com sucesso!')
-                showSuccess('Funcionário removido com sucesso!')
-                // Forçar atualização imediata da lista
-                setEmployees(prev => prev.filter(emp => emp.id !== employeeToDelete))
-                // Também recarregar do servidor para garantir
+                if (data.alreadyDeleted) {
+                    console.log('ℹ️ [Delete] Funcionário já havia sido removido anteriormente')
+                    showInfo('Funcionário já foi removido anteriormente')
+                } else {
+                    console.log('✅ [Delete] Funcionário removido com sucesso!')
+                    showSuccess('Funcionário removido com sucesso!')
+                }
+                console.log('🔄 [Delete] Iniciando recarregamento da lista...')
+                // Recarregar lista do servidor para garantir dados atualizados
                 await loadEmployees()
+                console.log('✅ [Delete] Recarregamento concluído!')
             } else {
                 console.error('❌ [Delete] Erro na API:', data)
                 showError('Erro ao remover funcionário: ' + (data.error || 'Erro desconhecido'))
@@ -526,60 +597,61 @@ export default function ManagerDashboard() {
                                 </tr>
                             </thead>
                             <tbody className="bg-white divide-y divide-gray-200">
-                                {employees.map((employee) => (
-                                    <tr key={employee.id}>
-                                        <td className="px-6 py-4 whitespace-nowrap">
-                                            <div className="text-sm font-medium text-gray-900">
-                                                {employee.name}
+                                {employeesLoading ? (
+                                    <tr>
+                                        <td colSpan={6} className="px-6 py-4 text-center">
+                                            <div className="flex items-center justify-center">
+                                                <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-primary-600 mr-2"></div>
+                                                <span className="text-gray-500">Atualizando lista de funcionários...</span>
                                             </div>
-                                        </td>
-                                        <td className="px-6 py-4 whitespace-nowrap">
-                                            <div className="text-sm text-gray-500">
-                                                {employee.email}
-                                            </div>
-                                        </td>
-                                        <td className="px-6 py-4 whitespace-nowrap">
-                                            {getStatusBadge(employee.status || 'invited')}
-                                        </td>
-                                        <td className="px-6 py-4 whitespace-nowrap">
-                                            {getMapStatusBadge(employee.mapStatus || 'not_started')}
-                                        </td>
-                                        <td className="px-6 py-4 whitespace-nowrap">
-                                            <div className="text-sm text-gray-900">
-                                                {employee.videosWatched || 0}/{employee.totalVideos || 6}
-                                            </div>
-                                            <div className="w-16 bg-gray-200 rounded-full h-1.5">
-                                                <div
-                                                    className="bg-primary-600 h-1.5 rounded-full"
-                                                    style={{ width: `${((employee.videosWatched || 0) / (employee.totalVideos || 6)) * 100}%` }}
-                                                ></div>
-                                            </div>
-                                        </td>
-                                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                                            <button
-                                                onClick={() => handleResendInvite(employee.id)}
-                                                className="text-primary-600 hover:text-primary-900 mr-3"
-                                            >
-                                                Reenviar
-                                            </button>
-                                            <button
-                                                onClick={() => generateEmployeeLink(employee)}
-                                                className="text-blue-600 hover:text-blue-900 mr-3"
-                                            >
-                                                Gerar Link
-                                            </button>
-                                            <button
-                                                onClick={() => handleDeleteEmployee(employee.id)}
-                                                className="text-red-600 hover:text-red-900 mr-3"
-                                            >
-                                                Remover
-                                            </button>
-                                            <button className="text-gray-600 hover:text-gray-900">
-                                                Editar
-                                            </button>
                                         </td>
                                     </tr>
-                                ))}
+                                ) : employees.length === 0 ? (
+                                    <tr>
+                                        <td colSpan={6} className="px-6 py-4 text-center text-gray-500">
+                                            Nenhum funcionário cadastrado
+                                        </td>
+                                    </tr>
+                                ) : (
+                                    employees.map((employee) => (
+                                        <tr key={employee.id}>
+                                            <td className="px-6 py-4 whitespace-nowrap">
+                                                <div className="text-sm font-medium text-gray-900">
+                                                    {employee.name}
+                                                </div>
+                                            </td>
+                                            <td className="px-6 py-4 whitespace-nowrap">
+                                                <div className="text-sm text-gray-500">
+                                                    {employee.email}
+                                                </div>
+                                            </td>
+                                            <td className="px-6 py-4 whitespace-nowrap">
+                                                {getStatusBadge(employee.status || 'invited')}
+                                            </td>
+                                            <td className="px-6 py-4 whitespace-nowrap">
+                                                {getMapStatusBadge(employee.mapStatus || 'not_started')}
+                                            </td>
+                                            <td className="px-6 py-4 whitespace-nowrap">
+                                                <div className="text-sm text-gray-900">
+                                                    {employee.videosWatched || 0}/{totalVideos || 10}
+                                                </div>
+                                                <div className="w-16 bg-gray-200 rounded-full h-1.5">
+                                                    <div
+                                                        className="bg-primary-600 h-1.5 rounded-full"
+                                                        style={{ width: `${totalVideos > 0 ? ((employee.videosWatched || 0) / totalVideos) * 100 : 0}%` }}
+                                                    ></div>
+                                                </div>
+                                            </td>
+                                            <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                                <button
+                                                    onClick={() => handleDeleteEmployee(employee.id)}
+                                                    className="text-red-600 hover:text-red-900"
+                                                >
+                                                    Remover
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    )))}
                             </tbody>
                         </table>
                     </div>
@@ -676,6 +748,23 @@ export default function ManagerDashboard() {
                                                 onChange={(e) => setNewEmployee(prev => ({
                                                     ...prev,
                                                     email: e.target.value
+                                                }))}
+                                            />
+                                        </div>
+
+                                        <div>
+                                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                                                WhatsApp *
+                                            </label>
+                                            <input
+                                                type="tel"
+                                                required
+                                                className="input"
+                                                placeholder="(11) 99999-9999"
+                                                value={newEmployee.whatsapp}
+                                                onChange={(e) => setNewEmployee(prev => ({
+                                                    ...prev,
+                                                    whatsapp: e.target.value
                                                 }))}
                                             />
                                         </div>

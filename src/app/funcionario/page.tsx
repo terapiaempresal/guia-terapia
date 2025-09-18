@@ -86,16 +86,26 @@ export default function EmployeeDashboard() {
         try {
             console.log('📊 Buscando progresso do funcionário:', employeeId)
 
-            const response = await fetch(`/api/videos/progress/get?employee_id=${employeeId}`)
-            const data = await response.json()
+            // Buscar progresso do funcionário
+            const progressResponse = await fetch(`/api/videos/progress/get?employee_id=${employeeId}`)
+            const progressData = await progressResponse.json()
 
-            if (data.success) {
+            // Buscar total de vídeos disponíveis
+            const videosResponse = await fetch('/api/videos')
+            const videosData = await videosResponse.json()
+
+            if (progressData.success && videosData.videos) {
                 // Contar vídeos assistidos
-                const progress = data.progress || {}
+                const progress = progressData.progress || {}
                 const videosWatched = Object.values(progress).filter((completed: any) => completed === true).length
-                const totalVideos = Object.keys(progress).length || 15 // fallback para 15 vídeos
+                const totalVideos = videosData.videos.length // Total real de vídeos no banco
 
-                console.log('📈 Progresso carregado:', { videosWatched, totalVideos, progress })
+                console.log('📈 Progresso carregado:', {
+                    videosWatched,
+                    totalVideos,
+                    progress,
+                    totalVideosFromAPI: videosData.videos.length
+                })
 
                 setStats({
                     videosWatched,
@@ -103,11 +113,11 @@ export default function EmployeeDashboard() {
                     mapCompleted: videosWatched >= Math.ceil(totalVideos * 0.8) // Mapa completo com 80% dos vídeos
                 })
             } else {
-                console.warn('⚠️ Não foi possível carregar progresso, usando dados padrão')
+                console.warn('⚠️ Não foi possível carregar dados, usando fallback')
                 // Dados padrão se não conseguir buscar
                 setStats({
                     videosWatched: 0,
-                    totalVideos: 15,
+                    totalVideos: 10, // Fallback para 10 vídeos (valor conhecido)
                     mapCompleted: false
                 })
             }
@@ -120,7 +130,7 @@ export default function EmployeeDashboard() {
             // Dados padrão em caso de erro
             setStats({
                 videosWatched: 0,
-                totalVideos: 15,
+                totalVideos: 10, // Fallback para 10 vídeos (valor conhecido)
                 mapCompleted: false
             })
 
