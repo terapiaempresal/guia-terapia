@@ -3,46 +3,38 @@ import { supabase } from '@/lib/supabase'
 
 export async function POST(request: NextRequest) {
     try {
-        const { video_id, watched } = await request.json()
+        const { video_id, completed, employee_id } = await request.json()
 
-        console.log('Dados recebidos:', { video_id, watched })
+        console.log('📥 Dados recebidos:', { video_id, completed, employee_id })
 
-        // Primeiro, vamos tentar buscar um funcionário existente
-        const { data: employees, error: employeeError } = await supabase
-            .from('employees')
-            .select('id')
-            .limit(1)
-
-        let employee_id = '550e8400-e29b-41d4-a716-446655440000' // fallback
-
-        if (!employeeError && employees && employees.length > 0) {
-            employee_id = employees[0].id
-            console.log('Usando employee_id real:', employee_id)
-        } else {
-            console.log('Nenhum funcionário encontrado, usando mock:', employee_id)
+        if (!employee_id || !video_id) {
+            return NextResponse.json(
+                { error: 'employee_id e video_id são obrigatórios' },
+                { status: 400 }
+            )
         }
 
-        console.log('Tentando inserir no employee_progress:', {
+        console.log('💾 Atualizando progresso:', {
             employee_id,
             video_id,
-            completed: watched
+            completed: !!completed
         })
 
-        // Inserir na tabela employee_progress
+        // Inserir/atualizar na tabela employee_progress
         const { data, error } = await supabase
             .from('employee_progress')
             .upsert({
                 employee_id,
                 video_id,
-                completed: !!watched,
-                completed_at: watched ? new Date().toISOString() : null
+                completed: !!completed,
+                completed_at: completed ? new Date().toISOString() : null
             })
             .select()
 
-        console.log('Resultado do Supabase:', { data, error })
+        console.log('🔄 Resultado do Supabase:', { data, error })
 
         if (error) {
-            console.error('Erro específico do Supabase:', error)
+            console.error('❌ Erro específico do Supabase:', error)
             return NextResponse.json(
                 { error: `Erro no banco de dados: ${error.message}`, details: error },
                 { status: 500 }

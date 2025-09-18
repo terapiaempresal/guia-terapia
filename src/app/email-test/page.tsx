@@ -1,15 +1,17 @@
 'use client'
 
 import { useState } from 'react'
+import { useToast } from '@/components/ToastProvider'
 
 export default function EmailTestPage() {
+    const { showSuccess, showError, showWarning } = useToast()
     const [email, setEmail] = useState('')
     const [loading, setLoading] = useState(false)
     const [result, setResult] = useState<string | null>(null)
 
     const testEmail = async () => {
         if (!email) {
-            alert('Por favor, insira um e-mail')
+            showWarning('Por favor, insira um e-mail')
             return
         }
 
@@ -43,7 +45,7 @@ export default function EmailTestPage() {
 
     const testManagerEmail = async () => {
         if (!email) {
-            alert('Por favor, insira um e-mail')
+            showWarning('Por favor, insira um e-mail')
             return
         }
 
@@ -80,7 +82,7 @@ export default function EmailTestPage() {
 
     const testEmployeeEmail = async () => {
         if (!email) {
-            alert('Por favor, insira um e-mail')
+            showWarning('Por favor, insira um e-mail')
             return
         }
 
@@ -165,8 +167,8 @@ export default function EmailTestPage() {
 
                     {result && (
                         <div className={`mt-6 p-4 rounded-lg ${result.includes('✅')
-                                ? 'bg-success-50 text-success-800 border border-success-200'
-                                : 'bg-error-50 text-error-800 border border-error-200'
+                            ? 'bg-success-50 text-success-800 border border-success-200'
+                            : 'bg-error-50 text-error-800 border border-error-200'
                             }`}>
                             {result}
                         </div>

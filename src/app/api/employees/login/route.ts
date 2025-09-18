@@ -4,11 +4,11 @@ import { supabase } from '@/lib/supabase'
 export async function POST(request: NextRequest) {
     try {
         const body = await request.json()
-        const { cpf } = body
+        const { cpf, birthDate } = body
 
-        if (!cpf) {
+        if (!cpf || !birthDate) {
             return NextResponse.json(
-                { error: 'CPF é obrigatório' },
+                { error: 'CPF e data de nascimento são obrigatórios' },
                 { status: 400 }
             )
         }
@@ -39,6 +39,14 @@ export async function POST(request: NextRequest) {
             return NextResponse.json(
                 { error: 'CPF não encontrado. Verifique se você está cadastrado.' },
                 { status: 404 }
+            )
+        }
+
+        // Validar data de nascimento
+        if (employee.birth_date !== birthDate) {
+            return NextResponse.json(
+                { error: 'Data de nascimento incorreta. Verifique e tente novamente.' },
+                { status: 401 }
             )
         }
 

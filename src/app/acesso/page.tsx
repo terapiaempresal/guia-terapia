@@ -3,13 +3,17 @@
 import { useState, useEffect, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { cpfValidator, formatCPF } from '@/lib/utils'
+import { useToast } from '@/components/ToastProvider'
+import ConfirmModal from '@/components/ConfirmModal'
 
 function EmployeeFirstAccessContent() {
     const router = useRouter()
     const searchParams = useSearchParams()
+    const { showSuccess, showError, showWarning } = useToast()
     const [loading, setLoading] = useState(false)
     const [tokenValid, setTokenValid] = useState(false)
     const [tokenData, setTokenData] = useState<any>(null)
+    const [showLogoutConfirm, setShowLogoutConfirm] = useState(false)
 
     const [formData, setFormData] = useState({
         full_name: '',
@@ -22,7 +26,7 @@ function EmployeeFirstAccessContent() {
     useEffect(() => {
         const token = searchParams.get('token')
         if (!token) {
-            alert('Token de acesso não fornecido')
+            showError('Token de acesso não fornecido')
             router.push('/')
             return
         }
@@ -50,12 +54,12 @@ function EmployeeFirstAccessContent() {
                     setFormData(prev => ({ ...prev, email: data.data.email || '' }))
                 }
             } else {
-                alert('Token de acesso inválido ou expirado')
+                showError('Token de acesso inválido ou expirado')
                 router.push('/')
             }
         } catch (error) {
             console.error('Erro ao validar token:', error)
-            alert('Erro ao validar acesso')
+            showError('Erro ao validar acesso')
             router.push('/')
         }
     }
@@ -66,13 +70,13 @@ function EmployeeFirstAccessContent() {
 
         // Validações
         if (!formData.full_name || !formData.cpf || !formData.birth_date || !formData.email) {
-            alert('Por favor, preencha todos os campos obrigatórios')
+            showWarning('Por favor, preencha todos os campos obrigatórios')
             setLoading(false)
             return
         }
 
         if (!cpfValidator(formData.cpf)) {
-            alert('CPF inválido')
+            showError('CPF inválido')
             setLoading(false)
             return
         }
@@ -81,10 +85,10 @@ function EmployeeFirstAccessContent() {
             // Simular criação de conta e vinculação
             await new Promise(resolve => setTimeout(resolve, 1500))
 
-            alert('✅ Perfil criado com sucesso! Redirecionando para sua área...')
+            showSuccess('Perfil criado com sucesso! Redirecionando para sua área...')
             router.push('/funcionario')
         } catch (error) {
-            alert('Erro ao criar perfil')
+            showError('Erro ao criar perfil')
         } finally {
             setLoading(false)
         }
@@ -114,11 +118,7 @@ function EmployeeFirstAccessContent() {
                 {/* Botão Sair */}
                 <div className="flex justify-end mb-4">
                     <button
-                        onClick={() => {
-                            if (confirm('Tem certeza que deseja sair?')) {
-                                window.location.href = '/'
-                            }
-                        }}
+                        onClick={() => setShowLogoutConfirm(true)}
                         className="flex items-center px-3 py-2 text-gray-600 hover:text-gray-900 hover:bg-white rounded-lg transition-colors"
                         title="Sair"
                     >
@@ -235,6 +235,21 @@ function EmployeeFirstAccessContent() {
                     </ul>
                 </div>
             </div>
+
+            {/* Modal de Confirmação de Logout */}
+            <ConfirmModal
+                isOpen={showLogoutConfirm}
+                title="Confirmar Saída"
+                message="Tem certeza que deseja sair do cadastro? Seus dados não salvos serão perdidos."
+                confirmText="Sair"
+                cancelText="Continuar"
+                type="warning"
+                onConfirm={() => {
+                    setShowLogoutConfirm(false)
+                    window.location.href = '/'
+                }}
+                onCancel={() => setShowLogoutConfirm(false)}
+            />
         </div>
     )
 }

@@ -2,6 +2,8 @@
 
 import { useState, useEffect } from 'react'
 import { useAuth } from '@/lib/auth'
+import { useToast } from '@/components/ToastProvider'
+import ConfirmModal from '@/components/ConfirmModal'
 
 interface Employee {
     id: string
@@ -37,12 +39,16 @@ interface Manager {
 
 export default function ManagerDashboard() {
     const { user, logout, isManager, loading: authLoading } = useAuth()
+    const { showSuccess, showError, showWarning, showInfo } = useToast()
     const [employees, setEmployees] = useState<Employee[]>([])
     const [company, setCompany] = useState<Company | null>(null)
     const [manager, setManager] = useState<Manager | null>(null)
     const [loading, setLoading] = useState(true)
     const [showAddEmployee, setShowAddEmployee] = useState(false)
     const [showLinkModal, setShowLinkModal] = useState(false)
+    const [showLogoutConfirm, setShowLogoutConfirm] = useState(false)
+    const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
+    const [employeeToDelete, setEmployeeToDelete] = useState<string | null>(null)
     const [generatedLink, setGeneratedLink] = useState('')
     const [selectedEmployee, setSelectedEmployee] = useState<Employee | null>(null)
     const [newEmployee, setNewEmployee] = useState({
@@ -87,7 +93,7 @@ export default function ManagerDashboard() {
 
             if (!managerEmail) {
                 console.log('❌ Email não encontrado no sessionStorage')
-                alert('Sessão expirada. Faça login novamente.')
+                showError('Sessão expirada. Faça login novamente.')
                 window.location.href = '/'
                 return
             }
@@ -105,7 +111,7 @@ export default function ManagerDashboard() {
                 setCompany(data.company)
             } else {
                 console.error('❌ Erro ao carregar dados:', data.error)
-                alert('Erro ao carregar dados do gestor')
+                showError('Erro ao carregar dados do gestor')
             }
         } catch (error) {
             console.error('❌ Erro ao carregar gestor:', error)
@@ -119,7 +125,7 @@ export default function ManagerDashboard() {
         if (!company?.id) return
 
         try {
-            const response = await fetch(`/api/employees?company_id=${company.id}`)
+            const response = await fetch(`/api/employees?company_id=${company.id}&_t=${Date.now()}`)
             const data = await response.json()
 
             if (response.ok) {
@@ -194,12 +200,12 @@ export default function ManagerDashboard() {
 
     const handleAddEmployee = async () => {
         if (!newEmployee.full_name || !newEmployee.email) {
-            alert('Por favor, preencha todos os campos obrigatórios')
+            showWarning('Por favor, preencha todos os campos obrigatórios')
             return
         }
 
         if (!company?.id || !manager?.id) {
-            alert('Dados da empresa não carregados')
+            showError('Dados da empresa não carregados')
             return
         }
 
@@ -238,21 +244,21 @@ export default function ManagerDashboard() {
                     const inviteData = await inviteResponse.json()
 
                     if (inviteResponse.ok) {
-                        alert('✅ Funcionário adicionado e convite enviado com sucesso!')
+                        showSuccess('Funcionário adicionado e convite enviado com sucesso!')
                         console.log('Link de acesso (dev):', inviteData.loginUrl)
                     } else {
-                        alert('Funcionário adicionado, mas falha ao enviar convite: ' + (inviteData.error || 'Erro desconhecido'))
+                        showWarning('Funcionário adicionado, mas falha ao enviar convite: ' + (inviteData.error || 'Erro desconhecido'))
                     }
                 } catch (emailError) {
                     console.error('Erro ao enviar convite:', emailError)
-                    alert('Funcionário adicionado, mas erro ao enviar convite. Verifique se o serviço de e-mail está configurado.')
+                    showWarning('Funcionário adicionado, mas erro ao enviar convite. Verifique se o serviço de e-mail está configurado.')
                 }
             } else {
-                alert('Erro ao adicionar funcionário: ' + (data.error || 'Erro desconhecido'))
+                showError('Erro ao adicionar funcionário: ' + (data.error || 'Erro desconhecido'))
             }
         } catch (error) {
             console.error('Erro ao adicionar funcionário:', error)
-            alert('Erro ao adicionar funcionário')
+            showError('Erro ao adicionar funcionário')
         }
 
         setNewEmployee({ full_name: '', email: '' })
@@ -260,33 +266,46 @@ export default function ManagerDashboard() {
     }
 
     const handleDeleteEmployee = async (employeeId: string) => {
-        if (!confirm('Tem certeza que deseja remover este funcionário?')) {
-            return
-        }
+        setEmployeeToDelete(employeeId)
+        setShowDeleteConfirm(true)
+    }
 
-        console.log('🗑️ [Delete] Iniciando exclusão do funcionário:', employeeId)
+    const confirmDeleteEmployee = async () => {
+        if (!employeeToDelete) return
+
+        console.log('🗑️ [Delete] Iniciando exclusão do funcionário:', employeeToDelete)
 
         try {
-            const response = await fetch(`/api/employees?employee_id=${employeeId}`, {
+            const response = await fetch(`/api/employees?employee_id=${employeeToDelete}`, {
                 method: 'DELETE',
                 headers: { 'Content-Type': 'application/json' }
             })
 
             const data = await response.json()
 
-            console.log('🗑️ [Delete] Resposta da API:', { status: response.status, data })
+            console.log('🗑️ [Delete] Resposta da API:', {
+                status: response.status,
+                ok: response.ok,
+                data: data
+            })
 
-            if (response.ok) {
+            if (response.ok && data.success) {
                 console.log('✅ [Delete] Funcionário removido com sucesso!')
-                alert('Funcionário removido com sucesso!')
-                await loadEmployees() // Recarregar lista
+                showSuccess('Funcionário removido com sucesso!')
+                // Forçar atualização imediata da lista
+                setEmployees(prev => prev.filter(emp => emp.id !== employeeToDelete))
+                // Também recarregar do servidor para garantir
+                await loadEmployees()
             } else {
                 console.error('❌ [Delete] Erro na API:', data)
-                alert('Erro ao remover funcionário: ' + (data.error || 'Erro desconhecido'))
+                showError('Erro ao remover funcionário: ' + (data.error || 'Erro desconhecido'))
             }
         } catch (error) {
             console.error('❌ [Delete] Erro de rede:', error)
-            alert('Erro ao remover funcionário: Problema de conexão')
+            showError('Erro ao remover funcionário: Problema de conexão')
+        } finally {
+            setShowDeleteConfirm(false)
+            setEmployeeToDelete(null)
         }
     }
 
@@ -310,18 +329,18 @@ export default function ManagerDashboard() {
                 setSelectedEmployee(employee)
                 setShowLinkModal(true)
             } else {
-                alert(data.error || 'Erro ao gerar link')
+                showError(data.error || 'Erro ao gerar link')
             }
         } catch (error) {
             console.error('Erro ao gerar link:', error)
-            alert('Erro ao gerar link de acesso.')
+            showError('Erro ao gerar link de acesso.')
         }
     }
 
     const copyToClipboard = async (text: string) => {
         try {
             await navigator.clipboard.writeText(text)
-            alert('✅ Link copiado para a área de transferência!')
+            showSuccess('Link copiado para a área de transferência!')
         } catch (error) {
             // Fallback para navegadores que não suportam clipboard API
             const textArea = document.createElement('textarea')
@@ -330,7 +349,7 @@ export default function ManagerDashboard() {
             textArea.select()
             document.execCommand('copy')
             document.body.removeChild(textArea)
-            alert('✅ Link copiado para a área de transferência!')
+            showSuccess('Link copiado para a área de transferência!')
         }
     }
 
@@ -353,14 +372,14 @@ export default function ManagerDashboard() {
             const data = await response.json()
 
             if (response.ok) {
-                alert('✅ Convite enviado com sucesso!')
+                showSuccess('Convite enviado com sucesso!')
                 console.log('Link de acesso (dev):', data.loginUrl)
             } else {
-                alert(data.error || 'Erro ao enviar convite')
+                showError(data.error || 'Erro ao enviar convite')
             }
         } catch (error) {
             console.error('Erro ao enviar convite:', error)
-            alert('Erro ao enviar convite. Verifique se o serviço de e-mail está configurado.')
+            showError('Erro ao enviar convite. Verifique se o serviço de e-mail está configurado.')
         }
     }
 
@@ -388,11 +407,7 @@ export default function ManagerDashboard() {
                             </button>
 
                             <button
-                                onClick={() => {
-                                    if (confirm('Tem certeza que deseja sair?')) {
-                                        window.location.href = '/'
-                                    }
-                                }}
+                                onClick={() => setShowLogoutConfirm(true)}
                                 className="flex items-center px-4 py-2 text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded-lg transition-colors"
                                 title="Sair"
                             >
@@ -592,7 +607,7 @@ export default function ManagerDashboard() {
                                 {/* Opção 1: Link genérico da empresa */}
                                 <div className="bg-blue-50 p-4 rounded-lg">
                                     <h4 className="text-sm font-medium text-blue-900 mb-2">
-                                        💡 Opção 1: Link de convite genérico
+                                        💡 Opção 1: Link de convite
                                     </h4>
                                     <p className="text-xs text-blue-700 mb-3">
                                         Compartilhe este link para que funcionários façam seu próprio cadastro
@@ -607,7 +622,7 @@ export default function ManagerDashboard() {
                                         <button
                                             onClick={() => {
                                                 navigator.clipboard.writeText(`${window.location.origin}/cadastro-funcionario?empresa=${company?.id}`)
-                                                alert('Link copiado!')
+                                                showSuccess('Link copiado!')
                                             }}
                                             className="bg-blue-600 text-white px-3 py-2 rounded-md hover:bg-blue-700 text-xs"
                                         >
@@ -753,6 +768,38 @@ export default function ManagerDashboard() {
                     </div>
                 )}
             </div>
+
+            {/* Modal de Confirmação de Logout */}
+            <ConfirmModal
+                isOpen={showLogoutConfirm}
+                title="Confirmar Saída"
+                message="Tem certeza que deseja sair do painel de gestão?"
+                confirmText="Sair"
+                cancelText="Cancelar"
+                type="warning"
+                onConfirm={() => {
+                    setShowLogoutConfirm(false)
+                    window.location.href = '/'
+                }}
+                onCancel={() => setShowLogoutConfirm(false)}
+            />
+
+            {/* Modal de Confirmação de Exclusão */}
+            <ConfirmModal
+                isOpen={showDeleteConfirm}
+                title="Remover Funcionário"
+                message="Tem certeza que deseja remover este funcionário? Esta ação não pode ser desfeita."
+                confirmText="Remover"
+                cancelText="Cancelar"
+                type="danger"
+                onConfirm={() => {
+                    confirmDeleteEmployee()
+                }}
+                onCancel={() => {
+                    setShowDeleteConfirm(false)
+                    setEmployeeToDelete(null)
+                }}
+            />
         </div>
     )
 }

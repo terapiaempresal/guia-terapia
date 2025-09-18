@@ -2,10 +2,12 @@
 
 import { useState, useEffect, Suspense } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
+import { useToast } from '@/components/ToastProvider'
 
 function CadastroFuncionarioContent() {
     const searchParams = useSearchParams()
     const router = useRouter()
+    const { showSuccess, showError, showWarning } = useToast()
     const empresaId = searchParams.get('empresa')
 
     console.log('Página carregada - empresaId:', empresaId)
@@ -53,19 +55,19 @@ function CadastroFuncionarioContent() {
 
         // Validação básica antes de enviar
         if (!formData.full_name) {
-            alert('Nome completo é obrigatório')
+            showWarning('Nome completo é obrigatório')
             setLoading(false)
             return
         }
 
         if (!formData.email) {
-            alert('E-mail é obrigatório')
+            showWarning('E-mail é obrigatório')
             setLoading(false)
             return
         }
 
         if (!empresaId) {
-            alert('ID da empresa não encontrado no link')
+            showError('ID da empresa não encontrado no link')
             setLoading(false)
             return
         }
@@ -95,15 +97,15 @@ function CadastroFuncionarioContent() {
             console.log('Data:', data)
 
             if (data.success) {
-                alert('Cadastro realizado com sucesso! Bem-vindo à equipe!')
+                showSuccess('Cadastro realizado com sucesso! Bem-vindo à equipe!')
                 router.push('/funcionario/videos')
             } else {
-                alert(data.error || 'Erro ao realizar cadastro')
+                showError(data.error || 'Erro ao realizar cadastro')
             }
         } catch (error) {
             console.error('=== ERRO DE REDE ===')
             console.error('Erro:', error)
-            alert('Erro ao conectar com o servidor')
+            showError('Erro ao conectar com o servidor')
         } finally {
             setLoading(false)
         }

@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { getFeatureFlags } from '@/lib/feature-flags'
 import { isUsingMockDB } from '@/lib/supabase'
+import { useToast } from '@/components/ToastProvider'
 
 interface CheckoutFormData {
     nomeEmpresa: string
@@ -18,6 +19,7 @@ interface LiderFormData {
 }
 
 export default function CheckoutPage() {
+    const { showSuccess, showError, showWarning } = useToast()
     const [activeTab, setActiveTab] = useState<'equipe' | 'lider'>('equipe')
     const [loading, setLoading] = useState(false)
     const [equipeForm, setEquipeForm] = useState<CheckoutFormData>({
@@ -94,7 +96,7 @@ export default function CheckoutPage() {
 
                 // Simular processamento
                 setTimeout(() => {
-                    alert('✅ Pagamento simulado com sucesso! Redirecionando...')
+                    showSuccess('Pagamento simulado com sucesso! Redirecionando...')
                     window.location.href = '/checkout/sucesso?simulation=true'
                 }, 1500)
                 return
@@ -109,10 +111,10 @@ export default function CheckoutPage() {
             if (response.ok) {
                 window.location.href = data.checkoutUrl
             } else {
-                alert(data.error || 'Erro ao processar pagamento')
+                showError(data.error || 'Erro ao processar pagamento')
             }
         } catch (error) {
-            alert('Erro ao processar solicitação')
+            showError('Erro ao processar solicitação')
         } finally {
             setLoading(false)
         }
@@ -122,7 +124,7 @@ export default function CheckoutPage() {
         e.preventDefault()
 
         if (!liderForm.nome || !liderForm.email) {
-            alert('Por favor, preencha todos os campos')
+            showWarning('Por favor, preencha todos os campos')
             return
         }
 
@@ -317,48 +319,35 @@ export default function CheckoutPage() {
                 {/* Jornada do Líder */}
                 {activeTab === 'lider' && (
                     <div className="max-w-2xl mx-auto">
-                        <div className="card">
+                        <div className="card text-center">
                             <h2 className="text-2xl font-bold text-gray-900 mb-6">
                                 Jornada do Líder
                             </h2>
 
-                            <form onSubmit={handleLiderSubmit} className="space-y-6">
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                                        Nome Completo
-                                    </label>
-                                    <input
-                                        type="text"
-                                        required
-                                        className="input"
-                                        value={liderForm.nome}
-                                        onChange={(e) => setLiderForm(prev => ({
-                                            ...prev,
-                                            nome: e.target.value
-                                        }))}
-                                    />
+                            <div className="mb-8">
+                                <div className="text-6xl mb-4">🚀</div>
+                                <p className="text-lg text-gray-600 mb-6">
+                                    Para líderes que querem se desenvolver individualmente com conteúdo exclusivo e mentorias personalizadas.
+                                </p>
+                                <div className="bg-green-50 border border-green-200 rounded-lg p-6 mb-6">
+                                    <p className="text-green-800 font-medium">
+                                        🎯 Processo de compra rápido e seguro através da plataforma Hotmart
+                                    </p>
                                 </div>
+                            </div>
 
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                                        E-mail
-                                    </label>
-                                    <input
-                                        type="email"
-                                        required
-                                        className="input"
-                                        value={liderForm.email}
-                                        onChange={(e) => setLiderForm(prev => ({
-                                            ...prev,
-                                            email: e.target.value
-                                        }))}
-                                    />
-                                </div>
+                            <a
+                                href="https://pay.hotmart.com/T101934320V"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="inline-block bg-green-600 hover:bg-green-700 text-white font-bold py-4 px-8 rounded-lg transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl text-lg"
+                            >
+                                💳 Finalizar Compra - Jornada do Líder
+                            </a>
 
-                                <button type="submit" className="btn-primary w-full">
-                                    Ir para Hotmart
-                                </button>
-                            </form>
+                            <p className="text-sm text-gray-500 mt-4">
+                                Você será redirecionado para a plataforma segura do Hotmart
+                            </p>
                         </div>
                     </div>
                 )}

@@ -3,16 +3,19 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
+import { useToast } from '@/components/ToastProvider'
 
 export default function LoginPage() {
     const router = useRouter()
+    const { showSuccess, showError, showWarning } = useToast()
     const [loading, setLoading] = useState(false)
     const [showPassword, setShowPassword] = useState(false)
     const [loginType, setLoginType] = useState<'gestor' | 'funcionario'>('gestor')
     const [formData, setFormData] = useState({
         email: '',
         password: '',
-        cpf: ''
+        cpf: '',
+        birthDate: ''
     })
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -27,7 +30,7 @@ export default function LoginPage() {
             }
         } catch (error) {
             console.error('Erro no login:', error)
-            alert('Erro ao fazer login. Tente novamente.')
+            showError('Erro ao fazer login. Tente novamente.')
         } finally {
             setLoading(false)
         }
@@ -77,17 +80,22 @@ export default function LoginPage() {
                 }
             } else {
                 console.log('❌ Erro no login:', data.error)
-                alert(data.error || 'Erro ao fazer login')
+                showError(data.error || 'Erro ao fazer login')
             }
         } catch (error) {
             console.error('Erro no login:', error)
-            alert('Erro ao conectar com o servidor')
+            showError('Erro ao conectar com o servidor')
         }
     }
 
     const handleEmployeeLogin = async () => {
         if (!formData.cpf) {
-            alert('Por favor, digite seu CPF')
+            showWarning('Por favor, digite seu CPF')
+            return
+        }
+
+        if (loginType === 'funcionario' && !formData.birthDate) {
+            showWarning('Por favor, digite sua data de nascimento')
             return
         }
 
@@ -96,7 +104,8 @@ export default function LoginPage() {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
-                    cpf: formData.cpf
+                    cpf: formData.cpf,
+                    birthDate: formData.birthDate
                 })
             })
 
@@ -111,14 +120,14 @@ export default function LoginPage() {
                 localStorage.setItem('companyId', data.employee.company_id)
                 localStorage.setItem('companyName', data.employee.company?.name || '')
 
-                alert(`Bem-vindo, ${data.employee.full_name || data.employee.name}!`)
-                router.push('/funcionario/videos')
+                showSuccess(`Bem-vindo, ${data.employee.full_name || data.employee.name}!`)
+                router.push('/funcionario') // Redirecionar para home do funcionário
             } else {
-                alert(data.error || 'CPF não encontrado. Verifique se você está cadastrado.')
+                showError(data.error || 'CPF ou data de nascimento incorretos. Verifique os dados.')
             }
         } catch (error) {
             console.error('Erro ao verificar CPF:', error)
-            alert('Erro ao verificar CPF. Tente novamente.')
+            showError('Erro ao verificar CPF. Tente novamente.')
         }
     }
 
@@ -240,25 +249,45 @@ export default function LoginPage() {
                                 </div>
                             </>
                         ) : (
-                            <div>
-                                <label htmlFor="cpf" className="block text-sm font-medium text-gray-700 mb-1">
-                                    CPF
-                                </label>
-                                <input
-                                    type="text"
-                                    id="cpf"
-                                    name="cpf"
-                                    value={formData.cpf}
-                                    onChange={handleInputChange}
-                                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                                    placeholder="000.000.000-00"
-                                    maxLength={14}
-                                    required
-                                />
-                                <p className="text-xs text-gray-500 mt-1">
-                                    Use o CPF cadastrado pela sua empresa
-                                </p>
-                            </div>
+                            <>
+                                <div>
+                                    <label htmlFor="cpf" className="block text-sm font-medium text-gray-700 mb-1">
+                                        CPF
+                                    </label>
+                                    <input
+                                        type="text"
+                                        id="cpf"
+                                        name="cpf"
+                                        value={formData.cpf}
+                                        onChange={handleInputChange}
+                                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                                        placeholder="000.000.000-00"
+                                        maxLength={14}
+                                        required
+                                    />
+                                    <p className="text-xs text-gray-500 mt-1">
+                                        Use o CPF cadastrado pela sua empresa
+                                    </p>
+                                </div>
+
+                                <div>
+                                    <label htmlFor="birthDate" className="block text-sm font-medium text-gray-700 mb-1">
+                                        Data de Nascimento
+                                    </label>
+                                    <input
+                                        type="date"
+                                        id="birthDate"
+                                        name="birthDate"
+                                        value={formData.birthDate}
+                                        onChange={handleInputChange}
+                                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                                        required
+                                    />
+                                    <p className="text-xs text-gray-500 mt-1">
+                                        Use sua data de nascimento como senha de segurança
+                                    </p>
+                                </div>
+                            </>
                         )}
 
                         <button
