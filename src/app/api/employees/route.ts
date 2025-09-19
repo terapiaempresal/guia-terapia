@@ -216,25 +216,23 @@ export async function DELETE(request: NextRequest) {
 
         console.log('✅ [API Delete] Funcionário encontrado:', employee.name || employee.full_name)
 
-        // Excluir funcionário (CASCADE vai excluir progresso automaticamente)
-        console.log('🗑️ [API Delete] Executando exclusão...')
-        const { data: deletedData, error, count } = await supabase
+        // Delete the employee
+        const { data: deletedData, error: deleteError } = await supabase
             .from('employees')
             .delete()
             .eq('id', employeeId)
-            .select()
+            .select();
 
         console.log('🔍 [API Delete] Resultado da exclusão:', {
-            error: error,
+            error: deleteError,
             deletedData: deletedData,
-            count: count,
             employeeId: employeeId
         })
 
-        if (error) {
-            console.error('❌ [API Delete] Erro ao excluir funcionário:', error)
+        if (deleteError) {
+            console.error('❌ [API Delete] Erro ao excluir funcionário:', deleteError)
             return NextResponse.json(
-                { error: 'Erro ao excluir funcionário: ' + error.message },
+                { error: 'Erro ao excluir funcionário: ' + deleteError.message },
                 { status: 500 }
             )
         }

@@ -264,8 +264,27 @@ export default function ManagerDashboard() {
     }
 
     const handleAddEmployee = async () => {
-        if (!newEmployee.full_name || !newEmployee.email || !newEmployee.whatsapp) {
-            showWarning('Por favor, preencha todos os campos obrigatórios')
+        // Validação mais rigorosa dos campos obrigatórios
+        const fullName = newEmployee.full_name.trim()
+        const email = newEmployee.email.trim()
+        const whatsapp = newEmployee.whatsapp.trim()
+
+        if (!fullName || !email || !whatsapp) {
+            showWarning('Por favor, preencha todos os campos obrigatórios (Nome Completo, E-mail e WhatsApp)')
+            return
+        }
+
+        // Validação básica do formato do e-mail
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+        if (!emailRegex.test(email)) {
+            showWarning('Por favor, digite um e-mail válido')
+            return
+        }
+
+        // Validação básica do WhatsApp (deve ter pelo menos 10 dígitos)
+        const whatsappNumbers = whatsapp.replace(/\D/g, '')
+        if (whatsappNumbers.length < 10) {
+            showWarning('Por favor, digite um número de WhatsApp válido')
             return
         }
 
@@ -282,9 +301,9 @@ export default function ManagerDashboard() {
                 body: JSON.stringify({
                     company_id: company.id,
                     manager_id: manager.id,
-                    name: newEmployee.full_name,
-                    email: newEmployee.email,
-                    whatsapp: newEmployee.whatsapp
+                    name: fullName,
+                    email: email,
+                    whatsapp: whatsapp
                 })
             })
 
@@ -300,8 +319,8 @@ export default function ManagerDashboard() {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({
-                            employeeName: newEmployee.full_name,
-                            employeeEmail: newEmployee.email,
+                            employeeName: fullName,
+                            employeeEmail: email,
                             companyName: company.name,
                             companyId: company.id
                         })
@@ -363,10 +382,27 @@ export default function ManagerDashboard() {
                     console.log('✅ [Delete] Funcionário removido com sucesso!')
                     showSuccess('Funcionário removido com sucesso!')
                 }
-                console.log('🔄 [Delete] Iniciando recarregamento da lista...')
-                // Recarregar lista do servidor para garantir dados atualizados
-                await loadEmployees()
-                console.log('✅ [Delete] Recarregamento concluído!')
+
+                console.log('🔄 [Delete] Forçando limpeza da interface...')
+
+                // Força remover da interface imediatamente
+                setEmployees(prev => {
+                    const filtered = prev.filter(emp => emp.id !== employeeToDelete)
+                    console.log('🧹 [Delete] Removido da interface local:', {
+                        original: prev.length,
+                        filtered: filtered.length,
+                        removedId: employeeToDelete
+                    })
+                    return filtered
+                })
+
+                // Aguardar um pouco e recarregar do servidor para confirmar
+                setTimeout(async () => {
+                    console.log('🔄 [Delete] Recarregando do servidor para confirmar...')
+                    await loadEmployees()
+                    console.log('✅ [Delete] Sincronização com servidor concluída!')
+                }, 500)
+
             } else {
                 console.error('❌ [Delete] Erro na API:', data)
                 showError('Erro ao remover funcionário: ' + (data.error || 'Erro desconhecido'))
@@ -470,12 +506,30 @@ export default function ManagerDashboard() {
                         </div>
 
                         <div className="flex items-center space-x-4">
-                            <button
-                                onClick={() => setShowAddEmployee(true)}
-                                className="btn-primary"
-                            >
-                                Adicionar Funcionário
-                            </button>
+                            <div className="flex space-x-3">
+                                <button
+                                    onClick={() => setShowAddEmployee(true)}
+                                    className="btn-primary"
+                                >
+                                    Adicionar Funcionário
+                                </button>
+
+                                <button
+                                    onClick={loadEmployees}
+                                    className="flex items-center px-4 py-2 bg-gray-100 text-gray-700 hover:bg-gray-200 rounded-lg transition-colors"
+                                    title="Atualizar lista de funcionários"
+                                    disabled={employeesLoading}
+                                >
+                                    {employeesLoading ? (
+                                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-gray-700 mr-2"></div>
+                                    ) : (
+                                        <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                                        </svg>
+                                    )}
+                                    Atualizar Lista
+                                </button>
+                            </div>
 
                             <button
                                 onClick={() => setShowLogoutConfirm(true)}
