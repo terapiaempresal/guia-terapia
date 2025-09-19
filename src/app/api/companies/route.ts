@@ -142,10 +142,30 @@ export async function GET(request: NextRequest) {
             )
         }
 
+        // Buscar dados do pedido mais recente para obter employee_count
+        const { data: order, error: orderError } = await supabase
+            .from('orders')
+            .select('employee_count, amount, status')
+            .eq('company_id', manager.company_id)
+            .order('created_at', { ascending: false })
+            .limit(1)
+            .single()
+
+        if (orderError && orderError.code !== 'PGRST116') { // PGRST116 = no rows returned
+            console.error('Erro ao buscar pedido:', orderError)
+        }
+
+        // Adicionar employee_count à empresa
+        const companyWithQuota = {
+            ...manager.company,
+            quota: order?.employee_count || 50 // fallback para 50 se não encontrar pedido
+        }
+
         return NextResponse.json({
             success: true,
             manager,
-            company: manager.company
+            company: companyWithQuota,
+            order: order || null
         })
 
     } catch (error) {

@@ -205,7 +205,7 @@ export default function ManagerDashboard() {
 
     // Dados calculados
     const activeEmployees = employees.filter(e => e.accepted_at).length
-    const quota = 10 // Por enquanto fixo, pode vir do plano/pedido depois
+    const quota = company?.quota || 50 // Agora vem dinamicamente da API, baseado na tabela orders
     const completedMaps = employees.filter(e => e.mapStatus === 'done').length
     const completionRate = activeEmployees > 0 ? Math.round((completedMaps / activeEmployees) * 100) : 0
 
@@ -557,9 +557,9 @@ export default function ManagerDashboard() {
                                 </svg>
                             </div>
                             <div className="ml-4">
-                                <h3 className="text-sm font-medium text-gray-500">Funcionários Ativos</h3>
+                                <h3 className="text-sm font-medium text-gray-500">Funcionários Totais</h3>
                                 <div className="text-2xl font-bold text-gray-900">
-                                    {employees.length}/{company?.quota || 50}
+                                    {employees.length}/{quota}
                                 </div>
                             </div>
                         </div>
