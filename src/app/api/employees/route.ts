@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { supabase } from '@/lib/supabase'
+import { supabase, supabaseAdmin } from '@/lib/supabase'
 
 // GET - Listar funcionários de uma empresa
 export async function GET(request: NextRequest) {
@@ -192,7 +192,7 @@ export async function DELETE(request: NextRequest) {
 
         // Verificar se funcionário existe
         console.log('🔍 [API Delete] Verificando se funcionário existe...')
-        const { data: employee, error: fetchError } = await supabase
+        const { data: employee, error: fetchError } = await supabaseAdmin
             .from('employees')
             .select('id, name, full_name')
             .eq('id', employeeId)
@@ -217,7 +217,7 @@ export async function DELETE(request: NextRequest) {
         console.log('✅ [API Delete] Funcionário encontrado:', employee.name || employee.full_name)
 
         // Delete the employee
-        const { data: deletedData, error: deleteError } = await supabase
+        const { data: deletedData, error: deleteError } = await supabaseAdmin
             .from('employees')
             .delete()
             .eq('id', employeeId)

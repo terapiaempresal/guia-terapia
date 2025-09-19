@@ -236,7 +236,7 @@ function CadastroFuncionarioContent() {
 
                         <div>
                             <label htmlFor="whatsapp" className="block text-sm font-medium text-gray-700 mb-1">
-                                WhatsApp (opcional)
+                                WhatsApp
                             </label>
                             <input
                                 type="text"
@@ -247,6 +247,7 @@ function CadastroFuncionarioContent() {
                                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                                 placeholder="(11) 99999-9999"
                                 maxLength={15}
+                                required
                             />
                         </div>
 
