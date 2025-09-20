@@ -18,6 +18,8 @@ interface Employee {
     videosWatched?: number
     totalVideos?: number
     videos_watched?: number
+    archived?: boolean
+    archived_at?: string
 }
 
 interface Company {
@@ -41,6 +43,8 @@ export default function ManagerDashboard() {
     const { user, logout, isManager, loading: authLoading } = useAuth()
     const { showSuccess, showError, showWarning, showInfo } = useToast()
     const [employees, setEmployees] = useState<Employee[]>([])
+    const [archivedEmployees, setArchivedEmployees] = useState<Employee[]>([])
+    const [showArchivedEmployees, setShowArchivedEmployees] = useState(false)
     const [company, setCompany] = useState<Company | null>(null)
     const [manager, setManager] = useState<Manager | null>(null)
     const [loading, setLoading] = useState(true)
@@ -50,7 +54,7 @@ export default function ManagerDashboard() {
     const [showLinkModal, setShowLinkModal] = useState(false)
     const [showLogoutConfirm, setShowLogoutConfirm] = useState(false)
     const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
-    const [employeeToDelete, setEmployeeToDelete] = useState<string | null>(null)
+    const [employeeToArchive, setEmployeeToArchive] = useState<string | null>(null)
     const [generatedLink, setGeneratedLink] = useState('')
     const [selectedEmployee, setSelectedEmployee] = useState<Employee | null>(null)
     const [newEmployee, setNewEmployee] = useState({
@@ -182,6 +186,39 @@ export default function ManagerDashboard() {
             console.error('❌ [LoadEmployees] Erro de rede:', error)
         } finally {
             setEmployeesLoading(false)
+        }
+    }
+
+    const loadArchivedEmployees = async () => {
+        if (!company?.id) {
+            console.log('⚠️ [LoadArchivedEmployees] Company ID não disponível')
+            return
+        }
+
+        console.log('🔄 [LoadArchivedEmployees] Carregando funcionários arquivados da empresa:', company.id)
+
+        try {
+            const url = `/api/employees/archived?company_id=${company.id}`
+            console.log('🌐 [LoadArchivedEmployees] Fazendo requisição para:', url)
+
+            const response = await fetch(url)
+            const data = await response.json()
+
+            console.log('📝 [LoadArchivedEmployees] Resposta recebida:', {
+                status: response.status,
+                ok: response.ok,
+                employeesCount: data.employees?.length || 0,
+                employees: data.employees?.map((emp: Employee) => ({ id: emp.id, name: emp.name || emp.full_name })) || []
+            })
+
+            if (response.ok) {
+                setArchivedEmployees(data.employees || [])
+                console.log('✅ [LoadArchivedEmployees] Lista de funcionários arquivados atualizada')
+            } else {
+                console.error('❌ [LoadArchivedEmployees] Erro ao carregar funcionários arquivados:', data.error)
+            }
+        } catch (error) {
+            console.error('❌ [LoadArchivedEmployees] Erro de rede:', error)
         }
     }
 
@@ -350,69 +387,69 @@ export default function ManagerDashboard() {
         setShowAddEmployee(false)
     }
 
-    const handleDeleteEmployee = async (employeeId: string) => {
-        setEmployeeToDelete(employeeId)
+    const handleArchiveEmployee = async (employeeId: string) => {
+        setEmployeeToArchive(employeeId)
         setShowDeleteConfirm(true)
     }
 
-    const confirmDeleteEmployee = async () => {
-        if (!employeeToDelete) return
+    const confirmArchiveEmployee = async () => {
+        if (!employeeToArchive) return
 
-        console.log('🗑️ [Delete] Iniciando exclusão do funcionário:', employeeToDelete)
+        console.log('� [Archive] Iniciando arquivamento do funcionário:', employeeToArchive)
 
         try {
-            const response = await fetch(`/api/employees?employee_id=${employeeToDelete}`, {
+            const response = await fetch(`/api/employees?employee_id=${employeeToArchive}`, {
                 method: 'DELETE',
                 headers: { 'Content-Type': 'application/json' }
             })
 
             const data = await response.json()
 
-            console.log('🗑️ [Delete] Resposta da API:', {
+            console.log('� [Archive] Resposta da API:', {
                 status: response.status,
                 ok: response.ok,
                 data: data
             })
 
             if (response.ok && data.success) {
-                if (data.alreadyDeleted) {
-                    console.log('ℹ️ [Delete] Funcionário já havia sido removido anteriormente')
-                    showInfo('Funcionário já foi removido anteriormente')
+                if (data.alreadyArchived) {
+                    console.log('ℹ️ [Archive] Funcionário já havia sido arquivado anteriormente')
+                    showInfo('Funcionário já foi arquivado anteriormente')
                 } else {
-                    console.log('✅ [Delete] Funcionário removido com sucesso!')
-                    showSuccess('Funcionário removido com sucesso!')
+                    console.log('✅ [Archive] Funcionário arquivado com sucesso!')
+                    showSuccess('Funcionário arquivado com sucesso!')
                 }
 
-                console.log('🔄 [Delete] Forçando limpeza da interface...')
+                console.log('🔄 [Archive] Forçando limpeza da interface...')
 
                 // Força remover da interface imediatamente
                 setEmployees(prev => {
-                    const filtered = prev.filter(emp => emp.id !== employeeToDelete)
-                    console.log('🧹 [Delete] Removido da interface local:', {
+                    const filtered = prev.filter(emp => emp.id !== employeeToArchive)
+                    console.log('🧹 [Archive] Removido da interface local:', {
                         original: prev.length,
                         filtered: filtered.length,
-                        removedId: employeeToDelete
+                        archivedId: employeeToArchive
                     })
                     return filtered
                 })
 
                 // Aguardar um pouco e recarregar do servidor para confirmar
                 setTimeout(async () => {
-                    console.log('🔄 [Delete] Recarregando do servidor para confirmar...')
+                    console.log('🔄 [Archive] Recarregando do servidor para confirmar...')
                     await loadEmployees()
-                    console.log('✅ [Delete] Sincronização com servidor concluída!')
+                    console.log('✅ [Archive] Sincronização com servidor concluída!')
                 }, 500)
 
             } else {
-                console.error('❌ [Delete] Erro na API:', data)
-                showError('Erro ao remover funcionário: ' + (data.error || 'Erro desconhecido'))
+                console.error('❌ [Archive] Erro na API:', data)
+                showError('Erro ao arquivar funcionário: ' + (data.error || 'Erro desconhecido'))
             }
         } catch (error) {
-            console.error('❌ [Delete] Erro de rede:', error)
-            showError('Erro ao remover funcionário: Problema de conexão')
+            console.error('❌ [Archive] Erro de rede:', error)
+            showError('Erro ao arquivar funcionário: Problema de conexão')
         } finally {
             setShowDeleteConfirm(false)
-            setEmployeeToDelete(null)
+            setEmployeeToArchive(null)
         }
     }
 
@@ -512,6 +549,24 @@ export default function ManagerDashboard() {
                                     className="btn-primary"
                                 >
                                     Adicionar Funcionário
+                                </button>
+
+                                <button
+                                    onClick={() => {
+                                        setShowArchivedEmployees(!showArchivedEmployees)
+                                        if (!showArchivedEmployees) {
+                                            loadArchivedEmployees()
+                                        }
+                                    }}
+                                    className={`flex items-center px-4 py-2 rounded-lg transition-colors ${showArchivedEmployees
+                                        ? 'bg-orange-100 text-orange-700 hover:bg-orange-200'
+                                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                                        }`}
+                                >
+                                    <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h8a2 2 0 002-2V8m-9 4h4" />
+                                    </svg>
+                                    {showArchivedEmployees ? 'Ocultar Arquivados' : 'Ver Arquivados'}
                                 </button>
 
                                 <button
@@ -618,11 +673,14 @@ export default function ManagerDashboard() {
                 <div className="card">
                     <div className="flex items-center justify-between mb-6">
                         <h2 className="text-xl font-bold text-gray-900">
-                            Funcionários
+                            {showArchivedEmployees ? 'Funcionários Arquivados' : 'Funcionários'}
                         </h2>
 
                         <div className="text-sm text-gray-500">
-                            {employees.length} funcionários cadastrados
+                            {showArchivedEmployees
+                                ? `${archivedEmployees.length} funcionários arquivados`
+                                : `${employees.length} funcionários cadastrados`
+                            }
                         </div>
                     </div>
 
@@ -646,7 +704,7 @@ export default function ManagerDashboard() {
                                         Progresso
                                     </th>
                                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                        Ações
+                                        {showArchivedEmployees ? 'Arquivado em' : 'Ações'}
                                     </th>
                                 </tr>
                             </thead>
@@ -660,18 +718,26 @@ export default function ManagerDashboard() {
                                             </div>
                                         </td>
                                     </tr>
-                                ) : employees.length === 0 ? (
+                                ) : (showArchivedEmployees ? archivedEmployees : employees).length === 0 ? (
                                     <tr>
                                         <td colSpan={6} className="px-6 py-4 text-center text-gray-500">
-                                            Nenhum funcionário cadastrado
+                                            {showArchivedEmployees
+                                                ? 'Nenhum funcionário arquivado'
+                                                : 'Nenhum funcionário cadastrado'
+                                            }
                                         </td>
                                     </tr>
                                 ) : (
-                                    employees.map((employee) => (
+                                    (showArchivedEmployees ? archivedEmployees : employees).map((employee) => (
                                         <tr key={employee.id}>
                                             <td className="px-6 py-4 whitespace-nowrap">
                                                 <div className="text-sm font-medium text-gray-900">
                                                     {employee.name}
+                                                    {showArchivedEmployees && (
+                                                        <span className="ml-2 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-orange-100 text-orange-800">
+                                                            Arquivado
+                                                        </span>
+                                                    )}
                                                 </div>
                                             </td>
                                             <td className="px-6 py-4 whitespace-nowrap">
@@ -697,12 +763,18 @@ export default function ManagerDashboard() {
                                                 </div>
                                             </td>
                                             <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                                                <button
-                                                    onClick={() => handleDeleteEmployee(employee.id)}
-                                                    className="text-red-600 hover:text-red-900"
-                                                >
-                                                    Remover
-                                                </button>
+                                                {showArchivedEmployees ? (
+                                                    <div className="text-sm text-gray-500">
+                                                        {employee.archived_at ? new Date(employee.archived_at).toLocaleDateString('pt-BR') : '-'}
+                                                    </div>
+                                                ) : (
+                                                    <button
+                                                        onClick={() => handleArchiveEmployee(employee.id)}
+                                                        className="text-orange-600 hover:text-orange-900"
+                                                    >
+                                                        Arquivar
+                                                    </button>
+                                                )}
                                             </td>
                                         </tr>
                                     )))}
@@ -927,20 +999,20 @@ export default function ManagerDashboard() {
                 onCancel={() => setShowLogoutConfirm(false)}
             />
 
-            {/* Modal de Confirmação de Exclusão */}
+            {/* Modal de Confirmação de Arquivamento */}
             <ConfirmModal
                 isOpen={showDeleteConfirm}
-                title="Remover Funcionário"
-                message="Tem certeza que deseja remover este funcionário? Esta ação não pode ser desfeita."
-                confirmText="Remover"
+                title="Arquivar Funcionário"
+                message="Tem certeza que deseja arquivar este funcionário? Ele será removido da lista principal mas continuará com acesso ao portal."
+                confirmText="Arquivar"
                 cancelText="Cancelar"
-                type="danger"
+                type="warning"
                 onConfirm={() => {
-                    confirmDeleteEmployee()
+                    confirmArchiveEmployee()
                 }}
                 onCancel={() => {
                     setShowDeleteConfirm(false)
-                    setEmployeeToDelete(null)
+                    setEmployeeToArchive(null)
                 }}
             />
         </div>

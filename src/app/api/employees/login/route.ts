@@ -1,14 +1,22 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { supabase } from '@/lib/supabase'
+import { generateInitialPassword, validatePasswordAgainstBirthDate } from '@/lib/password-utils'
 
 export async function POST(request: NextRequest) {
     try {
         const body = await request.json()
-        const { cpf, birthDate } = body
+        const { cpf, password, birthDate } = body
 
-        if (!cpf || !birthDate) {
+        if (!cpf) {
             return NextResponse.json(
-                { error: 'CPF e data de nascimento são obrigatórios' },
+                { error: 'CPF é obrigatório' },
+                { status: 400 }
+            )
+        }
+
+        if (!password && !birthDate) {
+            return NextResponse.json(
+                { error: 'Senha ou data de nascimento é obrigatória' },
                 { status: 400 }
             )
         }
@@ -42,18 +50,50 @@ export async function POST(request: NextRequest) {
             )
         }
 
-        // Validar data de nascimento
-        if (employee.birth_date !== birthDate) {
+        // Verificar autenticação
+        let isAuthenticated = false;
+        let needsPasswordSetup = false;
+
+        if (employee.password) {
+            // Funcionário já tem senha personalizada
+            if (password && employee.password === password) {
+                isAuthenticated = true;
+            }
+        } else {
+            // Funcionário ainda não configurou senha personalizada
+            if (password) {
+                // Verificar se a senha corresponde à data de nascimento
+                if (employee.birth_date && validatePasswordAgainstBirthDate(password, employee.birth_date)) {
+                    isAuthenticated = true;
+                    needsPasswordSetup = true;
+                }
+            } else if (birthDate) {
+                // Compatibilidade com o sistema antigo (temporário)
+                if (employee.birth_date === birthDate) {
+                    isAuthenticated = true;
+                    needsPasswordSetup = true;
+                }
+            }
+        }
+
+        if (!isAuthenticated) {
             return NextResponse.json(
-                { error: 'Data de nascimento incorreta. Verifique e tente novamente.' },
+                { error: 'Senha incorreta. Tente novamente.' },
                 { status: 401 }
             )
         }
 
-        return NextResponse.json({
+        // Se é o primeiro login com senha baseada na data, sugerir alteração
+        const response = {
             success: true,
-            employee
-        })
+            employee,
+            needsPasswordSetup,
+            initialPassword: needsPasswordSetup && employee.birth_date
+                ? generateInitialPassword(employee.birth_date)
+                : undefined
+        };
+
+        return NextResponse.json(response)
 
     } catch (error) {
         console.error('Erro interno:', error)

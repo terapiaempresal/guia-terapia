@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import { useAuth } from '@/lib/auth'
 import Link from 'next/link'
 import ConfirmModal from '@/components/ConfirmModal'
+import ChangePasswordModal from '@/components/ChangePasswordModal'
 import { useToast } from '@/components/ToastProvider'
 
 interface EmployeeData {
@@ -22,6 +23,7 @@ export default function EmployeeDashboard() {
     const { user, logout, isEmployee, loading: authLoading } = useAuth()
     const { showError } = useToast()
     const [showLogoutConfirm, setShowLogoutConfirm] = useState(false)
+    const [showChangePassword, setShowChangePassword] = useState(false)
     const [employee, setEmployee] = useState<EmployeeData | null>(null)
     const [stats, setStats] = useState<EmployeeStats | null>(null)
     const [loading, setLoading] = useState(true)
@@ -177,6 +179,12 @@ export default function EmployeeDashboard() {
                             <span className="text-xs text-gray-500">
                                 {employee.company}
                             </span>
+                            <button
+                                onClick={() => setShowChangePassword(true)}
+                                className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors"
+                            >
+                                Alterar Senha
+                            </button>
                             <button
                                 onClick={() => setShowLogoutConfirm(true)}
                                 className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors"
@@ -352,6 +360,13 @@ export default function EmployeeDashboard() {
                     window.location.href = '/'
                 }}
                 onCancel={() => setShowLogoutConfirm(false)}
+            />
+
+            {/* Modal de Alteração de Senha */}
+            <ChangePasswordModal
+                isOpen={showChangePassword}
+                onClose={() => setShowChangePassword(false)}
+                employeeId={employee?.id || ''}
             />
         </div>
     )

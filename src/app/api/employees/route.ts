@@ -22,6 +22,7 @@ export async function GET(request: NextRequest) {
                 manager:managers(name, email)
             `)
             .eq('company_id', companyId)
+            .eq('archived', false) // Filtrar apenas funcionários não arquivados
             .order('created_at', { ascending: false })
 
         if (error) {
@@ -174,32 +175,32 @@ export async function POST(request: NextRequest) {
     }
 }
 
-// DELETE - Excluir funcionário
+// DELETE - Arquivar funcionário (soft delete)
 export async function DELETE(request: NextRequest) {
     try {
         const { searchParams } = new URL(request.url)
         const employeeId = searchParams.get('employee_id')
 
-        console.log('🗑️ [API Delete] Recebida requisição para excluir funcionário:', employeeId)
+        console.log('� [API Archive] Recebida requisição para arquivar funcionário:', employeeId)
 
         if (!employeeId) {
-            console.error('❌ [API Delete] employee_id não fornecido')
+            console.error('❌ [API Archive] employee_id não fornecido')
             return NextResponse.json(
                 { error: 'employee_id é obrigatório' },
                 { status: 400 }
             )
         }
 
-        // Verificar se funcionário existe
-        console.log('🔍 [API Delete] Verificando se funcionário existe...')
+        // Verificar se funcionário existe e não está arquivado
+        console.log('🔍 [API Archive] Verificando se funcionário existe...')
         const { data: employee, error: fetchError } = await supabaseAdmin
             .from('employees')
-            .select('id, name, full_name')
+            .select('id, name, full_name, archived')
             .eq('id', employeeId)
             .single()
 
         if (fetchError) {
-            console.error('❌ [API Delete] Erro ao buscar funcionário:', fetchError)
+            console.error('❌ [API Archive] Erro ao buscar funcionário:', fetchError)
             return NextResponse.json(
                 { error: 'Erro ao buscar funcionário' },
                 { status: 500 }
@@ -207,51 +208,61 @@ export async function DELETE(request: NextRequest) {
         }
 
         if (!employee) {
-            console.error('❌ [API Delete] Funcionário não encontrado:', employeeId)
+            console.error('❌ [API Archive] Funcionário não encontrado:', employeeId)
             return NextResponse.json(
                 { error: 'Funcionário não encontrado' },
                 { status: 404 }
             )
         }
 
-        console.log('✅ [API Delete] Funcionário encontrado:', employee.name || employee.full_name)
+        if (employee.archived) {
+            console.log('ℹ️ [API Archive] Funcionário já estava arquivado:', employee.name || employee.full_name)
+            return NextResponse.json({
+                success: true,
+                message: 'Funcionário já foi arquivado anteriormente',
+                alreadyArchived: true
+            })
+        }
 
-        // Delete the employee
-        const { data: deletedData, error: deleteError } = await supabaseAdmin
+        console.log('✅ [API Archive] Funcionário encontrado:', employee.name || employee.full_name)
+
+        // Arquivar o funcionário (soft delete)
+        const { data: archivedData, error: archiveError } = await supabaseAdmin
             .from('employees')
-            .delete()
+            .update({
+                archived: true,
+                archived_at: new Date().toISOString()
+            })
             .eq('id', employeeId)
             .select();
 
-        console.log('🔍 [API Delete] Resultado da exclusão:', {
-            error: deleteError,
-            deletedData: deletedData,
+        console.log('🔍 [API Archive] Resultado do arquivamento:', {
+            error: archiveError,
+            archivedData: archivedData,
             employeeId: employeeId
         })
 
-        if (deleteError) {
-            console.error('❌ [API Delete] Erro ao excluir funcionário:', deleteError)
+        if (archiveError) {
+            console.error('❌ [API Archive] Erro ao arquivar funcionário:', archiveError)
             return NextResponse.json(
-                { error: 'Erro ao excluir funcionário: ' + deleteError.message },
+                { error: 'Erro ao arquivar funcionário: ' + archiveError.message },
                 { status: 500 }
             )
         }
 
-        if (!deletedData || deletedData.length === 0) {
-            console.error('❌ [API Delete] Nenhum registro foi excluído - funcionário pode já ter sido removido')
-            // Se o funcionário não existe mais, consideramos como sucesso
-            // pois o objetivo (não ter o funcionário) foi alcançado
+        if (!archivedData || archivedData.length === 0) {
+            console.error('❌ [API Archive] Nenhum registro foi arquivado')
             return NextResponse.json({
-                success: true,
-                message: 'Funcionário já foi removido anteriormente',
-                alreadyDeleted: true
-            })
+                success: false,
+                message: 'Erro ao arquivar funcionário'
+            }, { status: 500 })
         }
 
-        console.log('✅ [API Delete] Funcionário excluído com sucesso!')
+        console.log('✅ [API Archive] Funcionário arquivado com sucesso!')
         return NextResponse.json({
             success: true,
-            message: `Funcionário ${employee.name || employee.full_name} excluído com sucesso`
+            message: `Funcionário ${employee.name || employee.full_name} arquivado com sucesso`,
+            archived: true
         })
 
     } catch (error) {
