@@ -29,7 +29,7 @@ export async function GET() {
 
     } catch (error) {
         console.error('❌ Erro:', error)
-        return NextResponse.json({ 
+        return NextResponse.json({
             error: 'Erro interno',
             debug: error instanceof Error ? error.message : String(error)
         }, { status: 500 })

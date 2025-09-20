@@ -4,14 +4,14 @@ import { supabase } from '@/lib/supabase'
 export async function POST(request: NextRequest) {
     try {
         const { cpf } = await request.json()
-        
+
         if (!cpf) {
             return NextResponse.json({ error: 'CPF é obrigatório' }, { status: 400 })
         }
 
         // Limpar o CPF
         const cleanCPF = cpf.replace(/\D/g, '')
-        
+
         console.log('🔍 Buscando funcionário com CPF:', cleanCPF)
 
         // Buscar funcionário
@@ -23,16 +23,16 @@ export async function POST(request: NextRequest) {
 
         if (error) {
             console.error('❌ Erro ao buscar funcionário:', error)
-            
+
             // Listar todos os funcionários para debug
             const { data: allEmployees } = await supabase
                 .from('employees')
                 .select('id, name, cpf, birth_date, password')
                 .limit(5)
-            
-            return NextResponse.json({ 
+
+            return NextResponse.json({
                 error: 'Funcionário não encontrado',
-                debug: { 
+                debug: {
                     searchedCpf: cleanCPF,
                     allEmployees: allEmployees || [],
                     supabaseError: error.message
@@ -44,9 +44,9 @@ export async function POST(request: NextRequest) {
         let expectedPassword = null
         if (employee.birth_date) {
             const birthDate = new Date(employee.birth_date)
-            expectedPassword = String(birthDate.getDate()).padStart(2, '0') + 
-                             String(birthDate.getMonth() + 1).padStart(2, '0') + 
-                             birthDate.getFullYear()
+            expectedPassword = String(birthDate.getDate()).padStart(2, '0') +
+                String(birthDate.getMonth() + 1).padStart(2, '0') +
+                birthDate.getFullYear()
         }
 
         return NextResponse.json({
@@ -66,7 +66,7 @@ export async function POST(request: NextRequest) {
 
     } catch (error) {
         console.error('❌ Erro interno:', error)
-        return NextResponse.json({ 
+        return NextResponse.json({
             error: 'Erro interno',
             debug: error instanceof Error ? error.message : String(error)
         }, { status: 500 })

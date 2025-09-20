@@ -16,9 +16,9 @@ const supabase = createClient(supabaseUrl, supabaseKey)
 async function checkEmployee() {
     try {
         const cpf = '01932999680' // CPF limpo
-        
+
         console.log('🔍 Buscando funcionário com CPF:', cpf)
-        
+
         // Buscar funcionário
         const { data: employee, error } = await supabase
             .from('employees')
@@ -28,7 +28,7 @@ async function checkEmployee() {
 
         if (error) {
             console.error('❌ Erro ao buscar funcionário:', error.message)
-            
+
             // Vamos buscar todos os funcionários para ver o que temos
             console.log('\n📋 Listando todos os funcionários para debug:')
             const { data: allEmployees, error: allError } = await supabase
@@ -49,18 +49,18 @@ async function checkEmployee() {
         console.log('CPF:', employee.cpf)
         console.log('Data de nascimento:', employee.birth_date)
         console.log('Tem senha configurada:', employee.password ? 'SIM' : 'NÃO')
-        
+
         if (employee.password) {
             console.log('Senha atual:', employee.password)
         }
-        
+
         // Verificar se a senha esperada (19092004) bate com a data de nascimento
         if (employee.birth_date) {
             const birthDate = new Date(employee.birth_date)
-            const expectedPassword = String(birthDate.getDate()).padStart(2, '0') + 
-                                   String(birthDate.getMonth() + 1).padStart(2, '0') + 
-                                   birthDate.getFullYear()
-            
+            const expectedPassword = String(birthDate.getDate()).padStart(2, '0') +
+                String(birthDate.getMonth() + 1).padStart(2, '0') +
+                birthDate.getFullYear()
+
             console.log('Senha esperada baseada na data de nascimento:', expectedPassword)
             console.log('Senha tentada pelo usuário: 19092004')
             console.log('Senhas coincidem:', expectedPassword === '19092004' ? 'SIM' : 'NÃO')
