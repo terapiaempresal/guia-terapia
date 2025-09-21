@@ -179,7 +179,7 @@ export default function EmployeeDashboard() {
 
             // Verificar modo debug
             const isDebugMode = typeof window !== 'undefined' && window.location.search.includes('debug=true')
-            const requiredHours = isDebugMode ? 0 : 72 // 72 horas = 3 dias
+            const requiredHours = isDebugMode ? 0 : 52 // 52 horas = 3 dias
 
             if (hoursPassed < requiredHours) {
                 return { status: 'Em Análise', progress: 50, color: 'blue' }

@@ -150,7 +150,7 @@ export default function ClarityMapPage() {
 
         // DEBUG: Para testes, usar parâmetro debug=true na URL
         const debugMode = window.location.search.includes('debug=true')
-        const requiredHours = debugMode ? 0 : 72 // 72 horas = 3 dias
+        const requiredHours = debugMode ? 0 : 52 // 52 horas = 3 dias
 
         return hoursPassed >= requiredHours
     }
