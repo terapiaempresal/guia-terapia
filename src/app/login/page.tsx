@@ -120,6 +120,16 @@ export default function LoginPage() {
                 localStorage.setItem('companyId', data.employee.company_id)
                 localStorage.setItem('companyName', data.employee.company?.name || '')
 
+                // Salvar objeto completo para uso na página do mapa
+                localStorage.setItem('employee', JSON.stringify({
+                    id: data.employee.id,
+                    name: data.employee.full_name || data.employee.name,
+                    cpf: data.employee.cpf,
+                    journey_filled: data.employee.journey_filled || false,
+                    journey_filled_at: data.employee.journey_filled_at || null,
+                    journey_result_html: data.employee.journey_result_html || null
+                }))
+
                 showSuccess(`Bem-vindo, ${data.employee.full_name || data.employee.name}!`)
 
                 // Se é primeira senha (baseada na data de nascimento), mostrar aviso

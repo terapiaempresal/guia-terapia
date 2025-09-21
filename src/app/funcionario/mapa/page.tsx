@@ -1,61 +1,305 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 
-interface ClarityMapResult {
-    perfil: string
-    pontos_fortes: string[]
-    areas_desenvolvimento: string[]
-    recomendacoes: string[]
+interface EmployeeData {
+    id: string
+    name: string
+    cpf?: string
+    journey_filled: boolean
+    journey_filled_at: string | null
+    journey_result_html: string | null
 }
 
 export default function ClarityMapPage() {
-    const [mapStatus, setMapStatus] = useState<'not_started' | 'in_progress' | 'done'>('not_started')
-    const [mapResult, setMapResult] = useState<ClarityMapResult | null>(null)
+    const [employee, setEmployee] = useState<EmployeeData | null>(null)
+    const [loading, setLoading] = useState(true)
+    const [currentTime, setCurrentTime] = useState(new Date())
+    const [isDebugMode, setIsDebugMode] = useState(false)
 
-    // Mock de resultado para demonstração
-    const mockResult: ClarityMapResult = {
-        perfil: "Líder Colaborativo",
-        pontos_fortes: [
-            "Excelente comunicação interpessoal",
-            "Capacidade de trabalhar em equipe",
-            "Flexibilidade e adaptabilidade",
-            "Pensamento estratégico"
-        ],
-        areas_desenvolvimento: [
-            "Tomada de decisão sob pressão",
-            "Gestão de conflitos",
-            "Delegação efetiva"
-        ],
-        recomendacoes: [
-            "Pratique técnicas de respiração para momentos de pressão",
-            "Estude métodos de mediação e resolução de conflitos",
-            "Desenvolva um sistema de delegação estruturado"
-        ]
+    useEffect(() => {
+        loadEmployeeData()
+
+        // Verificar se está no modo debug
+        setIsDebugMode(window.location.search.includes('debug=true'))
+
+        // Atualizar cronômetro a cada segundo para countdown dinâmico
+        const timer = setInterval(() => {
+            setCurrentTime(new Date())
+        }, 1000) // 1 segundo
+
+        return () => clearInterval(timer)
+    }, [])
+
+    const loadEmployeeData = async () => {
+        try {
+            console.log('🔄 Iniciando carregamento dos dados do funcionário...')
+
+            const employeeData = localStorage.getItem('employee')
+            console.log('🔍 Dados do localStorage (employee):', employeeData)
+
+            // Também verificar os dados individuais como debug
+            const userType = localStorage.getItem('userType')
+            const employeeId = localStorage.getItem('employeeId')
+            const employeeName = localStorage.getItem('employeeName')
+            console.log('🔍 Dados individuais:', { userType, employeeId, employeeName })
+
+            if (employeeData) {
+                const emp = JSON.parse(employeeData)
+                console.log('👤 Dados parseados:', emp)
+
+                setEmployee({
+                    id: emp.id || 'temp-id',
+                    name: emp.name || 'Funcionário',
+                    cpf: emp.cpf || '000.000.000-00',
+                    journey_filled: emp.journey_filled || false,
+                    journey_filled_at: emp.journey_filled_at || null,
+                    journey_result_html: emp.journey_result_html || null
+                })
+                console.log('✅ Dados do funcionário carregados do localStorage')
+            } else {
+                // Fallback: tentar ler dos itens individuais do localStorage
+                const employeeId = localStorage.getItem('employeeId')
+                const employeeName = localStorage.getItem('employeeName')
+
+                console.log('🔍 Tentando dados individuais:', { employeeId, employeeName })
+
+                if (employeeId) {
+                    // Buscar dados completos do funcionário na API
+                    console.log('📡 Buscando dados completos na API...')
+                    const response = await fetch(`/api/employees/${employeeId}`)
+
+                    if (response.ok) {
+                        const employeeApiData = await response.json()
+                        console.log('✅ Dados da API:', employeeApiData)
+
+                        setEmployee({
+                            id: employeeApiData.id,
+                            name: employeeApiData.full_name || employeeApiData.name,
+                            cpf: employeeApiData.cpf,
+                            journey_filled: employeeApiData.journey_filled || false,
+                            journey_filled_at: employeeApiData.journey_filled_at || null,
+                            journey_result_html: employeeApiData.journey_result_html || null
+                        })
+
+                        // Salvar os dados completos para próximas vezes
+                        localStorage.setItem('employee', JSON.stringify({
+                            id: employeeApiData.id,
+                            name: employeeApiData.full_name || employeeApiData.name,
+                            cpf: employeeApiData.cpf,
+                            journey_filled: employeeApiData.journey_filled || false,
+                            journey_filled_at: employeeApiData.journey_filled_at || null,
+                            journey_result_html: employeeApiData.journey_result_html || null
+                        }))
+                        console.log('💾 Dados salvos no localStorage para próximas vezes')
+                    } else {
+                        console.log('⚠️ Erro na API, usando dados padrão')
+                        setEmployee({
+                            id: employeeId,
+                            name: employeeName || 'Funcionário',
+                            cpf: '000.000.000-00',
+                            journey_filled: false,
+                            journey_filled_at: null,
+                            journey_result_html: null
+                        })
+                    }
+                } else {
+                    // Mesmo sem dados do localStorage, mostrar interface
+                    console.log('⚠️ Sem dados no localStorage, usando dados padrão')
+                    setEmployee({
+                        id: 'demo-id',
+                        name: 'Funcionário',
+                        cpf: '000.000.000-00',
+                        journey_filled: false,
+                        journey_filled_at: null,
+                        journey_result_html: null
+                    })
+                }
+            }
+        } catch (error) {
+            console.error('❌ Erro ao carregar dados:', error)
+            // Sempre mostrar interface, mesmo com erro
+            setEmployee({
+                id: 'demo-id',
+                name: 'Funcionário',
+                cpf: '000.000.000-00',
+                journey_filled: false,
+                journey_filled_at: null,
+                journey_result_html: null
+            })
+        } finally {
+            setLoading(false)
+        }
     }
 
-    const handleStartMap = () => {
-        setMapStatus('in_progress')
-        // Simular carregamento do resultado
-        setTimeout(() => {
-            setMapResult(mockResult)
-            setMapStatus('done')
-        }, 2000)
+    const handleStartJourney = () => {
+        if (!employee) return
+
+        // Redirecionar para formulário externo com CPF do funcionário
+        const cpfForUrl = employee.cpf?.replace(/\D/g, '') || employee.id
+        const url = `https://terapiaempresarial.com.br/formulario/?cpf=${cpfForUrl}`
+        window.open(url, '_blank')
+    }
+
+    const canViewResult = () => {
+        if (!employee?.journey_filled || !employee.journey_filled_at) return false
+
+        const filledAt = new Date(employee.journey_filled_at)
+        const now = new Date()
+        const hoursPassed = (now.getTime() - filledAt.getTime()) / (1000 * 60 * 60)
+
+        // DEBUG: Para testes, usar parâmetro debug=true na URL
+        const debugMode = window.location.search.includes('debug=true')
+        const requiredHours = debugMode ? 0 : 72 // 72 horas = 3 dias
+
+        return hoursPassed >= requiredHours
+    }
+
+    const getTimeUntilResult = () => {
+        if (!employee?.journey_filled_at) return null
+
+        const filledAt = new Date(employee.journey_filled_at)
+        const releaseTime = new Date(filledAt.getTime() + (72 * 60 * 60 * 1000)) // + 72 horas (3 dias)
+
+        if (currentTime >= releaseTime) return null
+
+        const timeDiff = releaseTime.getTime() - currentTime.getTime()
+
+        const days = Math.floor(timeDiff / (1000 * 60 * 60 * 24))
+        const hours = Math.floor((timeDiff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60))
+        const minutes = Math.floor((timeDiff % (1000 * 60 * 60)) / (1000 * 60))
+        const seconds = Math.floor((timeDiff % (1000 * 60)) / 1000)
+
+        return { days, hours, minutes, seconds }
+    }
+
+    const renderCleanTimer = () => {
+        const timeLeft = getTimeUntilResult()
+        if (!timeLeft) return null
+
+        const { days, hours, minutes, seconds } = timeLeft
+        const totalSeconds = days * 86400 + hours * 3600 + minutes * 60 + seconds
+        const totalOriginalSeconds = 72 * 60 * 60 // 3 dias em segundos
+        const progress = ((totalOriginalSeconds - totalSeconds) / totalOriginalSeconds) * 100
+
+        return (
+            <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl p-6 border border-blue-200 shadow-sm">
+                <div className="text-center mb-6">
+                    <h3 className="text-xl font-semibold text-gray-800 mb-3">
+                        ⏰ Seu resultado estará disponível em:
+                    </h3>
+
+                    {/* Barra de progresso limpa */}
+                    <div className="w-full bg-gray-200 rounded-full h-2 mb-3">
+                        <div
+                            className="bg-gradient-to-r from-blue-500 to-blue-600 h-2 rounded-full transition-all duration-500"
+                            style={{ width: `${progress}%` }}
+                        ></div>
+                    </div>
+                    <p className="text-sm text-gray-600">
+                        Progresso: {progress.toFixed(1)}%
+                    </p>
+                </div>
+
+                <div className="grid grid-cols-4 gap-4 text-center">
+                    {/* Dias */}
+                    <div className="bg-white rounded-lg p-4 shadow-sm border">
+                        <div className="text-2xl font-bold text-blue-600 mb-1">
+                            {days}
+                        </div>
+                        <div className="text-sm font-medium text-gray-700">
+                            {days === 1 ? 'Dia' : 'Dias'}
+                        </div>
+                    </div>
+
+                    {/* Horas */}
+                    <div className="bg-white rounded-lg p-4 shadow-sm border">
+                        <div className="text-2xl font-bold text-blue-600 mb-1">
+                            {hours}
+                        </div>
+                        <div className="text-sm font-medium text-gray-700">
+                            {hours === 1 ? 'Hora' : 'Horas'}
+                        </div>
+                    </div>
+
+                    {/* Minutos */}
+                    <div className="bg-white rounded-lg p-4 shadow-sm border">
+                        <div className="text-2xl font-bold text-blue-600 mb-1">
+                            {minutes}
+                        </div>
+                        <div className="text-sm font-medium text-gray-700">
+                            {minutes === 1 ? 'Minuto' : 'Minutos'}
+                        </div>
+                    </div>
+
+                    {/* Segundos */}
+                    <div className="bg-white rounded-lg p-4 shadow-sm border">
+                        <div className="text-2xl font-bold text-blue-600 mb-1">
+                            {seconds}
+                        </div>
+                        <div className="text-sm font-medium text-gray-700">
+                            {seconds === 1 ? 'Segundo' : 'Segundos'}
+                        </div>
+                    </div>
+                </div>
+
+                <div className="text-center mt-4">
+                    <p className="text-sm text-gray-500">
+                        📊 Nossos especialistas estão preparando seu relatório personalizado
+                    </p>
+                </div>
+            </div>
+        )
     }
 
     const getStatusBadge = () => {
-        switch (mapStatus) {
-            case 'not_started':
-                return <span className="bg-gray-100 text-gray-800 px-3 py-1 rounded-full text-sm">Não iniciado</span>
-            case 'in_progress':
-                return <span className="bg-warning-100 text-warning-800 px-3 py-1 rounded-full text-sm">Em andamento</span>
-            case 'done':
-                return <span className="bg-success-100 text-success-800 px-3 py-1 rounded-full text-sm">Concluído</span>
+        if (!employee) return null
+
+        if (!employee.journey_filled) {
+            return <span className="bg-gray-100 text-gray-800 px-3 py-1 rounded-full text-sm">Não iniciado</span>
         }
+
+        if (employee.journey_filled && !canViewResult()) {
+            return <span className="bg-warning-100 text-warning-800 px-3 py-1 rounded-full text-sm">Processando resultado</span>
+        }
+
+        return <span className="bg-success-100 text-success-800 px-3 py-1 rounded-full text-sm">Resultado disponível</span>
+    }
+
+    if (loading) {
+        return (
+            <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+                <div className="text-center">
+                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600 mx-auto mb-4"></div>
+                    <p className="text-gray-600">Carregando...</p>
+                </div>
+            </div>
+        )
     }
 
     return (
         <div className="min-h-screen bg-gray-50 p-8">
+            {/* Banner de Debug */}
+            {isDebugMode && (
+                <div className="max-w-4xl mx-auto mb-4">
+                    <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4 rounded-md">
+                        <div className="flex items-center">
+                            <svg className="w-5 h-5 text-yellow-400 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
+                            </svg>
+                            <div>
+                                <div className="font-medium text-yellow-800">
+                                    Modo Debug Ativo
+                                </div>
+                                <div className="text-sm text-yellow-700">
+                                    Prazo de 3 dias ignorado para testes
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
+
             <div className="max-w-4xl mx-auto">
                 {/* Botão Voltar */}
                 <div className="mb-6">
@@ -73,147 +317,166 @@ export default function ClarityMapPage() {
                 <div className="mb-8">
                     <div className="flex items-center justify-between mb-4">
                         <h1 className="text-3xl font-bold text-gray-900">
-                            Mapa de Clareza
+                            Mapa de Jornada Comportamental
                         </h1>
                         {getStatusBadge()}
                     </div>
 
-                    <p className="text-gray-600">
-                        Descubra seu perfil de liderança e áreas de desenvolvimento
+                    <p className="text-lg text-gray-600">
+                        Descubra seu perfil comportamental completo e áreas de desenvolvimento
                     </p>
                 </div>
 
-                {mapStatus === 'not_started' && (
-                    <div className="card text-center">
-                        <div className="mb-6">
-                            <div className="w-24 h-24 bg-primary-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                                <svg className="w-12 h-12 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-                                </svg>
-                            </div>
-
-                            <h2 className="text-2xl font-bold text-gray-900 mb-2">
-                                Pronto para descobrir seu perfil?
-                            </h2>
-
-                            <p className="text-gray-600 mb-6 max-w-2xl mx-auto">
-                                O Mapa de Clareza é uma ferramenta personalizada que identifica seus pontos fortes,
-                                áreas de desenvolvimento e oferece recomendações específicas para seu crescimento.
-                            </p>
-                        </div>
-
-                        <button
-                            onClick={handleStartMap}
-                            className="btn-primary inline-block"
-                        >
-                            Iniciar Mapa de Clareza
-                        </button>
-                    </div>
-                )}
-
-                {mapStatus === 'in_progress' && (
-                    <div className="card text-center">
-                        <div className="animate-pulse">
-                            <div className="w-16 h-16 bg-warning-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                                <svg className="animate-spin w-8 h-8 text-warning-600" fill="none" viewBox="0 0 24 24">
-                                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                                </svg>
-                            </div>
-
-                            <h2 className="text-2xl font-bold text-gray-900 mb-2">
-                                Processando seu perfil...
-                            </h2>
-
-                            <p className="text-gray-600">
-                                Estamos analisando suas respostas para gerar seu Mapa de Clareza personalizado
-                            </p>
-                        </div>
-                    </div>
-                )}
-
-                {mapStatus === 'done' && mapResult && (
+                {/* Estado: Não iniciado */}
+                {!employee?.journey_filled && (
                     <div className="space-y-6">
-                        {/* Perfil Principal */}
-                        <div className="card">
-                            <div className="text-center mb-6">
-                                <div className="w-20 h-20 bg-success-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                                    <svg className="w-10 h-10 text-success-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                        {/* Card principal de explicação */}
+                        <div className="card text-center">
+                            <div className="mb-6">
+                                <div className="w-32 h-32 bg-gradient-to-br from-primary-100 to-primary-200 rounded-full flex items-center justify-center mx-auto mb-6">
+                                    <svg className="w-16 h-16 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
                                     </svg>
                                 </div>
 
-                                <h2 className="text-3xl font-bold text-gray-900 mb-2">
-                                    {mapResult.perfil}
+                                <h2 className="text-3xl font-bold text-gray-900 mb-4">
+                                    Descubra Seu Perfil Comportamental
                                 </h2>
 
-                                <p className="text-gray-600">
-                                    Seu perfil de liderança identificado
+                                <p className="text-lg text-gray-600 mb-8 max-w-3xl mx-auto leading-relaxed">
+                                    O Mapa de Jornada é uma ferramenta avançada de análise comportamental que
+                                    identifica seu perfil único, pontos fortes e áreas de desenvolvimento.
+                                    Receba um relatório personalizado com recomendações específicas para seu crescimento.
+                                </p>
+                            </div>
+
+                            <button
+                                onClick={handleStartJourney}
+                                className="btn-primary text-lg px-8 py-4 inline-flex items-center"
+                            >
+                                <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                                </svg>
+                                Iniciar Meu Mapa de Jornada
+                            </button>
+                        </div>
+
+                        {/* Card informativo */}
+                        <div className="grid md:grid-cols-3 gap-6">
+                            <div className="card text-center">
+                                <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                                    <svg className="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                    </svg>
+                                </div>
+                                <h3 className="text-lg font-semibold text-gray-900 mb-2">Análise Detalhada</h3>
+                                <p className="text-gray-600 text-sm">
+                                    Questionário completo que analisa seus padrões comportamentais e preferências
+                                </p>
+                            </div>
+
+                            <div className="card text-center">
+                                <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                                    <svg className="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                    </svg>
+                                </div>
+                                <h3 className="text-lg font-semibold text-gray-900 mb-2">Resultado em até 3 dias</h3>
+                                <p className="text-gray-600 text-sm">
+                                    Receba seu relatório personalizado após análise especializada
+                                </p>
+                            </div>
+
+                            <div className="card text-center">
+                                <div className="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                                    <svg className="w-8 h-8 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+                                    </svg>
+                                </div>
+                                <h3 className="text-lg font-semibold text-gray-900 mb-2">Recomendações</h3>
+                                <p className="text-gray-600 text-sm">
+                                    Estratégias específicas para desenvolver seu potencial
                                 </p>
                             </div>
                         </div>
+                    </div>
+                )}
 
-                        {/* Pontos Fortes */}
-                        <div className="card">
-                            <h3 className="text-xl font-bold text-gray-900 mb-4 flex items-center">
-                                <svg className="w-6 h-6 text-success-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                {/* Estado: Preenchido, aguardando liberação */}
+                {employee?.journey_filled && !canViewResult() && (
+                    <div className="card text-center">
+                        <div className="mb-6">
+                            <div className="w-24 h-24 bg-warning-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                                <svg className="w-12 h-12 text-warning-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                                 </svg>
-                                Seus Pontos Fortes
-                            </h3>
-
-                            <div className="grid md:grid-cols-2 gap-3">
-                                {mapResult.pontos_fortes.map((ponto, index) => (
-                                    <div key={index} className="flex items-center p-3 bg-success-50 rounded-lg">
-                                        <svg className="w-5 h-5 text-success-500 mr-3" fill="currentColor" viewBox="0 0 20 20">
-                                            <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                                        </svg>
-                                        <span className="text-success-800">{ponto}</span>
-                                    </div>
-                                ))}
                             </div>
+
+                            <h2 className="text-2xl font-bold text-gray-900 mb-2">
+                                Processando seu resultado
+                            </h2>
+
+                            <p className="text-gray-600 mb-6">
+                                Recebemos suas respostas! Nossos especialistas estão analisando seu perfil para gerar
+                                um relatório personalizado e detalhado.
+                            </p>
+
+                            {renderCleanTimer()}
+                        </div>
+                    </div>
+                )}
+
+                {/* Estado: Resultado disponível */}
+                {employee?.journey_filled && canViewResult() && employee.journey_result_html && (
+                    <div className="card">
+                        <div className="mb-6 text-center">
+                            <div className="w-20 h-20 bg-success-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                                <svg className="w-10 h-10 text-success-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                            </div>
+
+                            <h2 className="text-2xl font-bold text-gray-900 mb-2">
+                                Seu Resultado está Pronto!
+                            </h2>
+
+                            <p className="text-gray-600 mb-6">
+                                Preenchido em: {employee.journey_filled_at && new Date(employee.journey_filled_at).toLocaleDateString('pt-BR', {
+                                    day: '2-digit',
+                                    month: '2-digit',
+                                    year: 'numeric',
+                                    hour: '2-digit',
+                                    minute: '2-digit'
+                                })}
+                            </p>
                         </div>
 
-                        {/* Áreas de Desenvolvimento */}
-                        <div className="card">
-                            <h3 className="text-xl font-bold text-gray-900 mb-4 flex items-center">
-                                <svg className="w-6 h-6 text-warning-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+                        {/* Renderizar HTML do resultado */}
+                        <div
+                            className="prose max-w-none"
+                            dangerouslySetInnerHTML={{ __html: employee.journey_result_html }}
+                        />
+                    </div>
+                )}
+
+                {/* Estado: Resultado disponível mas sem HTML */}
+                {employee?.journey_filled && canViewResult() && !employee.journey_result_html && (
+                    <div className="card text-center">
+                        <div className="mb-6">
+                            <div className="w-24 h-24 bg-yellow-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                                <svg className="w-12 h-12 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.664-.833-2.464 0L3.34 16.5c-.77.833.192 2.5 1.732 2.5z" />
                                 </svg>
-                                Áreas de Desenvolvimento
-                            </h3>
-
-                            <div className="space-y-3">
-                                {mapResult.areas_desenvolvimento.map((area, index) => (
-                                    <div key={index} className="flex items-center p-3 bg-warning-50 rounded-lg">
-                                        <svg className="w-5 h-5 text-warning-500 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                        </svg>
-                                        <span className="text-warning-800">{area}</span>
-                                    </div>
-                                ))}
                             </div>
-                        </div>
 
-                        {/* Recomendações */}
-                        <div className="card">
-                            <h3 className="text-xl font-bold text-gray-900 mb-4 flex items-center">
-                                <svg className="w-6 h-6 text-primary-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
-                                </svg>
-                                Recomendações Personalizadas
-                            </h3>
+                            <h2 className="text-2xl font-bold text-gray-900 mb-2">
+                                Resultado em processamento
+                            </h2>
 
-                            <div className="space-y-3">
-                                {mapResult.recomendacoes.map((recomendacao, index) => (
-                                    <div key={index} className="flex items-start p-4 bg-primary-50 rounded-lg">
-                                        <div className="flex-shrink-0 w-6 h-6 bg-primary-100 rounded-full flex items-center justify-center mr-3 mt-0.5">
-                                            <span className="text-primary-600 text-sm font-medium">{index + 1}</span>
-                                        </div>
-                                        <span className="text-primary-800">{recomendacao}</span>
-                                    </div>
-                                ))}
-                            </div>
+                            <p className="text-gray-600">
+                                Seu mapa foi preenchido com sucesso, mas o resultado ainda está sendo processado.
+                                Por favor, aguarde um pouco mais.
+                            </p>
                         </div>
                     </div>
                 )}

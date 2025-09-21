@@ -17,6 +17,9 @@ interface EmployeeStats {
     videosWatched: number
     totalVideos: number
     mapCompleted: boolean
+    journey_filled: boolean
+    journey_filled_at: string | null
+    journey_result_html: string | null
 }
 
 export default function EmployeeDashboard() {
@@ -88,6 +91,10 @@ export default function EmployeeDashboard() {
         try {
             console.log('📊 Buscando progresso do funcionário:', employeeId)
 
+            // Buscar dados completos do funcionário incluindo jornada
+            const employeeResponse = await fetch(`/api/employees/${employeeId}`)
+            const employeeData = await employeeResponse.json()
+
             // Buscar progresso do funcionário
             const progressResponse = await fetch(`/api/videos/progress/get?employee_id=${employeeId}`)
             const progressData = await progressResponse.json()
@@ -106,13 +113,22 @@ export default function EmployeeDashboard() {
                     videosWatched,
                     totalVideos,
                     progress,
-                    totalVideosFromAPI: videosData.videos.length
+                    totalVideosFromAPI: videosData.videos.length,
+                    employeeJourneyData: {
+                        journey_filled: employeeData.journey_filled,
+                        journey_filled_at: employeeData.journey_filled_at,
+                        journey_result_html: employeeData.journey_result_html
+                    }
                 })
 
                 setStats({
                     videosWatched,
                     totalVideos,
-                    mapCompleted: videosWatched >= Math.ceil(totalVideos * 0.8) // Mapa completo com 80% dos vídeos
+                    mapCompleted: videosWatched >= Math.ceil(totalVideos * 0.8), // Mapa completo com 80% dos vídeos
+                    // Adicionar dados da jornada
+                    journey_filled: employeeData.journey_filled || false,
+                    journey_filled_at: employeeData.journey_filled_at || null,
+                    journey_result_html: employeeData.journey_result_html || null
                 })
             } else {
                 console.warn('⚠️ Não foi possível carregar dados, usando fallback')
@@ -120,7 +136,10 @@ export default function EmployeeDashboard() {
                 setStats({
                     videosWatched: 0,
                     totalVideos: 10, // Fallback para 10 vídeos (valor conhecido)
-                    mapCompleted: false
+                    mapCompleted: false,
+                    journey_filled: false,
+                    journey_filled_at: null,
+                    journey_result_html: null
                 })
             }
 
@@ -133,11 +152,42 @@ export default function EmployeeDashboard() {
             setStats({
                 videosWatched: 0,
                 totalVideos: 10, // Fallback para 10 vídeos (valor conhecido)
-                mapCompleted: false
+                mapCompleted: false,
+                journey_filled: false,
+                journey_filled_at: null,
+                journey_result_html: null
             })
 
             setLoading(false)
         }
+    }
+
+    // Função para determinar o status da jornada
+    const getJourneyStatus = () => {
+        if (!stats) return { status: 'Pendente', progress: 0, color: 'yellow' }
+
+        // 1. Pendente - não preencheu ainda
+        if (!stats.journey_filled) {
+            return { status: 'Pendente', progress: 0, color: 'yellow' }
+        }
+
+        // 2. Em Análise - preencheu mas ainda no prazo
+        if (stats.journey_filled && stats.journey_filled_at) {
+            const filledAt = new Date(stats.journey_filled_at)
+            const now = new Date()
+            const hoursPassed = (now.getTime() - filledAt.getTime()) / (1000 * 60 * 60)
+
+            // Verificar modo debug
+            const isDebugMode = typeof window !== 'undefined' && window.location.search.includes('debug=true')
+            const requiredHours = isDebugMode ? 0 : 72 // 72 horas = 3 dias
+
+            if (hoursPassed < requiredHours) {
+                return { status: 'Em Análise', progress: 50, color: 'blue' }
+            }
+        }
+
+        // 3. Concluído - após 72 horas
+        return { status: 'Concluído', progress: 100, color: 'green' }
     }
 
     if (loading) {
@@ -225,21 +275,25 @@ export default function EmployeeDashboard() {
                         </div>
                     </div>
 
-                    {/* Mapa Concluído */}
+                    {/* Mapa da Jornada - Status Dinâmico */}
                     <div className="card">
                         <div className="flex items-center justify-between">
                             <div>
                                 <p className="text-sm font-medium text-gray-600">Mapa da Jornada</p>
                                 <p className="text-2xl font-bold text-gray-900">
-                                    {stats.mapCompleted ? 'Concluído' : 'Pendente'}
+                                    {getJourneyStatus().status}
                                 </p>
                             </div>
-                            <div className={`w-8 h-8 rounded-full flex items-center justify-center ${stats.mapCompleted ? 'bg-green-100' : 'bg-yellow-100'
+                            <div className={`w-8 h-8 rounded-full flex items-center justify-center ${getJourneyStatus().color === 'green' ? 'bg-green-100' :
+                                    getJourneyStatus().color === 'blue' ? 'bg-blue-100' : 'bg-yellow-100'
                                 }`}>
-                                <svg className={`w-5 h-5 ${stats.mapCompleted ? 'text-green-600' : 'text-yellow-600'
+                                <svg className={`w-5 h-5 ${getJourneyStatus().color === 'green' ? 'text-green-600' :
+                                        getJourneyStatus().color === 'blue' ? 'text-blue-600' : 'text-yellow-600'
                                     }`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    {stats.mapCompleted ? (
+                                    {getJourneyStatus().color === 'green' ? (
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                    ) : getJourneyStatus().color === 'blue' ? (
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
                                     ) : (
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                                     )}
@@ -249,9 +303,10 @@ export default function EmployeeDashboard() {
                         <div className="mt-4">
                             <div className="w-full bg-gray-200 rounded-full h-2">
                                 <div
-                                    className={`h-2 rounded-full transition-all duration-300 ${stats.mapCompleted ? 'bg-green-600' : 'bg-yellow-500'
+                                    className={`h-2 rounded-full transition-all duration-300 ${getJourneyStatus().color === 'green' ? 'bg-green-600' :
+                                            getJourneyStatus().color === 'blue' ? 'bg-blue-600' : 'bg-yellow-500'
                                         }`}
-                                    style={{ width: `${stats.mapCompleted ? 100 : 0}%` }}
+                                    style={{ width: `${getJourneyStatus().progress}%` }}
                                 />
                             </div>
                         </div>
@@ -263,7 +318,7 @@ export default function EmployeeDashboard() {
                             <div>
                                 <p className="text-sm font-medium text-gray-600">Progresso Geral</p>
                                 <p className="text-2xl font-bold text-gray-900">
-                                    {Math.round(((stats.videosWatched + (stats.mapCompleted ? 1 : 0)) / (stats.totalVideos + 1)) * 100)}%
+                                    {Math.round(((stats.videosWatched + (getJourneyStatus().progress / 100)) / (stats.totalVideos + 1)) * 100)}%
                                 </p>
                             </div>
                             <div className="w-8 h-8 bg-orange-100 rounded-full flex items-center justify-center">
@@ -276,7 +331,7 @@ export default function EmployeeDashboard() {
                             <div className="w-full bg-gray-200 rounded-full h-2">
                                 <div
                                     className="bg-orange-600 h-2 rounded-full transition-all duration-300"
-                                    style={{ width: `${((stats.videosWatched + (stats.mapCompleted ? 1 : 0)) / (stats.totalVideos + 1)) * 100}%` }}
+                                    style={{ width: `${((stats.videosWatched + (getJourneyStatus().progress / 100)) / (stats.totalVideos + 1)) * 100}%` }}
                                 />
                             </div>
                         </div>
