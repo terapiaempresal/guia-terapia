@@ -3,12 +3,28 @@ import { supabase } from '@/lib/supabase'
 
 export async function GET(request: NextRequest) {
     try {
-        const { data: videos, error } = await supabase
+        // Pegar parâmetros da query
+        const { searchParams } = new URL(request.url)
+        const companyId = searchParams.get('company_id')
+        const managerId = searchParams.get('manager_id')
+
+        let query = supabase
             .from('videos')
             .select('*')
-            .order('id')
+            .order('display_order', { ascending: true })
+
+        if (companyId || managerId) {
+            // Se tem company_id ou manager_id, buscar:
+            // 1. Vídeos do sistema (created_by_type = 'system')
+            // 2. Vídeos específicos da empresa (created_by_type = 'company' AND company_id = empresa)
+            query = query.or(`created_by_type.eq.system,and(created_by_type.eq.company,company_id.eq.${companyId})`)
+        }
+
+        const { data: videos, error } = await query
 
         if (error) throw error
+
+        console.log(`📺 Retornando ${videos?.length || 0} vídeos para empresa ${companyId}`)
 
         return NextResponse.json({ videos })
 

@@ -1,4 +1,7 @@
-'use client'
+const fs = require('fs');
+const path = require('path');
+
+const fullWorkbookContent = `'use client'
 
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
@@ -38,7 +41,7 @@ export default function WorkbookPage() {
 
       const response = await fetch('/api/workbook/responses', {
         headers: {
-          'Authorization': `Bearer ${employeeToken}`
+          'Authorization': \`Bearer \${employeeToken}\`
         }
       })
 
@@ -68,7 +71,7 @@ export default function WorkbookPage() {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${employeeToken}`
+          'Authorization': \`Bearer \${employeeToken}\`
         },
         body: JSON.stringify({ field_key: fieldKey, value })
       })
@@ -99,11 +102,11 @@ export default function WorkbookPage() {
     <button
       onClick={() => saveResponse(fieldKey, responses[fieldKey] || '')}
       disabled={saving[fieldKey]}
-      className={`ml-2 px-3 py-1 text-sm rounded-md transition-all ${
+      className={\`ml-2 px-3 py-1 text-sm rounded-md transition-all \${
         saving[fieldKey]
           ? 'bg-green-500 text-white'
           : 'bg-blue-500 hover:bg-blue-600 text-white'
-      }`}
+      }\`}
     >
       {saving[fieldKey] ? '✅ Salvo!' : '💾 Salvar'}
     </button>
@@ -468,4 +471,10 @@ export default function WorkbookPage() {
       </div>
     </div>
   )
-}
+}`;
+
+// Substituir arquivo existente
+const targetFile = path.join(__dirname, '..', 'src', 'app', 'funcionario', 'ferramentas', 'page.tsx');
+fs.writeFileSync(targetFile, fullWorkbookContent);
+
+console.log('✅ Arquivo atualizado com todas as seções do caderno!');

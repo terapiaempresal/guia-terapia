@@ -135,17 +135,19 @@ export default function ManagerDashboard() {
     }
 
     const loadEmployees = async () => {
-        if (!company?.id) {
-            console.log('⚠️ [LoadEmployees] Company ID não disponível')
+        // Pegar o ID do gestor do localStorage
+        const managerId = localStorage.getItem('userId')
+        if (!managerId) {
+            console.log('⚠️ [LoadEmployees] Manager ID não disponível')
             return
         }
 
-        console.log('🔄 [LoadEmployees] Carregando funcionários da empresa:', company.id)
+        console.log('🔄 [LoadEmployees] Carregando funcionários do gestor:', managerId)
         setEmployeesLoading(true)
 
         try {
-            // Força clear de qualquer cache usando timestamp e random
-            const url = `/api/employees?company_id=${company.id}&_t=${Date.now()}&_r=${Math.random()}`
+            // Usar manager_id em vez de company_id
+            const url = `/api/employees?manager_id=${managerId}&_t=${Date.now()}&_r=${Math.random()}`
             console.log('🌐 [LoadEmployees] Fazendo requisição para:', url)
 
             const response = await fetch(url, {
@@ -276,12 +278,12 @@ export default function ManagerDashboard() {
 
     const getMapStatusBadge = (status: string) => {
         switch (status) {
-            case 'not_started':
+            case 'Não iniciado':
                 return <span className="bg-gray-100 text-gray-800 px-2 py-1 rounded-full text-xs">Não iniciado</span>
-            case 'in_progress':
-                return <span className="bg-warning-100 text-warning-800 px-2 py-1 rounded-full text-xs">Em andamento</span>
-            case 'done':
-                return <span className="bg-success-100 text-success-800 px-2 py-1 rounded-full text-xs">Concluído</span>
+            case 'Aguardando retorno':
+                return <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-xs">Aguardando retorno</span>
+            case 'Concluído':
+                return <span className="bg-purple-100 text-purple-800 px-2 py-1 rounded-full text-xs">Concluído</span>
             default:
                 return <span className="bg-gray-100 text-gray-800 px-2 py-1 rounded-full text-xs">Não iniciado</span>
         }
@@ -289,14 +291,14 @@ export default function ManagerDashboard() {
 
     const getStatusBadge = (status: string) => {
         switch (status) {
-            case 'invited':
-                return <span className="bg-gray-100 text-gray-800 px-2 py-1 rounded-full text-xs">Convidado</span>
-            case 'active':
-                return <span className="bg-success-100 text-success-800 px-2 py-1 rounded-full text-xs">Ativo</span>
-            case 'blocked':
-                return <span className="bg-error-100 text-error-800 px-2 py-1 rounded-full text-xs">Bloqueado</span>
+            case 'Convidado':
+                return <span className="bg-yellow-100 text-yellow-800 px-2 py-1 rounded-full text-xs">Convidado</span>
+            case 'Ativo':
+                return <span className="bg-green-100 text-green-800 px-2 py-1 rounded-full text-xs">Ativo</span>
+            case 'Arquivado':
+                return <span className="bg-red-100 text-red-800 px-2 py-1 rounded-full text-xs">Arquivado</span>
             default:
-                return <span className="bg-gray-100 text-gray-800 px-2 py-1 rounded-full text-xs">Convidado</span>
+                return <span className="bg-yellow-100 text-yellow-800 px-2 py-1 rounded-full text-xs">Convidado</span>
         }
     }
 
@@ -552,6 +554,16 @@ export default function ManagerDashboard() {
                                 </button>
 
                                 <button
+                                    onClick={() => window.location.href = '/gestor/videos'}
+                                    className="flex items-center px-4 py-2 bg-blue-600 text-white hover:bg-blue-700 rounded-lg transition-colors"
+                                >
+                                    <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                                    </svg>
+                                    Gerenciar Vídeos
+                                </button>
+
+                                <button
                                     onClick={() => {
                                         setShowArchivedEmployees(!showArchivedEmployees)
                                         if (!showArchivedEmployees) {
@@ -732,7 +744,7 @@ export default function ManagerDashboard() {
                                         <tr key={employee.id}>
                                             <td className="px-6 py-4 whitespace-nowrap">
                                                 <div className="text-sm font-medium text-gray-900">
-                                                    {employee.name}
+                                                    {employee.full_name || employee.name}
                                                     {showArchivedEmployees && (
                                                         <span className="ml-2 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-orange-100 text-orange-800">
                                                             Arquivado
@@ -746,10 +758,10 @@ export default function ManagerDashboard() {
                                                 </div>
                                             </td>
                                             <td className="px-6 py-4 whitespace-nowrap">
-                                                {getStatusBadge(employee.status || 'invited')}
+                                                {getStatusBadge(employee.status || 'Convidado')}
                                             </td>
                                             <td className="px-6 py-4 whitespace-nowrap">
-                                                {getMapStatusBadge(employee.mapStatus || 'not_started')}
+                                                {getMapStatusBadge(employee.mapStatus || 'Não iniciado')}
                                             </td>
                                             <td className="px-6 py-4 whitespace-nowrap">
                                                 <div className="text-sm text-gray-900">

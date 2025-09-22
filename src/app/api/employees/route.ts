@@ -4,69 +4,102 @@ import { supabase, supabaseAdmin } from '@/lib/supabase'
 // GET - Listar funcionários de uma empresa
 export async function GET(request: NextRequest) {
     try {
+        // Pegar manager_id dos query parameters
         const { searchParams } = new URL(request.url)
-        const companyId = searchParams.get('company_id')
+        const managerId = searchParams.get('manager_id')
 
-        if (!companyId) {
-            return NextResponse.json(
-                { error: 'company_id é obrigatório' },
-                { status: 400 }
-            )
-        }
+        console.log('🔍 Manager ID recebido:', managerId)
 
-        const { data: employees, error } = await supabase
+        let query = supabase
             .from('employees')
             .select(`
-                *,
-                company:companies(name),
-                manager:managers(name, email)
+                id, 
+                full_name, 
+                name,
+                email, 
+                archived, 
+                invited_at,
+                accepted_at,
+                journey_filled,
+                journey_filled_at,
+                created_at, 
+                manager_id
             `)
-            .eq('company_id', companyId)
-            .eq('archived', false) // Filtrar apenas funcionários não arquivados
             .order('created_at', { ascending: false })
+
+        // Se tiver manager_id, filtrar por ele
+        if (managerId) {
+            query = query.eq('manager_id', managerId)
+        }
+
+        const { data: employees, error } = await query
 
         if (error) {
             console.error('Erro ao buscar funcionários:', error)
             return NextResponse.json(
-                { error: 'Erro ao buscar funcionários' },
+                { success: false, error: 'Erro ao buscar funcionários' },
                 { status: 500 }
             )
         }
 
-        // Para cada funcionário, buscar o progresso de vídeos
-        const employeesWithProgress = await Promise.all(
-            (employees || []).map(async (employee: any) => {
-                // Buscar progresso de vídeos do funcionário
-                const { data: progress, error: progressError } = await supabase
+        // Processar dados para incluir status calculados
+        const processedEmployees = await Promise.all(employees?.map(async (emp: any) => {
+            // Determinar status do funcionário
+            let status = 'Convidado'
+            if (emp.archived) {
+                status = 'Arquivado'
+            } else if (emp.accepted_at || emp.journey_filled) {
+                // Se aceitou convite OU já preencheu o mapa, consideramos ativo
+                status = 'Ativo'
+            }
+
+            // Determinar status do mapa de clareza
+            let mapStatus = 'Não iniciado'
+            if (emp.journey_filled) {
+                mapStatus = 'Concluído'
+            } else if (emp.invited_at && !emp.journey_filled) {
+                mapStatus = 'Aguardando retorno'
+            }
+
+            // Buscar progresso de vídeos do funcionário
+            let videosWatched = 0
+            try {
+                const { data: progress } = await supabase
                     .from('employee_progress')
                     .select('video_id, completed')
-                    .eq('employee_id', employee.id)
+                    .eq('employee_id', emp.id)
                     .eq('completed', true)
 
-                if (progressError) {
-                    console.error(`Erro ao buscar progresso do funcionário ${employee.id}:`, progressError)
-                    return {
-                        ...employee,
-                        videosWatched: 0
-                    }
-                }
+                videosWatched = progress?.length || 0
+            } catch (error) {
+                console.error('Erro ao buscar progresso de vídeos:', error)
+            }
 
-                return {
-                    ...employee,
-                    videosWatched: progress?.length || 0
-                }
-            })
-        )
+            return {
+                id: emp.id,
+                full_name: emp.full_name || emp.name,
+                email: emp.email,
+                status,
+                mapStatus,
+                archived: emp.archived,
+                created_at: emp.created_at,
+                manager_id: emp.manager_id,
+                videosWatched
+            }
+        }) || [])
+
+        console.log('📊 Funcionários processados:', processedEmployees.length)
+        console.log('👥 Funcionários:', processedEmployees.map((e: any) => `${e.full_name} (${e.status} - ${e.mapStatus})`))
 
         return NextResponse.json({
             success: true,
-            employees: employeesWithProgress
+            employees: processedEmployees
         })
 
     } catch (error) {
         console.error('Erro interno:', error)
         return NextResponse.json(
-            { error: 'Erro interno do servidor' },
+            { success: false, error: 'Erro interno do servidor' },
             { status: 500 }
         )
     }

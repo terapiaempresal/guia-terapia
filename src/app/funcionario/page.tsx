@@ -285,10 +285,10 @@ export default function EmployeeDashboard() {
                                 </p>
                             </div>
                             <div className={`w-8 h-8 rounded-full flex items-center justify-center ${getJourneyStatus().color === 'green' ? 'bg-green-100' :
-                                    getJourneyStatus().color === 'blue' ? 'bg-blue-100' : 'bg-yellow-100'
+                                getJourneyStatus().color === 'blue' ? 'bg-blue-100' : 'bg-yellow-100'
                                 }`}>
                                 <svg className={`w-5 h-5 ${getJourneyStatus().color === 'green' ? 'text-green-600' :
-                                        getJourneyStatus().color === 'blue' ? 'text-blue-600' : 'text-yellow-600'
+                                    getJourneyStatus().color === 'blue' ? 'text-blue-600' : 'text-yellow-600'
                                     }`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     {getJourneyStatus().color === 'green' ? (
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -304,7 +304,7 @@ export default function EmployeeDashboard() {
                             <div className="w-full bg-gray-200 rounded-full h-2">
                                 <div
                                     className={`h-2 rounded-full transition-all duration-300 ${getJourneyStatus().color === 'green' ? 'bg-green-600' :
-                                            getJourneyStatus().color === 'blue' ? 'bg-blue-600' : 'bg-yellow-500'
+                                        getJourneyStatus().color === 'blue' ? 'bg-blue-600' : 'bg-yellow-500'
                                         }`}
                                     style={{ width: `${getJourneyStatus().progress}%` }}
                                 />
@@ -360,18 +360,18 @@ export default function EmployeeDashboard() {
                             </div>
                         </Link>
 
-                        <Link href="/funcionario/ferramentas" className="card hover:shadow-md transition-shadow">
+                        <Link href="https://terapiaempresarial.com.br/caderno-funcionario" className="card hover:shadow-md transition-shadow">
                             <div className="text-center">
-                                <div className="w-16 h-16 bg-warning-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                                    <svg className="w-8 h-8 text-warning-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                <div className="w-16 h-16 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                                    <svg className="w-8 h-8 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
                                     </svg>
                                 </div>
                                 <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                                    Guia de Ferramentas
+                                    Caderno de Clareza
                                 </h3>
                                 <p className="text-gray-600 text-sm">
-                                    Faça anotações e exercícios práticos
+                                    Ferramentas de autoconhecimento e carreira
                                 </p>
                             </div>
                         </Link>
