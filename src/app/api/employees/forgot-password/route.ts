@@ -82,7 +82,7 @@ export async function POST(request: NextRequest) {
         // Enviar email
         try {
             const emailService = new EmailService()
-            const resetLink = `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/login/funcionario/redefinir-senha?token=${resetToken}`
+            const resetLink = `${process.env.APP_URL || 'http://localhost:3000'}/login/funcionario/redefinir-senha?token=${resetToken}`
 
             const emailSent = await emailService.sendEmail({
                 to: employee.email,
