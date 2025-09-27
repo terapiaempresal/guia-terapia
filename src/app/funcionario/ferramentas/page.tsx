@@ -100,8 +100,8 @@ export default function WorkbookPage() {
       onClick={() => saveResponse(fieldKey, responses[fieldKey] || '')}
       disabled={saving[fieldKey]}
       className={`ml-2 px-3 py-1 text-sm rounded-md transition-all ${saving[fieldKey]
-          ? 'bg-green-500 text-white'
-          : 'bg-blue-500 hover:bg-blue-600 text-white'
+        ? 'bg-green-500 text-white'
+        : 'bg-blue-500 hover:bg-blue-600 text-white'
         }`}
     >
       {saving[fieldKey] ? '✅ Salvo!' : '💾 Salvar'}
