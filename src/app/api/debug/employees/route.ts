@@ -4,7 +4,7 @@ import { supabase } from '@/lib/supabase'
 // GET - Debug: Listar TODOS os funcionários sem filtros
 export async function GET(request: NextRequest) {
     try {
-        const { searchParams } = new URL(request.url)
+        const { searchParams } = request.nextUrl
         const companyId = searchParams.get('company_id')
 
         console.log('🔍 [DEBUG] Recebendo requisição para company_id:', companyId)

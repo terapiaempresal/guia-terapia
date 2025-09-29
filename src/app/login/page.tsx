@@ -120,6 +120,11 @@ export default function LoginPage() {
                 localStorage.setItem('companyId', data.employee.company_id)
                 localStorage.setItem('companyName', data.employee.company?.name || '')
 
+                // Salvar token JWT para autenticação da API
+                if (data.token) {
+                    localStorage.setItem('employeeToken', data.token)
+                }
+
                 // Salvar objeto completo para uso na página do mapa
                 localStorage.setItem('employee', JSON.stringify({
                     id: data.employee.id,

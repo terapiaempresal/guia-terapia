@@ -1,6 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { supabase } from '@/lib/supabase'
 import { generateInitialPassword, validatePasswordAgainstBirthDate } from '@/lib/password-utils'
+import jwt from 'jsonwebtoken'
+
+const JWT_SECRET = process.env.JWT_SECRET || 'sua-chave-super-secreta-aqui'
 
 export async function POST(request: NextRequest) {
     try {
@@ -83,10 +86,23 @@ export async function POST(request: NextRequest) {
             )
         }
 
+        // Gerar token JWT para o funcionário
+        const token = jwt.sign(
+            {
+                id: employee.id,
+                type: 'employee',
+                cpf: employee.cpf,
+                company_id: employee.company_id
+            },
+            JWT_SECRET,
+            { expiresIn: '7d' }
+        )
+
         // Se é o primeiro login com senha baseada na data, sugerir alteração
         const response = {
             success: true,
             employee,
+            token,
             needsPasswordSetup,
             initialPassword: needsPasswordSetup && employee.birth_date
                 ? generateInitialPassword(employee.birth_date)

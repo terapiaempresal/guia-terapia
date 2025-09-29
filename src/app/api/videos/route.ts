@@ -4,7 +4,7 @@ import { supabase } from '@/lib/supabase'
 export async function GET(request: NextRequest) {
     try {
         // Pegar parâmetros da query
-        const { searchParams } = new URL(request.url)
+        const { searchParams } = request.nextUrl
         const companyId = searchParams.get('company_id')
         const managerId = searchParams.get('manager_id')
 

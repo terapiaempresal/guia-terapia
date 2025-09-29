@@ -109,7 +109,7 @@ export async function POST(request: NextRequest) {
 // Endpoint para obter URL de upload pré-assinada (para uploads grandes)
 export async function GET(request: NextRequest) {
     try {
-        const { searchParams } = new URL(request.url)
+        const { searchParams } = request.nextUrl
         const fileName = searchParams.get('fileName')
         const fileType = searchParams.get('fileType')
 

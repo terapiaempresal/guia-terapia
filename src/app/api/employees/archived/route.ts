@@ -4,7 +4,7 @@ import { supabase } from '@/lib/supabase'
 // GET - Listar funcionários arquivados de uma empresa
 export async function GET(request: NextRequest) {
     try {
-        const { searchParams } = new URL(request.url)
+        const { searchParams } = request.nextUrl
         const companyId = searchParams.get('company_id')
 
         if (!companyId) {

@@ -16,8 +16,9 @@ interface Video {
     thumbnail_url?: string
     created_at: string
     updated_at: string
-    created_by_type?: string
+    created_by_type: 'system' | 'manager'
     created_by_id?: string
+    manager_id?: string
     company_id?: string
     display_order?: number
     category?: string
@@ -53,6 +54,17 @@ export default function VideoManagementPage() {
     const [showEditModal, setShowEditModal] = useState(false)
     const [selectedVideo, setSelectedVideo] = useState<Video | null>(null)
 
+    // Helper para identificar se vídeo é da empresa (workaround para constraint)
+    const isCompanyVideo = (video: Video) => {
+        return video.category === 'company' ||
+            (video.created_by_type === 'manager') ||
+            (video.company_id && video.manager_id)
+    }
+
+    const isSystemVideo = (video: Video) => {
+        return !isCompanyVideo(video)
+    }
+
     useEffect(() => {
         loadData()
     }, [])
@@ -85,10 +97,20 @@ export default function VideoManagementPage() {
 
     const loadVideos = async () => {
         try {
-            const response = await fetch('/api/videos/management')
+            // Obter company_id do gestor logado
+            const companyData = localStorage.getItem('company')
+            const company = companyData ? JSON.parse(companyData) : null
+            const companyId = company?.id
+
+            const url = companyId
+                ? `/api/videos/management?company_id=${companyId}`
+                : '/api/videos/management'
+
+            const response = await fetch(url)
             const data = await response.json()
             if (data.success) {
                 setVideos(data.videos || [])
+                console.log(`📺 Carregados ${data.videos?.length || 0} vídeos para empresa ${companyId}`)
             }
         } catch (error) {
             console.error('Erro ao carregar vídeos:', error)
@@ -141,13 +163,14 @@ export default function VideoManagementPage() {
         setShowEditModal(true)
     }
 
-    const handleDeleteVideo = async (video: any) => {
+    const handleDeleteVideo = async (video: Video) => {
         if (!confirm(`Tem certeza que deseja remover o vídeo "${video.title}"?`)) {
             return
         }
 
         try {
-            const response = await fetch(`/api/videos/management?id=${video.id}`, {
+            const managerId = localStorage.getItem('userId')
+            const response = await fetch(`/api/videos/management?id=${video.id}&manager_id=${managerId}`, {
                 method: 'DELETE'
             })
 
@@ -162,6 +185,65 @@ export default function VideoManagementPage() {
         } catch (error) {
             console.error('Erro ao remover vídeo:', error)
             showError('Erro ao remover vídeo')
+        }
+    }
+
+    const handleMoveVideo = async (video: Video, direction: 'up' | 'down') => {
+        try {
+            // Separar vídeos do sistema dos vídeos da empresa
+            const systemVideos = videos.filter(v => isSystemVideo(v))
+            const managerVideos = videos.filter(v => isCompanyVideo(v))
+
+            // Encontrar posição atual do vídeo
+            const currentIndex = managerVideos.findIndex(v => v.id === video.id)
+            if (currentIndex === -1) return
+
+            let newOrder = video.display_order || 100
+
+            if (direction === 'up') {
+                if (currentIndex === 0) {
+                    // Se é o primeiro vídeo da empresa, colocar antes dos vídeos do sistema
+                    newOrder = Math.min(...systemVideos.map(v => v.display_order || 100)) - 1
+                } else {
+                    // Trocar com o vídeo anterior
+                    const prevVideo = managerVideos[currentIndex - 1]
+                    newOrder = (prevVideo.display_order || 100) - 1
+                }
+            } else {
+                if (currentIndex === managerVideos.length - 1) {
+                    // Se é o último vídeo da empresa, colocar depois dos vídeos do sistema
+                    newOrder = Math.max(...systemVideos.map(v => v.display_order || 100)) + 1
+                } else {
+                    // Trocar com o próximo vídeo
+                    const nextVideo = managerVideos[currentIndex + 1]
+                    newOrder = (nextVideo.display_order || 100) + 1
+                }
+            }
+
+            const managerId = localStorage.getItem('userId')
+            const response = await fetch(`/api/videos/management`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    id: video.id,
+                    manager_id: managerId,
+                    display_order: newOrder
+                })
+            })
+
+            const data = await response.json()
+
+            if (data.success) {
+                showSuccess('Ordem do vídeo atualizada!')
+                loadVideos()
+            } else {
+                showError(data.error || 'Erro ao reordenar vídeo')
+            }
+        } catch (error) {
+            console.error('Erro ao reordenar vídeo:', error)
+            showError('Erro ao reordenar vídeo')
         }
     }
 
@@ -286,17 +368,55 @@ export default function VideoManagementPage() {
                                             </div>
 
                                             <div className="flex items-center space-x-2">
-                                                <button
-                                                    onClick={() => handleEditVideo(video)}
-                                                    className="flex items-center px-3 py-1.5 bg-blue-50 text-blue-700 rounded-md hover:bg-blue-100 transition-colors text-sm"
-                                                    title="Editar vídeo"
-                                                >
-                                                    <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                                                    </svg>
-                                                    Editar
-                                                </button>
+                                                {/* Indicador de tipo de vídeo */}
+                                                {isSystemVideo(video) && (
+                                                    <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+                                                        <svg className="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 24 24">
+                                                            <path d="M12 1l3.09 3.09L9 10.17l-1.59-1.59L12 1z" />
+                                                            <path d="M21 9l-1.59 1.59L17 8.17V21H7V8.17l-2.41 2.41L3 9l9-9z" />
+                                                        </svg>
+                                                        <svg className="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                                            <path fillRule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clipRule="evenodd" />
+                                                        </svg>
+                                                        Sistema
+                                                    </span>
+                                                )}
 
+                                                {isCompanyVideo(video) && (
+                                                    <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                                                        <svg className="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-4m-5 0H9m0 0H5m0 0H3m16-16a2 2 0 00-2-2H7a2 2 0 00-2 2m14 0v16a2 2 0 01-2 2H7a2 2 0 01-2-2V5a2 2 0 012-2h10a2 2 0 012 2z" />
+                                                        </svg>
+                                                        Sua Empresa
+                                                    </span>
+                                                )}
+
+                                                {/* Botão Editar - condicional */}
+                                                {isSystemVideo(video) ? (
+                                                    <button
+                                                        onClick={() => handleEditVideo(video)}
+                                                        className="flex items-center px-3 py-1.5 bg-yellow-50 text-yellow-700 rounded-md hover:bg-yellow-100 transition-colors text-sm"
+                                                        title="Editar apenas título e descrição"
+                                                    >
+                                                        <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                                        </svg>
+                                                        Editar Info
+                                                    </button>
+                                                ) : (
+                                                    <button
+                                                        onClick={() => handleEditVideo(video)}
+                                                        className="flex items-center px-3 py-1.5 bg-blue-50 text-blue-700 rounded-md hover:bg-blue-100 transition-colors text-sm"
+                                                        title="Editar vídeo"
+                                                    >
+                                                        <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                                        </svg>
+                                                        Editar
+                                                    </button>
+                                                )}
+
+                                                {/* Botão Atribuir - sempre disponível */}
                                                 <button
                                                     onClick={() => {
                                                         setSelectedVideo(video)
@@ -311,16 +431,43 @@ export default function VideoManagementPage() {
                                                     Atribuir
                                                 </button>
 
-                                                <button
-                                                    onClick={() => handleDeleteVideo(video)}
-                                                    className="flex items-center px-3 py-1.5 bg-red-50 text-red-700 rounded-md hover:bg-red-100 transition-colors text-sm"
-                                                    title="Remover vídeo"
-                                                >
-                                                    <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                                                    </svg>
-                                                    Remover
-                                                </button>
+                                                {/* Botões de Ordenação - apenas para vídeos do gestor */}
+                                                {isCompanyVideo(video) && (
+                                                    <>
+                                                        <button
+                                                            onClick={() => handleMoveVideo(video, 'up')}
+                                                            className="flex items-center px-2 py-1.5 bg-gray-50 text-gray-700 rounded-md hover:bg-gray-100 transition-colors text-sm"
+                                                            title="Mover para cima"
+                                                        >
+                                                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" />
+                                                            </svg>
+                                                        </button>
+                                                        <button
+                                                            onClick={() => handleMoveVideo(video, 'down')}
+                                                            className="flex items-center px-2 py-1.5 bg-gray-50 text-gray-700 rounded-md hover:bg-gray-100 transition-colors text-sm"
+                                                            title="Mover para baixo"
+                                                        >
+                                                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                                                            </svg>
+                                                        </button>
+                                                    </>
+                                                )}
+
+                                                {/* Botão Remover - apenas para vídeos do gestor */}
+                                                {isCompanyVideo(video) && (
+                                                    <button
+                                                        onClick={() => handleDeleteVideo(video)}
+                                                        className="flex items-center px-3 py-1.5 bg-red-50 text-red-700 rounded-md hover:bg-red-100 transition-colors text-sm"
+                                                        title="Remover vídeo"
+                                                    >
+                                                        <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                                        </svg>
+                                                        Remover
+                                                    </button>
+                                                )}
                                             </div>
                                         </div>
                                     </div>

@@ -18,6 +18,7 @@ export default function WorkbookPage() {
   const [responses, setResponses] = useState<Record<string, string>>({})
   const [saveState, setSaveState] = useState<Record<string, SaveState>>({})
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false)
+  const [lastPosition, setLastPosition] = useState<string | null>(null)
   const timersRef = useRef<Record<string, number>>({})
 
   // --- AUTH + LOAD ---
@@ -29,6 +30,7 @@ export default function WorkbookPage() {
       return
     }
     loadResponses()
+    loadLastPosition()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
@@ -77,12 +79,43 @@ export default function WorkbookPage() {
   const handleInputChange = (fieldKey: string, value: string) => {
     setResponses(prev => ({ ...prev, [fieldKey]: value }))
     setHasUnsavedChanges(true)
+
+    // Salvar posição atual
+    saveCurrentPosition(fieldKey)
+
     // clear previous timer
     if (timersRef.current[fieldKey]) window.clearTimeout(timersRef.current[fieldKey])
     // debounce 800ms
     timersRef.current[fieldKey] = window.setTimeout(() => {
       saveResponse(fieldKey, value)
     }, 800)
+  }
+
+  // Salvar posição atual no localStorage
+  const saveCurrentPosition = (fieldKey: string) => {
+    const employeeId = localStorage.getItem('employeeId')
+    if (employeeId) {
+      localStorage.setItem(`workbook_position_${employeeId}`, fieldKey)
+      setLastPosition(fieldKey)
+    }
+  }
+
+  // Carregar última posição salva
+  const loadLastPosition = () => {
+    const employeeId = localStorage.getItem('employeeId')
+    if (employeeId) {
+      const savedPosition = localStorage.getItem(`workbook_position_${employeeId}`)
+      if (savedPosition) {
+        setLastPosition(savedPosition)
+        // Scroll para a posição após um pequeno delay
+        setTimeout(() => {
+          const element = document.querySelector(`[data-field="${savedPosition}"]`)
+          if (element) {
+            element.scrollIntoView({ behavior: 'smooth', block: 'center' })
+          }
+        }, 500)
+      }
+    }
   }
 
   useEffect(() => {
@@ -95,10 +128,21 @@ export default function WorkbookPage() {
 
   const Status = ({ k }: { k: string }) => {
     const s = saveState[k]
-    if (s === 'saving') return <span className="ml-2 text-blue-600 text-xs">salvando…</span>
-    if (s === 'saved') return <span className="ml-2 text-green-600 text-xs">✓ salvo</span>
-    if (s === 'error') return <span className="ml-2 text-red-600 text-xs">erro ao salvar</span>
-    return null
+    const isLastPosition = lastPosition === k
+    return (
+      <div className="flex items-center justify-between mt-1">
+        <div>
+          {s === 'saving' && <span className="text-blue-600 text-xs">💾 salvando…</span>}
+          {s === 'saved' && <span className="text-green-600 text-xs">✅ salvo</span>}
+          {s === 'error' && <span className="text-red-600 text-xs">❌ erro ao salvar</span>}
+        </div>
+        {/* {isLastPosition && (
+          <div className="bg-yellow-100 border border-yellow-300 rounded px-2 py-1">
+            <span className="text-yellow-800 text-xs font-medium">📍 Última posição</span>
+          </div>
+        )} */}
+      </div>
+    )
   }
 
   if (loading) {
@@ -127,17 +171,28 @@ export default function WorkbookPage() {
 
       {/* CONTROLES DO APP */}
       <div className="sticky top-0 z-10 bg-white/80 backdrop-blur border-b border-gray-200">
-        <div className="max-w-5xl mx-auto p-3 flex items-center justify-between">
-          <div className="text-sm text-gray-600">
-            Caderno de Clareza e Carreira
-            {hasUnsavedChanges ? <span className="ml-2 text-amber-600">• alterações pendentes</span> : null}
+        <div className="max-w-5xl mx-auto p-3">
+          <div className="flex items-center justify-between">
+            <div className="text-sm text-gray-600">
+              Caderno de Clareza e Carreira
+              {hasUnsavedChanges ? <span className="ml-2 text-amber-600">• alterações pendentes</span> : null}
+            </div>
+            <Link
+              href="/funcionario"
+              className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+            >
+              ← Voltar ao Dashboard
+            </Link>
           </div>
-          <Link
-            href="/funcionario"
-            className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
-          >
-            ← Voltar ao Dashboard
-          </Link>
+
+          {/* Banner de última posição
+          {lastPosition && (
+            <div className="mt-2 p-2 bg-yellow-50 border border-yellow-200 rounded text-center">
+              <span className="text-yellow-800 text-xs">
+                📍 <strong>Continue de onde parou:</strong> Scroll automático para a última pergunta respondida
+              </span>
+            </div>
+          )} */}
         </div>
       </div>
 
@@ -191,7 +246,7 @@ export default function WorkbookPage() {
             <fieldset>
               <legend>Minha Realidade Hoje</legend>
               <div className="space-y-6 mt-4">
-                <div>
+                <div data-field="capsula_desafio">
                   <label>Qual é o maior desafio ou frustração que você sente na sua carreira hoje?</label>
                   <textarea
                     rows={4}
@@ -200,7 +255,7 @@ export default function WorkbookPage() {
                   />
                   <Status k="capsula_desafio" />
                 </div>
-                <div>
+                <div data-field="capsula_futuro">
                   <label>Onde você gostaria de estar profissionalmente daqui a um ano? (Pense em cargo, habilidades ou tipo de projeto)</label>
                   <textarea
                     rows={4}
@@ -209,7 +264,7 @@ export default function WorkbookPage() {
                   />
                   <Status k="capsula_futuro" />
                 </div>
-                <div>
+                <div data-field="capsula_sentimento">
                   <label>Qual sentimento você mais busca no seu dia a dia de trabalho? (Ex: reconhecimento, tranquilidade, desafio, propósito)</label>
                   <textarea
                     rows={4}

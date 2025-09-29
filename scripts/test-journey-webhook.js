@@ -61,7 +61,7 @@ const testWebhook = async () => {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-                cpf: employee.cpf || '019.329.996-80', // Usar CPF do funcionário ou um padrão
+                cpf: employee.cpf || '01932999680', // Usar CPF do funcionário ou um padrão (apenas números)
                 html_result: resultado,
                 webhook_key: 'terapia_webhook_2024'
             })

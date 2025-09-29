@@ -24,7 +24,7 @@ export default function VideoUploadModal({ onClose, onSuccess }: VideoUploadModa
             /(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([^&\n?#]+)/,
             /youtube\.com\/watch\?.*v=([^&\n?#]+)/
         ]
-        
+
         for (const pattern of patterns) {
             const match = url.match(pattern)
             if (match) return match[1]
@@ -32,25 +32,39 @@ export default function VideoUploadModal({ onClose, onSuccess }: VideoUploadModa
         return null
     }
 
-    // Função para gerar thumbnail do YouTube
-    const generateThumbnail = (videoId: string): string => {
-        return `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`
+    // Função para gerar thumbnail do YouTube com fallback
+    const generateThumbnail = async (videoId: string): Promise<string> => {
+        // Tentar maxresdefault primeiro (alta qualidade)
+        const maxres = `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`
+
+        try {
+            const response = await fetch(maxres, { method: 'HEAD' })
+            if (response.ok) {
+                return maxres
+            }
+        } catch (error) {
+            console.log('maxresdefault não disponível, usando fallback')
+        }
+
+        // Fallback para hqdefault (sempre disponível)
+        return `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`
     }
 
     // Validar URL do YouTube e gerar thumbnail
-    const handleUrlChange = (url: string) => {
+    const handleUrlChange = async (url: string) => {
         setFormData(prev => ({ ...prev, youtube_url: url }))
-        
+
         if (url.trim()) {
             const videoId = extractYouTubeVideoId(url)
             if (videoId) {
-                setThumbnail(generateThumbnail(videoId))
-                
+                const thumbnailUrl = await generateThumbnail(videoId)
+                setThumbnail(thumbnailUrl)
+
                 // Auto-preencher título se estiver vazio
                 if (!formData.title.trim()) {
-                    setFormData(prev => ({ 
-                        ...prev, 
-                        title: `Vídeo do YouTube - ${videoId}` 
+                    setFormData(prev => ({
+                        ...prev,
+                        title: `Vídeo do YouTube - ${videoId}`
                     }))
                 }
             } else {
@@ -87,7 +101,43 @@ export default function VideoUploadModal({ onClose, onSuccess }: VideoUploadModa
 
         try {
             const videoId = extractYouTubeVideoId(formData.youtube_url)
-            
+            const managerId = localStorage.getItem('userId')
+            let companyId = localStorage.getItem('companyId')
+
+            console.log('🔍 Debug upload:', { managerId, companyId, videoId })
+
+            // Se não tem companyId no localStorage, buscar da API
+            if (!companyId && managerId) {
+                try {
+                    const managerResponse = await fetch(`/api/companies?manager_email=${localStorage.getItem('userEmail')}`)
+                    const managerData = await managerResponse.json()
+                    console.log('📊 Resposta da API companies:', managerData)
+
+                    if (managerData.success && managerData.company?.id) {
+                        companyId = managerData.company.id
+                        if (companyId) {
+                            localStorage.setItem('companyId', companyId)
+                            console.log('✅ CompanyId encontrado e salvo:', companyId)
+                        }
+                    } else {
+                        console.error('❌ Estrutura de resposta inesperada:', managerData)
+                    }
+                } catch (error) {
+                    console.error('Erro ao buscar companyId:', error)
+                }
+            }
+
+            // Validar dados obrigatórios
+            if (!managerId) {
+                showError('Erro: ID do gestor não encontrado. Faça login novamente.')
+                return
+            }
+
+            if (!companyId) {
+                showError('Erro: ID da empresa não encontrado. Contate o suporte.')
+                return
+            }
+
             const response = await fetch('/api/videos/management', {
                 method: 'POST',
                 headers: {
@@ -99,7 +149,9 @@ export default function VideoUploadModal({ onClose, onSuccess }: VideoUploadModa
                     youtube_url: formData.youtube_url.trim(),
                     youtube_video_id: videoId,
                     thumbnail_url: thumbnail,
-                    type: 'youtube'
+                    type: 'youtube',
+                    manager_id: managerId,
+                    company_id: companyId
                 })
             })
 
@@ -166,8 +218,8 @@ export default function VideoUploadModal({ onClose, onSuccess }: VideoUploadModa
                                     Preview do Vídeo
                                 </label>
                                 <div className="border rounded-lg p-4 bg-gray-50">
-                                    <img 
-                                        src={thumbnail} 
+                                    <img
+                                        src={thumbnail}
                                         alt="Thumbnail do vídeo"
                                         className="w-full max-w-sm mx-auto rounded"
                                         onError={(e) => {

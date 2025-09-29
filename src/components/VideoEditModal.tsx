@@ -38,6 +38,8 @@ export default function VideoEditModal({ video, onClose, onSuccess }: VideoEditM
         setLoading(true)
 
         try {
+            const managerId = localStorage.getItem('userId')
+
             const response = await fetch('/api/videos/management', {
                 method: 'PUT',
                 headers: {
@@ -45,6 +47,7 @@ export default function VideoEditModal({ video, onClose, onSuccess }: VideoEditM
                 },
                 body: JSON.stringify({
                     id: video.id,
+                    manager_id: managerId,
                     ...formData
                 }),
             })

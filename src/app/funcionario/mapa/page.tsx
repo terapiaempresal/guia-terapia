@@ -454,7 +454,12 @@ export default function ClarityMapPage() {
                         {/* Renderizar HTML do resultado */}
                         <div
                             className="prose max-w-none"
-                            dangerouslySetInnerHTML={{ __html: employee.journey_result_html }}
+                            dangerouslySetInnerHTML={{
+                                __html: employee.journey_result_html
+                                    .replace(/```html\s*/g, '') // Remove ```html no início
+                                    .replace(/\s*```\s*$/g, '') // Remove ``` no final
+                                    .trim() // Remove espaços em branco extras
+                            }}
                         />
                     </div>
                 )}

@@ -5,10 +5,14 @@ import { supabase, supabaseAdmin } from '@/lib/supabase'
 export async function GET(request: NextRequest) {
     try {
         // Pegar manager_id dos query parameters
-        const { searchParams } = new URL(request.url)
+        const { searchParams } = request.nextUrl
         const managerId = searchParams.get('manager_id')
+        const includeArchived = searchParams.get('include_archived') === 'true'
+        const archivedOnly = searchParams.get('archived_only') === 'true'
 
         console.log('🔍 Manager ID recebido:', managerId)
+        console.log('📋 Incluir arquivados:', includeArchived)
+        console.log('📋 Apenas arquivados:', archivedOnly)
 
         let query = supabase
             .from('employees')
@@ -32,6 +36,15 @@ export async function GET(request: NextRequest) {
             query = query.eq('manager_id', managerId)
         }
 
+        // Filtrar por status de arquivamento
+        if (archivedOnly) {
+            // Retornar apenas funcionários arquivados
+            query = query.eq('archived', true)
+        } else if (!includeArchived) {
+            // Por padrão, excluir funcionários arquivados da lista principal
+            query = query.eq('archived', false)
+        }
+
         const { data: employees, error } = await query
 
         if (error) {
@@ -45,20 +58,45 @@ export async function GET(request: NextRequest) {
         // Processar dados para incluir status calculados
         const processedEmployees = await Promise.all(employees?.map(async (emp: any) => {
             // Determinar status do funcionário
-            let status = 'Convidado'
+            let status = 'invited'
             if (emp.archived) {
-                status = 'Arquivado'
+                status = 'blocked'
             } else if (emp.accepted_at || emp.journey_filled) {
                 // Se aceitou convite OU já preencheu o mapa, consideramos ativo
-                status = 'Ativo'
+                status = 'active'
             }
 
-            // Determinar status do mapa de clareza
-            let mapStatus = 'Não iniciado'
-            if (emp.journey_filled) {
-                mapStatus = 'Concluído'
-            } else if (emp.invited_at && !emp.journey_filled) {
-                mapStatus = 'Aguardando retorno'
+            // Determinar status do mapa de clareza baseado no caderno
+            let mapStatus = 'not_started'
+            try {
+                // Verificar se há respostas no caderno
+                const { data: workbookResponses } = await supabase
+                    .from('employee_workbook_responses')
+                    .select('value')
+                    .eq('employee_id', emp.id)
+                    .not('value', 'is', null)
+                    .neq('value', '')
+
+                const completedFields = workbookResponses?.length || 0
+
+                if (completedFields >= 12) {
+                    // Se preencheu pelo menos 80% dos campos (12 de 15), consideramos concluído
+                    mapStatus = 'done'
+                } else if (completedFields > 0) {
+                    // Se tem algum progresso, está em progresso
+                    mapStatus = 'in_progress'
+                } else if (emp.invited_at) {
+                    // Se foi convidado mas não começou
+                    mapStatus = 'not_started'
+                }
+            } catch (error) {
+                console.error('Erro ao verificar progresso do caderno:', error)
+                // Fallback para o campo journey_filled se houver erro
+                if (emp.journey_filled) {
+                    mapStatus = 'done'
+                } else if (emp.invited_at) {
+                    mapStatus = 'not_started'
+                }
             }
 
             // Buscar progresso de vídeos do funcionário
@@ -176,9 +214,26 @@ export async function POST(request: NextRequest) {
             // Salvar CPF apenas com números (limpo)
             employeeData.cpf = cpf.replace(/\D/g, '')
         }
-        if (birth_date) employeeData.birth_date = birth_date
+        if (birth_date) {
+            employeeData.birth_date = birth_date
+
+            // Gerar senha automaticamente baseada na data de nascimento (DDMMAAAA)
+            try {
+                const date = new Date(birth_date)
+                const day = String(date.getDate()).padStart(2, '0')
+                const month = String(date.getMonth() + 1).padStart(2, '0')
+                const year = String(date.getFullYear())
+                employeeData.password = `${day}${month}${year}`
+
+                console.log('🔑 Senha gerada automaticamente para:', finalName, '- Formato: DDMMAAAA')
+            } catch (error) {
+                console.error('❌ Erro ao gerar senha da data de nascimento:', error)
+            }
+        }
         if (whatsapp) employeeData.whatsapp = whatsapp
         if (full_name) employeeData.full_name = full_name
+
+        console.log('📝 Dados do funcionário para inserir:', employeeData)
 
         const { data: employee, error } = await supabase
             .from('employees')
@@ -187,9 +242,13 @@ export async function POST(request: NextRequest) {
             .single()
 
         if (error) {
-            console.error('Erro ao criar funcionário:', error)
+            console.error('❌ Erro detalhado ao criar funcionário:', error)
             return NextResponse.json(
-                { error: 'Erro ao criar funcionário' },
+                {
+                    error: 'Erro ao criar funcionário',
+                    details: error.message,
+                    code: error.code
+                },
                 { status: 500 }
             )
         }
@@ -211,7 +270,7 @@ export async function POST(request: NextRequest) {
 // DELETE - Arquivar funcionário (soft delete)
 export async function DELETE(request: NextRequest) {
     try {
-        const { searchParams } = new URL(request.url)
+        const { searchParams } = request.nextUrl
         const employeeId = searchParams.get('employee_id')
 
         console.log('� [API Archive] Recebida requisição para arquivar funcionário:', employeeId)

@@ -57,6 +57,9 @@ export default function ManagerDashboard() {
     const [employeeToArchive, setEmployeeToArchive] = useState<string | null>(null)
     const [generatedLink, setGeneratedLink] = useState('')
     const [selectedEmployee, setSelectedEmployee] = useState<Employee | null>(null)
+    const [showProgressModal, setShowProgressModal] = useState(false)
+    const [employeeProgress, setEmployeeProgress] = useState<any>(null)
+    const [loadingProgress, setLoadingProgress] = useState(false)
     const [newEmployee, setNewEmployee] = useState({
         full_name: '',
         email: '',
@@ -192,15 +195,17 @@ export default function ManagerDashboard() {
     }
 
     const loadArchivedEmployees = async () => {
-        if (!company?.id) {
-            console.log('⚠️ [LoadArchivedEmployees] Company ID não disponível')
+        const managerId = localStorage.getItem('userId')
+        if (!managerId) {
+            console.log('⚠️ [LoadArchivedEmployees] Manager ID não disponível')
             return
         }
 
-        console.log('🔄 [LoadArchivedEmployees] Carregando funcionários arquivados da empresa:', company.id)
+        console.log('🔄 [LoadArchivedEmployees] Carregando funcionários arquivados do gestor:', managerId)
 
         try {
-            const url = `/api/employees/archived?company_id=${company.id}`
+            // Usar a rota principal com parâmetro para incluir arquivados
+            const url = `/api/employees?manager_id=${managerId}&include_archived=true&archived_only=true`
             console.log('🌐 [LoadArchivedEmployees] Fazendo requisição para:', url)
 
             const response = await fetch(url)
@@ -243,10 +248,39 @@ export default function ManagerDashboard() {
     }
 
     // Dados calculados
-    const activeEmployees = employees.filter(e => e.accepted_at).length
+    const activeEmployees = employees.filter(e => e.status === 'active').length
     const quota = company?.quota || 50 // Agora vem dinamicamente da API, baseado na tabela orders
     const completedMaps = employees.filter(e => e.mapStatus === 'done').length
-    const completionRate = activeEmployees > 0 ? Math.round((completedMaps / activeEmployees) * 100) : 0
+
+    // Calcular taxa de conclusão como média de progresso geral dos funcionários
+    const calculateCompletionRate = () => {
+        if (employees.length === 0) return 0
+
+        const totalProgress = employees.reduce((acc, emp) => {
+            // Progresso de vídeos (0-100%)
+            const videoProgress = totalVideos > 0 ? ((emp.videosWatched || 0) / totalVideos) * 100 : 0
+
+            // Progresso do mapa (0 ou 100%)
+            const mapProgress = emp.mapStatus === 'done' ? 100 : 0
+
+            // Média dos dois progressos
+            const employeeProgress = (videoProgress + mapProgress) / 2
+
+            return acc + employeeProgress
+        }, 0)
+
+        return Math.round(totalProgress / employees.length)
+    }
+
+    const completionRate = calculateCompletionRate()
+
+    // Log resumido dos dados
+    console.log('📊 Painel:', {
+        funcionarios: employees.length,
+        ativos: activeEmployees,
+        mapasConcluidos: completedMaps,
+        taxaConclusao: `${completionRate}%`
+    })
 
     if (loading) {
         return (
@@ -278,12 +312,12 @@ export default function ManagerDashboard() {
 
     const getMapStatusBadge = (status: string) => {
         switch (status) {
-            case 'Não iniciado':
+            case 'not_started':
                 return <span className="bg-gray-100 text-gray-800 px-2 py-1 rounded-full text-xs">Não iniciado</span>
-            case 'Aguardando retorno':
-                return <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-xs">Aguardando retorno</span>
-            case 'Concluído':
-                return <span className="bg-purple-100 text-purple-800 px-2 py-1 rounded-full text-xs">Concluído</span>
+            case 'in_progress':
+                return <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-xs">Em progresso</span>
+            case 'done':
+                return <span className="bg-green-100 text-green-800 px-2 py-1 rounded-full text-xs">Concluído</span>
             default:
                 return <span className="bg-gray-100 text-gray-800 px-2 py-1 rounded-full text-xs">Não iniciado</span>
         }
@@ -291,12 +325,12 @@ export default function ManagerDashboard() {
 
     const getStatusBadge = (status: string) => {
         switch (status) {
-            case 'Convidado':
+            case 'invited':
                 return <span className="bg-yellow-100 text-yellow-800 px-2 py-1 rounded-full text-xs">Convidado</span>
-            case 'Ativo':
+            case 'active':
                 return <span className="bg-green-100 text-green-800 px-2 py-1 rounded-full text-xs">Ativo</span>
-            case 'Arquivado':
-                return <span className="bg-red-100 text-red-800 px-2 py-1 rounded-full text-xs">Arquivado</span>
+            case 'blocked':
+                return <span className="bg-red-100 text-red-800 px-2 py-1 rounded-full text-xs">Bloqueado</span>
             default:
                 return <span className="bg-yellow-100 text-yellow-800 px-2 py-1 rounded-full text-xs">Convidado</span>
         }
@@ -529,6 +563,33 @@ export default function ManagerDashboard() {
         }
     }
 
+    const handleShowProgress = async (employee: Employee) => {
+        setSelectedEmployee(employee)
+        setLoadingProgress(true)
+        setShowProgressModal(true)
+        setEmployeeProgress(null)
+
+        try {
+            console.log('🔍 Carregando progresso detalhado do funcionário:', employee.id)
+
+            const response = await fetch(`/api/employees/progress?employee_id=${employee.id}`)
+            const data = await response.json()
+
+            if (response.ok) {
+                setEmployeeProgress(data)
+                console.log('✅ Progresso carregado:', data)
+            } else {
+                console.error('❌ Erro ao carregar progresso:', data.error)
+                showError('Erro ao carregar progresso do funcionário')
+            }
+        } catch (error) {
+            console.error('❌ Erro ao carregar progresso:', error)
+            showError('Erro ao carregar dados')
+        } finally {
+            setLoadingProgress(false)
+        }
+    }
+
     return (
         <div className="min-h-screen bg-gray-50">
             {/* Header */}
@@ -615,7 +676,7 @@ export default function ManagerDashboard() {
 
             {/* Stats */}
             <div className="max-w-7xl mx-auto px-4 py-8">
-                <div className="grid md:grid-cols-4 gap-6 mb-8">
+                <div className="grid md:grid-cols-3 gap-6 mb-8">
                     <div className="card">
                         <div className="flex items-center">
                             <div className="p-2 bg-primary-100 rounded-lg">
@@ -658,23 +719,7 @@ export default function ManagerDashboard() {
                             <div className="ml-4">
                                 <h3 className="text-sm font-medium text-gray-500">Mapas Concluídos</h3>
                                 <div className="text-2xl font-bold text-gray-900">
-                                    {employees.filter(emp => emp.mapStatus === 'done').length}
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div className="card">
-                        <div className="flex items-center">
-                            <div className="p-2 bg-primary-100 rounded-lg">
-                                <svg className="w-6 h-6 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
-                                </svg>
-                            </div>
-                            <div className="ml-4">
-                                <h3 className="text-sm font-medium text-gray-500">Média de Vídeos</h3>
-                                <div className="text-2xl font-bold text-gray-900">
-                                    {employees.length > 0 ? Math.round(employees.reduce((acc, emp) => acc + (emp.videosWatched || 0), 0) / employees.length) : 0}/6
+                                    {completedMaps}
                                 </div>
                             </div>
                         </div>
@@ -764,15 +809,24 @@ export default function ManagerDashboard() {
                                                 {getMapStatusBadge(employee.mapStatus || 'Não iniciado')}
                                             </td>
                                             <td className="px-6 py-4 whitespace-nowrap">
-                                                <div className="text-sm text-gray-900">
-                                                    {employee.videosWatched || 0}/{totalVideos || 10}
-                                                </div>
-                                                <div className="w-16 bg-gray-200 rounded-full h-1.5">
-                                                    <div
-                                                        className="bg-primary-600 h-1.5 rounded-full"
-                                                        style={{ width: `${totalVideos > 0 ? ((employee.videosWatched || 0) / totalVideos) * 100 : 0}%` }}
-                                                    ></div>
-                                                </div>
+                                                <button
+                                                    onClick={() => handleShowProgress(employee)}
+                                                    className="text-left hover:bg-gray-50 p-2 rounded-lg transition-colors cursor-pointer"
+                                                    title="Clique para ver detalhes dos vídeos"
+                                                >
+                                                    <div className="text-sm text-gray-900 font-medium">
+                                                        {employee.videosWatched || 0}/{totalVideos || 10}
+                                                    </div>
+                                                    <div className="w-16 bg-gray-200 rounded-full h-1.5 mt-1">
+                                                        <div
+                                                            className="bg-primary-600 h-1.5 rounded-full"
+                                                            style={{ width: `${totalVideos > 0 ? ((employee.videosWatched || 0) / totalVideos) * 100 : 0}%` }}
+                                                        ></div>
+                                                    </div>
+                                                    <div className="text-xs text-gray-500 mt-1">
+                                                        Ver detalhes
+                                                    </div>
+                                                </button>
                                             </td>
                                             <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                                                 {showArchivedEmployees ? (
@@ -1027,6 +1081,170 @@ export default function ManagerDashboard() {
                     setEmployeeToArchive(null)
                 }}
             />
+
+            {/* Modal de Progresso dos Vídeos */}
+            {showProgressModal && selectedEmployee && (
+                <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center p-4 z-50">
+                    <div className="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+                        <div className="sticky top-0 bg-white px-6 py-4 border-b border-gray-200">
+                            <div className="flex items-center justify-between">
+                                <h3 className="text-lg font-medium text-gray-900">
+                                    Progresso de {selectedEmployee.full_name || selectedEmployee.name}
+                                </h3>
+                                <button
+                                    onClick={() => {
+                                        setShowProgressModal(false)
+                                        setSelectedEmployee(null)
+                                        setEmployeeProgress(null)
+                                    }}
+                                    className="text-gray-400 hover:text-gray-600"
+                                >
+                                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div className="p-6">
+                            {loadingProgress ? (
+                                <div className="flex items-center justify-center py-8">
+                                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600 mr-3"></div>
+                                    <span className="text-gray-600">Carregando progresso...</span>
+                                </div>
+                            ) : employeeProgress ? (
+                                <div className="space-y-6">
+                                    {/* Resumo do Progresso */}
+                                    <div className="bg-gray-50 rounded-lg p-4">
+                                        <h4 className="font-medium text-gray-900 mb-3">Resumo Geral</h4>
+                                        <div className="grid grid-cols-2 gap-4">
+                                            <div>
+                                                <div className="text-sm text-gray-500">Vídeos Assistidos</div>
+                                                <div className="text-lg font-semibold text-gray-900">
+                                                    {employeeProgress.videos.watched}/{employeeProgress.videos.total}
+                                                </div>
+                                                <div className="text-sm text-gray-500">
+                                                    {employeeProgress.videos.progress_percentage}% completo
+                                                </div>
+                                            </div>
+                                            <div>
+                                                <div className="text-sm text-gray-500">Caderno de Clareza</div>
+                                                <div className="text-lg font-semibold text-gray-900">
+                                                    {employeeProgress.workbook.completed_fields}/{employeeProgress.workbook.total_fields}
+                                                </div>
+                                                <div className="text-sm text-gray-500">
+                                                    {employeeProgress.workbook.progress_percentage}% completo
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div className="mt-4">
+                                            <div className="flex items-center justify-between text-sm font-medium text-gray-700 mb-1">
+                                                <span>Progresso Geral</span>
+                                                <span>{employeeProgress.overall_progress_percentage}%</span>
+                                            </div>
+                                            <div className="w-full bg-gray-200 rounded-full h-2">
+                                                <div
+                                                    className="bg-primary-600 h-2 rounded-full transition-all duration-300"
+                                                    style={{ width: `${employeeProgress.overall_progress_percentage}%` }}
+                                                ></div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    {/* Lista de Vídeos */}
+                                    <div>
+                                        <h4 className="font-medium text-gray-900 mb-3">Vídeos</h4>
+                                        <div className="space-y-2">
+                                            {employeeProgress.videos.list.map((video: any, index: number) => (
+                                                <div
+                                                    key={video.id}
+                                                    className={`flex items-center justify-between p-3 rounded-lg border ${video.is_watched
+                                                        ? 'bg-green-50 border-green-200'
+                                                        : 'bg-gray-50 border-gray-200'
+                                                        }`}
+                                                >
+                                                    <div className="flex items-center space-x-3">
+                                                        <div className={`w-6 h-6 rounded-full flex items-center justify-center text-sm font-medium ${video.is_watched
+                                                            ? 'bg-green-500 text-white'
+                                                            : 'bg-gray-300 text-gray-600'
+                                                            }`}>
+                                                            {video.is_watched ? '✓' : index + 1}
+                                                        </div>
+                                                        <div>
+                                                            <div className="font-medium text-gray-900">
+                                                                {video.title}
+                                                            </div>
+                                                            {video.description && (
+                                                                <div className="text-sm text-gray-500 truncate max-w-md">
+                                                                    {video.description}
+                                                                </div>
+                                                            )}
+                                                        </div>
+                                                    </div>
+                                                    <div className="text-right">
+                                                        <div className={`text-sm font-medium ${video.is_watched ? 'text-green-600' : 'text-gray-400'
+                                                            }`}>
+                                                            {video.is_watched ? 'Assistido' : 'Não assistido'}
+                                                        </div>
+                                                        {video.completed_at && (
+                                                            <div className="text-xs text-gray-500">
+                                                                {new Date(video.completed_at).toLocaleDateString('pt-BR')}
+                                                            </div>
+                                                        )}
+                                                    </div>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+
+                                    {/* Status do Caderno */}
+                                    <div>
+                                        <h4 className="font-medium text-gray-900 mb-3">Caderno de Clareza e Carreira</h4>
+                                        <div className={`p-4 rounded-lg border ${employeeProgress.workbook.progress_percentage > 80
+                                            ? 'bg-green-50 border-green-200'
+                                            : employeeProgress.workbook.progress_percentage > 40
+                                                ? 'bg-yellow-50 border-yellow-200'
+                                                : 'bg-gray-50 border-gray-200'
+                                            }`}>
+                                            <div className="flex items-center justify-between mb-2">
+                                                <span className="font-medium text-gray-700">
+                                                    Progresso do Caderno
+                                                </span>
+                                                <span className="text-sm font-medium text-gray-600">
+                                                    {employeeProgress.workbook.completed_fields} de {employeeProgress.workbook.total_fields} campos preenchidos
+                                                </span>
+                                            </div>
+                                            <div className="w-full bg-gray-200 rounded-full h-2">
+                                                <div
+                                                    className={`h-2 rounded-full transition-all duration-300 ${employeeProgress.workbook.progress_percentage > 80
+                                                        ? 'bg-green-500'
+                                                        : employeeProgress.workbook.progress_percentage > 40
+                                                            ? 'bg-yellow-500'
+                                                            : 'bg-gray-400'
+                                                        }`}
+                                                    style={{ width: `${employeeProgress.workbook.progress_percentage}%` }}
+                                                ></div>
+                                            </div>
+                                            <div className="text-sm text-gray-600 mt-2">
+                                                {employeeProgress.workbook.progress_percentage > 80
+                                                    ? '🎉 Caderno quase completo!'
+                                                    : employeeProgress.workbook.progress_percentage > 40
+                                                        ? '📝 Progresso bom, continue!'
+                                                        : '📋 Início do preenchimento'
+                                                }
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            ) : (
+                                <div className="text-center py-8">
+                                    <div className="text-gray-500">Erro ao carregar dados do progresso</div>
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     )
 }
