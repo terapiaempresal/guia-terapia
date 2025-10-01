@@ -151,6 +151,18 @@ export async function PUT(request: NextRequest) {
             manager_id // Para validação
         } = body
 
+        console.log('🔄 PUT /api/videos/management - Dados recebidos:', {
+            id,
+            title,
+            description,
+            video_url,
+            thumbnail_url,
+            duration,
+            display_order,
+            manager_id,
+            manager_id_type: typeof manager_id
+        })
+
         if (!id) {
             return NextResponse.json(
                 { success: false, error: 'ID do vídeo é obrigatório' },
@@ -165,7 +177,13 @@ export async function PUT(request: NextRequest) {
             .eq('id', id)
             .single()
 
+        console.log('📺 Vídeo existente encontrado:', {
+            existingVideo,
+            fetchError
+        })
+
         if (fetchError || !existingVideo) {
+            console.error('❌ Vídeo não encontrado:', fetchError)
             return NextResponse.json(
                 { success: false, error: 'Vídeo não encontrado' },
                 { status: 404 }
@@ -176,6 +194,17 @@ export async function PUT(request: NextRequest) {
         const isSystemVideo = existingVideo.created_by_type === 'system'
         const isManagerVideo = existingVideo.created_by_type === 'manager'
         const isOwner = isManagerVideo && existingVideo.manager_id === manager_id
+
+        console.log('🔍 Verificação de permissões:', {
+            isSystemVideo,
+            isManagerVideo,
+            isOwner,
+            existingVideo_manager_id: existingVideo.manager_id,
+            existingVideo_manager_id_type: typeof existingVideo.manager_id,
+            requested_manager_id: manager_id,
+            requested_manager_id_type: typeof manager_id,
+            comparison: existingVideo.manager_id === manager_id
+        })
 
         // Campos que podem ser editados baseado no tipo
         const updateData: any = {}
