@@ -64,16 +64,7 @@ export default function HomePage() {
                             </div>
                         </div>
 
-                        <div className="text-center mb-6">
-                            <div className="text-3xl font-bold text-primary-600 mb-2">
-                                R$ 18
-                            </div>
-                            <div className="text-gray-600">
-                                por funcionário (mínimo 5)
-                            </div>
-                        </div>
-
-                        <Link href="/checkout" className="btn-primary w-full text-center block">
+                        <Link href="/cadastro-gestor" className="btn-primary w-full text-center block">
                             Começar Jornada de Equipe
                         </Link>
                     </div>
@@ -113,17 +104,6 @@ export default function HomePage() {
                                     <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                                 </svg>
                                 <span className="text-gray-700">Acesso vitalício</span>
-                            </div>
-                        </div>
-
-                        <div className="text-center mb-6">
-                            <div className="text-3xl font-bold text-gray-900 mb-2">
-                                R$ 288,00
-                            </div>
-                            <div className="text-lg text-green-600 font-semibold">
-                                ou 12x de R$ 41,88
-                            </div>
-                            <div className="text-sm text-gray-500 mt-1">
                             </div>
                         </div>
 

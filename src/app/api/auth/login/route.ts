@@ -18,10 +18,18 @@ export async function POST(request: NextRequest) {
             }, { status: 400 })
         }
 
-        // Buscar gestor no banco de dados
+        // Buscar gestor no banco de dados com dados da empresa
         const { data: manager, error } = await supabase
             .from('managers')
-            .select('*')
+            .select(`
+                *,
+                companies:company_id (
+                    id,
+                    name,
+                    status,
+                    plan
+                )
+            `)
             .eq('email', email)
             .single()
 
@@ -30,6 +38,23 @@ export async function POST(request: NextRequest) {
                 success: false,
                 error: 'Email ou senha incorretos'
             }, { status: 401 })
+        }
+
+        // Verificar se o gestor está ativo
+        if (manager.status === 'inactive') {
+            return NextResponse.json({
+                success: false,
+                error: 'Sua conta está inativa. Aguardando confirmação de pagamento.'
+            }, { status: 403 })
+        }
+
+        // Verificar se a empresa está ativa
+        const company = Array.isArray(manager.companies) ? manager.companies[0] : manager.companies
+        if (company && company.status === 'inactive') {
+            return NextResponse.json({
+                success: false,
+                error: 'Empresa inativa. Entre em contato com o suporte.'
+            }, { status: 403 })
         }
 
         // Verificar senha

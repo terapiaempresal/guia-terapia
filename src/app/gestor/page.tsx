@@ -10,6 +10,9 @@ interface Employee {
     name: string
     full_name?: string
     email: string
+    cpf?: string
+    birth_date?: string
+    whatsapp?: string
     invited_at: string
     accepted_at?: string
     created_at: string
@@ -35,7 +38,10 @@ interface Manager {
     id: string
     company_id: string
     name: string
+    full_name?: string
     email: string
+    phone?: string
+    status?: string
     company: Company
 }
 
@@ -65,6 +71,14 @@ export default function ManagerDashboard() {
         email: '',
         whatsapp: ''
     })
+
+    // Estados para Mapa de Conformidade
+    const [showComplianceMap, setShowComplianceMap] = useState(false)
+    const [complianceMapGenerated, setComplianceMapGenerated] = useState(false)
+    const [allManagers, setAllManagers] = useState<Manager[]>([])
+
+    // Estado para verificar se é admin
+    const [isAdmin, setIsAdmin] = useState(false)
 
     // Verificar autenticação e carregar dados
     useEffect(() => {
@@ -125,6 +139,15 @@ export default function ManagerDashboard() {
                 console.log('✅ Dados carregados com sucesso')
                 setManager(data.manager)
                 setCompany(data.company)
+
+                // Verificar se é admin
+                if (data.manager?.is_admin === true) {
+                    console.log('👑 Gestor é ADMIN')
+                    setIsAdmin(true)
+                } else {
+                    console.log('👤 Gestor é normal (não admin)')
+                    setIsAdmin(false)
+                }
             } else {
                 console.error('❌ Erro ao carregar dados:', data.error)
                 showError('Erro ao carregar dados do gestor')
@@ -273,6 +296,65 @@ export default function ManagerDashboard() {
     }
 
     const completionRate = calculateCompletionRate()
+
+    // Funções do Mapa de Conformidade
+    const checkComplianceReadiness = () => {
+        // Verificar se todos os funcionários têm os dados necessários preenchidos
+        const incompleteEmployees = employees.filter(emp =>
+            !emp.full_name || !emp.cpf || !emp.birth_date || !emp.email
+        )
+
+        return {
+            ready: incompleteEmployees.length === 0,
+            incompleteCount: incompleteEmployees.length,
+            incompleteEmployees
+        }
+    }
+
+    const loadAllManagers = async () => {
+        if (!company?.id) return
+
+        try {
+            const response = await fetch(`/api/companies/${company.id}/managers`)
+            const data = await response.json()
+
+            if (response.ok) {
+                setAllManagers(data.managers || [])
+                console.log('👥 Gestores/Sócios carregados:', data.managers?.length || 0)
+            } else {
+                console.error('Erro ao carregar gestores:', data.error)
+            }
+        } catch (error) {
+            console.error('Erro ao carregar gestores:', error)
+        }
+    }
+
+    const handleGenerateComplianceMap = () => {
+        console.log('🗺️ Gerando Mapa de Conformidade...')
+        const readiness = checkComplianceReadiness()
+
+        console.log('📊 Status da verificação:', readiness)
+
+        if (!readiness.ready) {
+            showWarning(
+                `${readiness.incompleteCount} funcionário(s) com dados incompletos. ` +
+                `Todos os funcionários precisam ter nome, CPF, data de nascimento e email preenchidos para gerar o mapa.`
+            )
+            return
+        }
+
+        // Carregar gestores/sócios
+        loadAllManagers()
+
+        // Mostrar o mapa
+        setShowComplianceMap(true)
+        setComplianceMapGenerated(true)
+        showSuccess('Mapa de Conformidade gerado com sucesso!')
+    }
+
+    const handleCloseComplianceMap = () => {
+        setShowComplianceMap(false)
+    }
 
     // Log resumido dos dados
     console.log('📊 Painel:', {
@@ -657,6 +739,20 @@ export default function ManagerDashboard() {
                                     )}
                                     Atualizar Lista
                                 </button>
+
+                                {/* Botão Admin - só aparece para admins */}
+                                {isAdmin && (
+                                    <button
+                                        onClick={() => window.location.href = '/admin'}
+                                        className="flex items-center px-4 py-2 bg-red-600 text-white hover:bg-red-700 rounded-lg transition-colors shadow-md"
+                                        title="Acessar Painel Administrativo"
+                                    >
+                                        <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                                        </svg>
+                                        Painel Admin
+                                    </button>
+                                )}
                             </div>
 
                             <button
@@ -676,7 +772,7 @@ export default function ManagerDashboard() {
 
             {/* Stats */}
             <div className="max-w-7xl mx-auto px-4 py-8">
-                <div className="grid md:grid-cols-3 gap-6 mb-8">
+                <div className="grid md:grid-cols-4 gap-6 mb-8">
                     <div className="card">
                         <div className="flex items-center">
                             <div className="p-2 bg-primary-100 rounded-lg">
@@ -724,6 +820,20 @@ export default function ManagerDashboard() {
                             </div>
                         </div>
                     </div>
+
+                    {/* Card do Botão Gerar Mapa */}
+                    <button
+                        onClick={handleGenerateComplianceMap}
+                        className="card hover:shadow-lg transition-shadow cursor-pointer bg-gradient-to-br from-purple-50 to-purple-100 border-2 border-purple-200 hover:border-purple-400"
+                    >
+                        <div className="flex flex-col items-center justify-center h-full py-2">
+
+                            <h3 className="text-sm font-semibold text-purple-900 text-center">
+                                Gerar Mapa de Conformidade
+                            </h3>
+                            <p className="text-xs text-purple-700 mt-1">Clique para gerar</p>
+                        </div>
+                    </button>
                 </div>
 
                 {/* Employee Table */}
@@ -1049,6 +1159,187 @@ export default function ManagerDashboard() {
                     </div>
                 )}
             </div>
+
+            {/* Modal do Mapa de Conformidade */}
+            {showComplianceMap && (
+                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+                    <div className="bg-white rounded-lg shadow-xl max-w-6xl w-full max-h-[90vh] overflow-y-auto">
+                        <div className="p-6">
+                            <div className="flex items-center justify-between mb-6">
+                                <div className="flex items-center">
+                                    <div className="p-2 bg-purple-100 rounded-lg mr-3">
+                                        <svg className="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                        </svg>
+                                    </div>
+                                    <div>
+                                        <h2 className="text-2xl font-bold text-gray-900">
+                                            Mapa de Conformidade
+                                        </h2>
+                                        <p className="text-sm text-gray-600">
+                                            {company?.name}
+                                        </p>
+                                    </div>
+                                </div>
+                                <button
+                                    onClick={handleCloseComplianceMap}
+                                    className="text-gray-400 hover:text-gray-600"
+                                >
+                                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                                    </svg>
+                                </button>
+                            </div>
+
+                            {/* Sócios/Gestores */}
+                            <div className="mb-8">
+                                <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+                                    <svg className="w-5 h-5 mr-2 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                                    </svg>
+                                    Sócios/Gestores ({allManagers.length})
+                                </h3>
+                                <div className="grid md:grid-cols-2 gap-4">
+                                    {allManagers.map((mgr) => (
+                                        <div key={mgr.id} className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                                            <div className="flex items-start justify-between">
+                                                <div className="flex-1">
+                                                    <h4 className="font-semibold text-gray-900">{mgr.full_name || mgr.name}</h4>
+                                                    <p className="text-sm text-gray-600">{mgr.email}</p>
+                                                    {mgr.phone && (
+                                                        <p className="text-sm text-gray-600">{mgr.phone}</p>
+                                                    )}
+                                                </div>
+                                                <span className={`px-2 py-1 rounded text-xs font-medium ${mgr.status === 'active'
+                                                    ? 'bg-green-100 text-green-800'
+                                                    : 'bg-gray-100 text-gray-800'
+                                                    }`}>
+                                                    {mgr.status === 'active' ? 'Ativo' : 'Inativo'}
+                                                </span>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+
+                            {/* Funcionários */}
+                            <div className="mb-6">
+                                <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+                                    <svg className="w-5 h-5 mr-2 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                                    </svg>
+                                    Funcionários ({employees.length})
+                                </h3>
+                                <div className="overflow-x-auto">
+                                    <table className="min-w-full divide-y divide-gray-200">
+                                        <thead className="bg-gray-50">
+                                            <tr>
+                                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                                    Nome
+                                                </th>
+                                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                                    CPF
+                                                </th>
+                                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                                    Data Nascimento
+                                                </th>
+                                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                                    Email
+                                                </th>
+                                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                                    WhatsApp
+                                                </th>
+                                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                                    Status
+                                                </th>
+                                            </tr>
+                                        </thead>
+                                        <tbody className="bg-white divide-y divide-gray-200">
+                                            {employees.map((emp) => (
+                                                <tr key={emp.id} className={
+                                                    !emp.full_name || !emp.cpf || !emp.birth_date || !emp.email
+                                                        ? 'bg-yellow-50'
+                                                        : ''
+                                                }>
+                                                    <td className="px-6 py-4 whitespace-nowrap">
+                                                        <div className="text-sm font-medium text-gray-900">
+                                                            {emp.full_name || emp.name || '-'}
+                                                        </div>
+                                                    </td>
+                                                    <td className="px-6 py-4 whitespace-nowrap">
+                                                        <div className="text-sm text-gray-900">
+                                                            {emp.cpf || (
+                                                                <span className="text-yellow-600 font-medium">Não preenchido</span>
+                                                            )}
+                                                        </div>
+                                                    </td>
+                                                    <td className="px-6 py-4 whitespace-nowrap">
+                                                        <div className="text-sm text-gray-900">
+                                                            {emp.birth_date ? new Date(emp.birth_date).toLocaleDateString('pt-BR') : (
+                                                                <span className="text-yellow-600 font-medium">Não preenchido</span>
+                                                            )}
+                                                        </div>
+                                                    </td>
+                                                    <td className="px-6 py-4 whitespace-nowrap">
+                                                        <div className="text-sm text-gray-900">
+                                                            {emp.email || (
+                                                                <span className="text-yellow-600 font-medium">Não preenchido</span>
+                                                            )}
+                                                        </div>
+                                                    </td>
+                                                    <td className="px-6 py-4 whitespace-nowrap">
+                                                        <div className="text-sm text-gray-900">
+                                                            {emp.whatsapp || '-'}
+                                                        </div>
+                                                    </td>
+                                                    <td className="px-6 py-4 whitespace-nowrap">
+                                                        <span className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${emp.status === 'active'
+                                                            ? 'bg-green-100 text-green-800'
+                                                            : emp.status === 'blocked'
+                                                                ? 'bg-red-100 text-red-800'
+                                                                : 'bg-yellow-100 text-yellow-800'
+                                                            }`}>
+                                                            {emp.status === 'active' ? 'Ativo' : emp.status === 'blocked' ? 'Bloqueado' : 'Convidado'}
+                                                        </span>
+                                                    </td>
+                                                </tr>
+                                            ))}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+
+                            {/* Legenda */}
+                            <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-6">
+                                <div className="flex items-start">
+                                    <svg className="w-5 h-5 text-yellow-600 mt-0.5 mr-3 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                                    </svg>
+                                    <div>
+                                        <p className="text-sm font-medium text-yellow-800">
+                                            Atenção
+                                        </p>
+                                        <p className="text-sm text-yellow-700 mt-1">
+                                            Linhas destacadas em amarelo indicam funcionários com dados incompletos.
+                                            Todos os campos (Nome, CPF, Data de Nascimento e Email) devem estar preenchidos.
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Botão Fechar */}
+                            <div className="flex justify-end">
+                                <button
+                                    onClick={handleCloseComplianceMap}
+                                    className="btn-primary"
+                                >
+                                    Fechar
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
 
             {/* Modal de Confirmação de Logout */}
             <ConfirmModal

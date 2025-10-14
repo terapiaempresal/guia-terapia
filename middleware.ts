@@ -5,12 +5,17 @@ export function middleware(request: NextRequest) {
     const { pathname } = request.nextUrl
 
     // Permitir acesso a rotas públicas
-    const publicRoutes = ['/', '/login', '/acesso']
-    const isPublicRoute = publicRoutes.some(route => 
+    const publicRoutes = ['/', '/login', '/acesso', '/cadastro-gestor', '/login/esqueci-senha', '/login/redefinir-senha']
+    const isPublicRoute = publicRoutes.some(route =>
         pathname === route || pathname.startsWith('/api/') || pathname.startsWith('/_next/')
     )
 
     if (isPublicRoute) {
+        return NextResponse.next()
+    }
+
+    // Rota de admin - proteção no lado do cliente com verificação de email
+    if (pathname.startsWith('/admin')) {
         return NextResponse.next()
     }
 
