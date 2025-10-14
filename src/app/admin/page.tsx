@@ -292,12 +292,24 @@ export default function AdminPage() {
                                 Gerencie empresas e gestores
                             </p>
                         </div>
-                        <button
-                            onClick={loadCompanies}
-                            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
-                        >
-                            Atualizar
-                        </button>
+                        <div className="flex items-center space-x-3">
+                            <button
+                                onClick={() => window.location.href = '/gestor'}
+                                className="flex items-center px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors"
+                                title="Voltar para o Painel do Gestor"
+                            >
+                                <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                                </svg>
+                                Painel do Gestor
+                            </button>
+                            <button
+                                onClick={loadCompanies}
+                                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                            >
+                                Atualizar
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
