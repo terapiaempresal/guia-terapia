@@ -72,6 +72,10 @@ export default function ManagerDashboard() {
         whatsapp: ''
     })
 
+    // Estados para Departamentos
+    const [departments, setDepartments] = useState<Array<{ id: string; name: string; description?: string }>>([])
+    const [selectedDepartments, setSelectedDepartments] = useState<string[]>([])
+
     // Estados para Mapa de Conformidade
     const [showComplianceMap, setShowComplianceMap] = useState(false)
     const [complianceMapGenerated, setComplianceMapGenerated] = useState(false)
@@ -112,6 +116,13 @@ export default function ManagerDashboard() {
     useEffect(() => {
         loadTotalVideos()
     }, [])
+
+    // Carregar departamentos quando o modal abrir
+    useEffect(() => {
+        if (showAddEmployee && company?.id) {
+            loadDepartments()
+        }
+    }, [showAddEmployee, company?.id])
 
     const loadManagerData = async () => {
         try {
@@ -157,6 +168,23 @@ export default function ManagerDashboard() {
         } finally {
             console.log('🏁 Finalizando carregamento, setLoading(false)')
             setLoading(false)
+        }
+    }
+
+    const loadDepartments = async () => {
+        if (!company?.id) return
+
+        try {
+            const response = await fetch(`/api/departments?company_id=${company.id}`)
+            const data = await response.json()
+
+            if (response.ok) {
+                setDepartments(data.departments || [])
+            } else {
+                console.error('Erro ao carregar departamentos:', data.error)
+            }
+        } catch (error) {
+            console.error('Erro ao carregar departamentos:', error)
         }
     }
 
@@ -465,6 +493,24 @@ export default function ManagerDashboard() {
             const data = await response.json()
 
             if (response.ok) {
+                // Vincular funcionário aos departamentos selecionados
+                if (selectedDepartments.length > 0 && data.employee?.id) {
+                    try {
+                        for (const departmentId of selectedDepartments) {
+                            await fetch('/api/employees/departments', {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({
+                                    employee_id: data.employee.id,
+                                    department_id: departmentId
+                                })
+                            })
+                        }
+                    } catch (deptError) {
+                        console.error('Erro ao vincular departamentos:', deptError)
+                    }
+                }
+
                 // Recarregar lista de funcionários
                 await loadEmployees()
 
@@ -502,6 +548,7 @@ export default function ManagerDashboard() {
         }
 
         setNewEmployee({ full_name: '', email: '', whatsapp: '' })
+        setSelectedDepartments([])
         setShowAddEmployee(false)
     }
 
@@ -986,7 +1033,7 @@ export default function ManagerDashboard() {
                                     <p className="text-xs text-blue-700 mb-3">
                                         Compartilhe este link para que funcionários façam seu próprio cadastro
                                     </p>
-                                    <div className="flex space-x-2">
+                                    <div className="flex space-x-2 mb-4">
                                         <input
                                             type="text"
                                             readOnly
@@ -1003,6 +1050,7 @@ export default function ManagerDashboard() {
                                             Copiar
                                         </button>
                                     </div>
+
                                 </div>
 
                                 {/* Divisor */}
@@ -1015,76 +1063,15 @@ export default function ManagerDashboard() {
                                     </div>
                                 </div>
 
-                                {/* Opção 2: Adicionar específico */}
-                                <div>
-                                    <h4 className="text-sm font-medium text-gray-900 mb-3">
-                                        👤 Opção 2: Adicionar funcionário específico
-                                    </h4>
-
-                                    <div className="space-y-4">
-                                        <div>
-                                            <label className="block text-sm font-medium text-gray-700 mb-2">
-                                                Nome Completo *
-                                            </label>
-                                            <input
-                                                type="text"
-                                                required
-                                                className="input"
-                                                value={newEmployee.full_name}
-                                                onChange={(e) => setNewEmployee(prev => ({
-                                                    ...prev,
-                                                    full_name: e.target.value
-                                                }))}
-                                            />
-                                        </div>
-
-                                        <div>
-                                            <label className="block text-sm font-medium text-gray-700 mb-2">
-                                                E-mail *
-                                            </label>
-                                            <input
-                                                type="email"
-                                                required
-                                                className="input"
-                                                value={newEmployee.email}
-                                                onChange={(e) => setNewEmployee(prev => ({
-                                                    ...prev,
-                                                    email: e.target.value
-                                                }))}
-                                            />
-                                        </div>
-
-                                        <div>
-                                            <label className="block text-sm font-medium text-gray-700 mb-2">
-                                                WhatsApp *
-                                            </label>
-                                            <input
-                                                type="tel"
-                                                required
-                                                className="input"
-                                                placeholder="(11) 99999-9999"
-                                                value={newEmployee.whatsapp}
-                                                onChange={(e) => setNewEmployee(prev => ({
-                                                    ...prev,
-                                                    whatsapp: e.target.value
-                                                }))}
-                                            />
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div className="flex space-x-3 pt-4">
+                                <div className="flex justify-center pt-4">
                                     <button
-                                        onClick={handleAddEmployee}
-                                        className="btn-primary flex-1"
+                                        onClick={() => window.location.href = '/gestor/departamentos'}
+                                        className="flex items-center px-4 py-2 bg-purple-600 text-white hover:bg-purple-700 rounded-lg transition-colors"
                                     >
-                                        Adicionar e Enviar Convite
-                                    </button>
-                                    <button
-                                        onClick={() => setShowAddEmployee(false)}
-                                        className="btn-secondary flex-1"
-                                    >
-                                        Cancelar
+                                        <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                                        </svg>
+                                        Adicionar Áreas de Atuação
                                     </button>
                                 </div>
                             </div>

@@ -14,6 +14,8 @@ function CadastroFuncionarioContent() {
 
     const [loading, setLoading] = useState(false)
     const [empresa, setEmpresa] = useState<any>(null)
+    const [departments, setDepartments] = useState<Array<{ id: string; name: string; description?: string }>>([])
+    const [selectedDepartments, setSelectedDepartments] = useState<string[]>([])
     const [formData, setFormData] = useState({
         full_name: '',
         email: '',
@@ -25,6 +27,7 @@ function CadastroFuncionarioContent() {
     useEffect(() => {
         if (empresaId) {
             carregarEmpresa()
+            carregarDepartamentos()
         }
     }, [empresaId])
 
@@ -37,6 +40,23 @@ function CadastroFuncionarioContent() {
             }
         } catch (error) {
             console.error('Erro ao carregar empresa:', error)
+        }
+    }
+
+    const carregarDepartamentos = async () => {
+        if (!empresaId) return
+
+        try {
+            const response = await fetch(`/api/departments?company_id=${empresaId}`)
+            const data = await response.json()
+
+            if (response.ok) {
+                setDepartments(data.departments || [])
+            } else {
+                console.error('Erro ao carregar departamentos:', data.error)
+            }
+        } catch (error) {
+            console.error('Erro ao carregar departamentos:', error)
         }
     }
 
@@ -97,6 +117,24 @@ function CadastroFuncionarioContent() {
             console.log('Data:', data)
 
             if (data.success) {
+                // Vincular funcionário aos departamentos selecionados
+                if (selectedDepartments.length > 0 && data.employee?.id) {
+                    try {
+                        for (const departmentId of selectedDepartments) {
+                            await fetch('/api/employees/departments', {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({
+                                    employee_id: data.employee.id,
+                                    department_id: departmentId
+                                })
+                            })
+                        }
+                    } catch (deptError) {
+                        console.error('Erro ao vincular departamentos:', deptError)
+                    }
+                }
+
                 showSuccess('Cadastro realizado com sucesso! Bem-vindo à equipe!')
                 router.push('/funcionario/videos')
             } else {
@@ -250,6 +288,47 @@ function CadastroFuncionarioContent() {
                                 required
                             />
                         </div>
+
+                        {/* Seleção de Áreas de Atuação */}
+                        {departments.length > 0 && (
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-2">
+                                    Áreas de Atuação (opcional)
+                                </label>
+                                <div className="space-y-2 max-h-48 overflow-y-auto border border-gray-200 rounded-lg p-3 bg-gray-50">
+                                    {departments.map((dept) => (
+                                        <label
+                                            key={dept.id}
+                                            className="flex items-start space-x-3 p-2 hover:bg-white rounded cursor-pointer transition-colors"
+                                        >
+                                            <input
+                                                type="checkbox"
+                                                checked={selectedDepartments.includes(dept.id)}
+                                                onChange={(e) => {
+                                                    if (e.target.checked) {
+                                                        setSelectedDepartments(prev => [...prev, dept.id])
+                                                    } else {
+                                                        setSelectedDepartments(prev => prev.filter(id => id !== dept.id))
+                                                    }
+                                                }}
+                                                className="mt-1 h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded"
+                                            />
+                                            <div className="flex-1">
+                                                <span className="text-sm font-medium text-gray-900">{dept.name}</span>
+                                                {dept.description && (
+                                                    <p className="text-xs text-gray-500 mt-0.5">{dept.description}</p>
+                                                )}
+                                            </div>
+                                        </label>
+                                    ))}
+                                </div>
+                                {selectedDepartments.length > 0 && (
+                                    <p className="text-xs text-gray-600 mt-2">
+                                        {selectedDepartments.length} {selectedDepartments.length === 1 ? 'área selecionada' : 'áreas selecionadas'}
+                                    </p>
+                                )}
+                            </div>
+                        )}
 
                         <button
                             type="submit"
