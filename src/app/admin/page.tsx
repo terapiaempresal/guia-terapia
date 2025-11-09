@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { supabase } from '@/lib/supabase'
 import { useRouter } from 'next/navigation'
+import { useToast } from '@/components/ToastProvider'
 
 // Lista de emails de administradores
 const ADMIN_EMAILS = [
@@ -32,13 +33,39 @@ interface Manager {
     updated_at: string
 }
 
+interface Employee {
+    id: string
+    company_id: string
+    manager_id?: string
+    name: string // Campo real é 'name', não 'full_name'
+    full_name?: string // Pode existir como alias
+    email: string | null
+    cpf?: string | null
+    birth_date?: string | null
+    whatsapp?: string | null
+    password?: string
+    status?: string
+    archived?: boolean
+    archived_at?: string | null
+    invited_at?: string | null
+    accepted_at?: string | null
+    journey_filled?: boolean
+    journey_filled_at?: string | null
+    journey_result_html?: string | null
+    under_review?: boolean // Mapa em modo de revisão
+    created_at: string
+    updated_at?: string
+}
+
 interface CompanyWithManagers extends Company {
     managers: Manager[]
     employees_count?: number
+    employees?: Employee[]
 }
 
 export default function AdminPage() {
     const router = useRouter()
+    const { showSuccess, showError, showWarning } = useToast()
     const [companies, setCompanies] = useState<CompanyWithManagers[]>([])
     const [loading, setLoading] = useState(true)
     const [selectedCompany, setSelectedCompany] = useState<CompanyWithManagers | null>(null)
@@ -47,6 +74,9 @@ export default function AdminPage() {
     const [searchTerm, setSearchTerm] = useState('')
     const [isAdmin, setIsAdmin] = useState(false)
     const [checkingAuth, setCheckingAuth] = useState(true)
+    const [expandedEmployeeId, setExpandedEmployeeId] = useState<string | null>(null)
+    const [editingEmployeeId, setEditingEmployeeId] = useState<string | null>(null)
+    const [editedHtml, setEditedHtml] = useState<{ [key: string]: string }>({})
 
     useEffect(() => {
         checkAdminAccess()
@@ -54,26 +84,11 @@ export default function AdminPage() {
 
     async function checkAdminAccess() {
         try {
-            console.log('🚀 [checkAdminAccess] Iniciando verificação...')
-
-            // Verificar sessão do usuário (Supabase Auth OU sessionStorage)
-            const { data: { session }, error: sessionError } = await supabase.auth.getSession()
+            const { data: { session } } = await supabase.auth.getSession()
             const emailFromStorage = sessionStorage.getItem('manager_email')
-
-            console.log('📊 [checkAdminAccess] Session:', {
-                hasSupabaseSession: !!session,
-                hasSessionStorage: !!emailFromStorage,
-                supabaseEmail: session?.user?.email,
-                storageEmail: emailFromStorage,
-                sessionError: sessionError
-            })
-
-            // Tentar obter email de qualquer fonte
             const userEmail = session?.user?.email || emailFromStorage
 
             if (!userEmail) {
-                console.log('❌ [checkAdminAccess] Nenhuma sessão encontrada')
-                console.log('💡 [checkAdminAccess] Redirecionando para login...')
 
                 // Salvar URL de retorno
                 if (typeof window !== 'undefined') {
@@ -84,78 +99,42 @@ export default function AdminPage() {
                 return
             }
 
-            console.log('✅ [checkAdminAccess] Usuário logado:', userEmail)
-
-            // Verificar se é admin pela coluna is_admin no banco
-            console.log('🔍 [checkAdminAccess] Buscando dados do manager...')
             const { data: managerData, error: managerError } = await supabase
                 .from('managers')
                 .select('is_admin, full_name, status')
                 .eq('email', userEmail)
                 .single()
 
-            console.log('📋 [checkAdminAccess] Resultado da busca:', {
-                managerData,
-                managerError,
-                errorCode: managerError?.code,
-                errorMessage: managerError?.message
-            })
-
             if (managerError) {
-                console.log('⚠️  [checkAdminAccess] Erro ao buscar gestor:', managerError.message)
-
-                // Se o erro for coluna não existe (42703)
-                if (managerError.code === '42703' || managerError.message?.includes('is_admin')) {
-                    console.log('🔴 [checkAdminAccess] COLUNA is_admin NÃO EXISTE!')
-                    console.log('📝 [checkAdminAccess] Execute o SQL: ALTER TABLE public.managers ADD COLUMN is_admin boolean DEFAULT false;')
-                }
-
-                // Fallback: Verificar se está na lista hardcoded
                 if (ADMIN_EMAILS.includes(userEmail)) {
-                    console.log('✅ [checkAdminAccess] Admin autorizado via lista hardcoded')
                     setIsAdmin(true)
                     setCheckingAuth(false)
                     loadCompanies()
                     return
                 }
-
-                alert(`Acesso negado!\n\nVocê não tem permissão para acessar o painel administrativo.\n\nSeu email: ${userEmail}\n\nErro: ${managerError.message}`)
+                alert(`Acesso negado! Você não tem permissão para acessar o painel administrativo.`)
                 router.push('/gestor')
                 return
             }
 
             if (!managerData) {
-                console.log('⚠️  [checkAdminAccess] Manager não encontrado no banco:', userEmail)
-
-                // Fallback: Verificar se está na lista hardcoded
                 if (ADMIN_EMAILS.includes(userEmail)) {
-                    console.log('✅ Admin autorizado via lista hardcoded')
                     setIsAdmin(true)
                     setCheckingAuth(false)
                     loadCompanies()
                     return
                 }
-
-                alert(`Acesso negado!\n\nVocê não tem permissão para acessar o painel administrativo.\n\nSeu email: ${userEmail}`)
+                alert(`Acesso negado! Você não tem permissão para acessar o painel administrativo.`)
                 router.push('/gestor')
                 return
             }
-
-            console.log('👤 [checkAdminAccess] Manager encontrado:', {
-                email: userEmail,
-                full_name: managerData.full_name,
-                is_admin: managerData.is_admin,
-                status: managerData.status
-            })
 
             if (!managerData.is_admin) {
-                console.log('⚠️  Usuário não é admin:', userEmail)
-                alert(`Acesso negado!\n\nVocê não tem permissão para acessar o painel administrativo.\n\nSeu email: ${userEmail}\n\nApenas administradores podem acessar esta área.`)
+                alert(`Acesso negado! Apenas administradores podem acessar esta área.`)
                 router.push('/gestor')
                 return
             }
 
-            console.log('🎉 Admin autorizado:', userEmail, '(', managerData.full_name, ')')
             setIsAdmin(true)
             setCheckingAuth(false)
             loadCompanies()
@@ -184,16 +163,17 @@ export default function AdminPage() {
                         .select('*')
                         .eq('company_id', company.id)
 
-                    // Contar funcionários
-                    const { count } = await supabase
+                    const { data: employees } = await supabase
                         .from('employees')
-                        .select('*', { count: 'exact', head: true })
+                        .select('*')
                         .eq('company_id', company.id)
+                        .order('created_at', { ascending: false })
 
                     return {
                         ...company,
                         managers: managers || [],
-                        employees_count: count || 0
+                        employees: employees || [],
+                        employees_count: (employees || []).length
                     } as CompanyWithManagers
                 })
             )
@@ -201,7 +181,7 @@ export default function AdminPage() {
             setCompanies(companiesWithManagers)
         } catch (error) {
             console.error('Erro ao carregar empresas:', error)
-            alert('Erro ao carregar dados')
+            showError('Não foi possível carregar os dados das empresas', 'Erro ao Carregar')
         } finally {
             setLoading(false)
         }
@@ -216,7 +196,7 @@ export default function AdminPage() {
             .eq('id', companyId)
 
         if (error) {
-            alert('Erro ao atualizar status')
+            showError('Não foi possível atualizar o status da empresa', 'Erro')
             return
         }
 
@@ -226,12 +206,13 @@ export default function AdminPage() {
             .update({ status: newStatus })
             .eq('company_id', companyId)
 
+        showSuccess(`Empresa ${newStatus === 'active' ? 'ativada' : 'desativada'} com sucesso!`, 'Status Atualizado')
         loadCompanies()
     }
 
     async function updateEmployeesQuota(companyId: string, newQuota: number) {
         if (newQuota < 5) {
-            alert('Mínimo de 5 funcionários')
+            showWarning('A quota mínima de funcionários é 5', 'Quota Inválida')
             return
         }
 
@@ -241,16 +222,103 @@ export default function AdminPage() {
             .eq('id', companyId)
 
         if (error) {
-            alert('Erro ao atualizar quota')
+            showError('Não foi possível atualizar a quota de funcionários', 'Erro')
             return
         }
 
+        showSuccess(`Quota atualizada para ${newQuota} funcionários`, 'Quota Atualizada')
         loadCompanies()
     }
 
-    function openDetails(company: CompanyWithManagers) {
-        setSelectedCompany(company)
+    async function openDetails(company: CompanyWithManagers) {
+        const { data: employees } = await supabase
+            .from('employees')
+            .select('*')
+            .eq('company_id', company.id)
+            .order('created_at', { ascending: false })
+
+        const updatedCompany = {
+            ...company,
+            employees: employees || []
+        }
+
+        setSelectedCompany(updatedCompany)
         setShowModal(true)
+        setExpandedEmployeeId(null)
+        setEditingEmployeeId(null)
+        setEditedHtml({})
+    }
+
+    async function saveEmployeeHtml(employeeId: string) {
+        const htmlToSave = editedHtml[employeeId]
+
+        if (!htmlToSave) {
+            showWarning('Nenhuma alteração foi feita para salvar', 'Atenção')
+            return
+        }
+
+        try {
+            const { error } = await supabase
+                .from('employees')
+                .update({ journey_result_html: htmlToSave })
+                .eq('id', employeeId)
+
+            if (error) throw error
+
+            // Atualizar o estado local
+            if (selectedCompany) {
+                const updatedEmployees = selectedCompany.employees?.map(emp =>
+                    emp.id === employeeId ? { ...emp, journey_result_html: htmlToSave } : emp
+                )
+                setSelectedCompany({ ...selectedCompany, employees: updatedEmployees || [] })
+            }
+
+            setEditingEmployeeId(null)
+            showSuccess('Mapa atualizado com sucesso!', '✅ Salvo')
+        } catch (error) {
+            console.error('Erro ao salvar:', error)
+            showError('Não foi possível salvar as alterações. Tente novamente.', 'Erro ao Salvar')
+        }
+    }
+
+    function startEditing(employeeId: string, currentHtml: string) {
+        setEditingEmployeeId(employeeId)
+        setEditedHtml({ ...editedHtml, [employeeId]: currentHtml })
+    }
+
+    function cancelEditing(employeeId: string) {
+        setEditingEmployeeId(null)
+        const newEditedHtml = { ...editedHtml }
+        delete newEditedHtml[employeeId]
+        setEditedHtml(newEditedHtml)
+    }
+
+    async function toggleReviewStatus(employeeId: string, currentStatus: boolean) {
+        try {
+            const { error } = await supabase
+                .from('employees')
+                .update({ under_review: !currentStatus })
+                .eq('id', employeeId)
+
+            if (error) throw error
+
+            // Atualizar o estado local
+            if (selectedCompany) {
+                const updatedEmployees = selectedCompany.employees?.map(emp =>
+                    emp.id === employeeId ? { ...emp, under_review: !currentStatus } : emp
+                )
+                setSelectedCompany({ ...selectedCompany, employees: updatedEmployees || [] })
+            }
+
+            if (!currentStatus) {
+                showSuccess('Mapa marcado para revisão com sucesso!', '🔍 Em Revisão')
+            } else {
+                showSuccess('Mapa removido da revisão!', '✅ Revisão Concluída')
+            }
+        } catch (error) {
+            console.error('Erro ao atualizar status de revisão:', error)
+            showError('Não foi possível atualizar o status de revisão. Tente novamente.', 'Erro')
+        }
     }
 
     const filteredCompanies = companies
@@ -600,6 +668,174 @@ export default function AdminPage() {
                                         </div>
                                     ))}
                                 </div>
+                            </div>
+
+                            {/* Funcionários */}
+                            <div>
+                                <h3 className="text-lg font-semibold text-gray-900 mb-4">
+                                    🧑‍💼 Funcionários ({selectedCompany.employees?.length || 0})
+                                </h3>
+                                {selectedCompany.employees && selectedCompany.employees.length > 0 ? (
+                                    <div className="space-y-3">
+                                        {selectedCompany.employees.map((employee) => (
+                                            <div key={employee.id} className="border rounded-lg p-4">
+                                                <div className="flex justify-between items-start mb-3">
+                                                    <div>
+                                                        <div className="font-semibold text-gray-900">
+                                                            {employee.full_name || employee.name}
+                                                        </div>
+                                                        {employee.email && (
+                                                            <div className="text-sm text-gray-600">📧 {employee.email}</div>
+                                                        )}
+                                                        {employee.whatsapp && (
+                                                            <div className="text-sm text-gray-600">📱 {employee.whatsapp}</div>
+                                                        )}
+                                                        {employee.cpf && (
+                                                            <div className="text-sm text-gray-600">🪪 CPF: {employee.cpf}</div>
+                                                        )}
+                                                        {employee.birth_date && (
+                                                            <div className="text-sm text-gray-600">🎂 {new Date(employee.birth_date).toLocaleDateString('pt-BR')}</div>
+                                                        )}
+                                                        <div className="text-xs text-gray-500 mt-1">
+                                                            Criado em {new Date(employee.created_at).toLocaleDateString('pt-BR')}
+                                                        </div>
+                                                    </div>
+                                                    <div className="flex flex-col gap-2 items-end">
+                                                        {employee.under_review && (
+                                                            <span className="px-3 py-1 text-xs rounded-full bg-yellow-100 text-yellow-800 font-semibold">
+                                                                🔍 Em Revisão
+                                                            </span>
+                                                        )}
+                                                        {employee.archived && (
+                                                            <span className="px-3 py-1 text-xs rounded-full bg-gray-100 text-gray-800">
+                                                                📦 Arquivado
+                                                            </span>
+                                                        )}
+                                                        {employee.journey_filled && (
+                                                            <span className="px-3 py-1 text-xs rounded-full bg-purple-100 text-purple-800">
+                                                                ✅ Jornada Preenchida
+                                                            </span>
+                                                        )}
+                                                        {employee.accepted_at && (
+                                                            <span className="px-3 py-1 text-xs rounded-full bg-green-100 text-green-800">
+                                                                ✓ Aceito
+                                                            </span>
+                                                        )}
+                                                        {employee.invited_at && !employee.accepted_at && (
+                                                            <span className="px-3 py-1 text-xs rounded-full bg-blue-100 text-blue-800">
+                                                                📧 Convidado
+                                                            </span>
+                                                        )}
+                                                    </div>
+                                                </div>
+
+                                                {/* Botões Ver Mapa, Editar e Revisão */}
+                                                {employee.journey_result_html && (
+                                                    <div className="mt-3 border-t pt-3">
+                                                        <div className="flex gap-2 flex-wrap">
+                                                            <button
+                                                                onClick={() => setExpandedEmployeeId(
+                                                                    expandedEmployeeId === employee.id ? null : employee.id
+                                                                )}
+                                                                className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                                                            >
+                                                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
+                                                                </svg>
+                                                                {expandedEmployeeId === employee.id ? 'Ocultar Mapa' : 'Ver Mapa'}
+                                                            </button>
+
+                                                            <button
+                                                                onClick={() => toggleReviewStatus(employee.id, employee.under_review || false)}
+                                                                className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-colors ${employee.under_review
+                                                                    ? 'bg-yellow-600 hover:bg-yellow-700 text-white'
+                                                                    : 'bg-yellow-100 hover:bg-yellow-200 text-yellow-800'
+                                                                    }`}
+                                                            >
+                                                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
+                                                                </svg>
+                                                                {employee.under_review ? 'Remover de Revisão' : 'Marcar para Revisão'}
+                                                            </button>
+
+                                                            {expandedEmployeeId === employee.id && (
+                                                                <>
+                                                                    {editingEmployeeId === employee.id ? (
+                                                                        <>
+                                                                            <button
+                                                                                onClick={() => saveEmployeeHtml(employee.id)}
+                                                                                className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+                                                                            >
+                                                                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                                                                                </svg>
+                                                                                Salvar
+                                                                            </button>
+                                                                            <button
+                                                                                onClick={() => cancelEditing(employee.id)}
+                                                                                className="flex items-center gap-2 px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors"
+                                                                            >
+                                                                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                                                                                </svg>
+                                                                                Cancelar
+                                                                            </button>
+                                                                        </>
+                                                                    ) : (
+                                                                        <button
+                                                                            onClick={() => startEditing(employee.id, employee.journey_result_html || '')}
+                                                                            className="flex items-center gap-2 px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition-colors"
+                                                                        >
+                                                                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                                                            </svg>
+                                                                            Editar HTML
+                                                                        </button>
+                                                                    )}
+                                                                </>
+                                                            )}
+                                                        </div>
+
+                                                        {/* Journey Result HTML - expandível */}
+                                                        {expandedEmployeeId === employee.id && (
+                                                            <div className="mt-3">
+                                                                <div className="flex items-center justify-between mb-2">
+                                                                    <div className="text-sm font-medium text-gray-700">
+                                                                        📊 Resultado da Jornada de: <strong>{employee.full_name || employee.name}</strong>
+                                                                    </div>
+                                                                </div>
+
+                                                                {editingEmployeeId === employee.id ? (
+                                                                    <textarea
+                                                                        value={editedHtml[employee.id] || ''}
+                                                                        onChange={(e) => setEditedHtml({ ...editedHtml, [employee.id]: e.target.value })}
+                                                                        className="w-full h-[600px] p-4 border rounded-lg font-mono text-sm"
+                                                                        placeholder="Cole ou edite o HTML aqui..."
+                                                                    />
+                                                                ) : (
+                                                                    <div
+                                                                        className="bg-white p-6 rounded-lg max-h-[600px] overflow-y-auto border shadow-sm"
+                                                                        style={{
+                                                                            fontFamily: 'inherit',
+                                                                            fontSize: 'inherit',
+                                                                            lineHeight: '1.6',
+                                                                            color: 'inherit'
+                                                                        }}
+                                                                        dangerouslySetInnerHTML={{ __html: employee.journey_result_html }}
+                                                                    />
+                                                                )}
+                                                            </div>
+                                                        )}
+                                                    </div>
+                                                )}
+                                            </div>
+                                        ))}
+                                    </div>
+                                ) : (
+                                    <div className="text-center py-8 text-gray-500 border rounded-lg bg-gray-50">
+                                        Nenhum funcionário cadastrado
+                                    </div>
+                                )}
                             </div>
                         </div>
 

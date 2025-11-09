@@ -11,6 +11,7 @@
     "test-db": "node scripts/test-db.js"
   },
   "dependencies": {
+    "@prisma/client": "^6.19.0",
     "@supabase/supabase-js": "^2.39.0",
     "@tailwindcss/forms": "^0.5.7",
     "@types/node": "^20",
@@ -26,6 +27,7 @@
     "node-fetch": "^3.3.2",
     "nodemailer": "^7.0.6",
     "postcss": "^8",
+    "prisma": "^6.19.0",
     "react": "^18",
     "react-dom": "^18",
     "tailwindcss": "^3.3.0",

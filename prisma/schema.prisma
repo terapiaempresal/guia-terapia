@@ -1,0 +1,109 @@
+// This is your Prisma schema file
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+// ===== EMPRESAS =====
+model Company {
+  id              String    @id @default(uuid())
+  name            String
+  employees_quota Int       @default(5)
+  plan            String    @default("basic")
+  status          String    @default("active") // 'active' | 'inactive'
+  created_at      DateTime  @default(now())
+  updated_at      DateTime  @updatedAt
+  
+  // Relações
+  managers        Manager[]
+  employees       Employee[]
+  departments     Department[]
+
+  @@map("companies")
+}
+
+// ===== GESTORES =====
+model Manager {
+  id             String   @id @default(uuid())
+  company_id     String
+  auth_user_id   String   @unique
+  name           String
+  full_name      String
+  email          String   @unique
+  phone          String?
+  password_hash  String
+  status         String   @default("active") // 'active' | 'inactive'
+  is_admin       Boolean  @default(false)
+  created_at     DateTime @default(now())
+  updated_at     DateTime @updatedAt
+
+  // Relações
+  company        Company  @relation(fields: [company_id], references: [id], onDelete: Cascade)
+
+  @@map("managers")
+  @@index([company_id])
+  @@index([email])
+}
+
+// ===== FUNCIONÁRIOS =====
+model Employee {
+  id                   String    @id @default(uuid())
+  company_id           String
+  auth_user_id         String?   @unique
+  full_name            String
+  cpf                  String?
+  birth_date           String?
+  email                String?
+  whatsapp             String?
+  department_id        String?
+  status               String    @default("invited") // 'invited' | 'active' | 'blocked'
+  journey_result_html  String?   @db.Text
+  created_at           DateTime  @default(now())
+  updated_at           DateTime  @updatedAt
+
+  // Relações
+  company              Company      @relation(fields: [company_id], references: [id], onDelete: Cascade)
+  department           Department?  @relation(fields: [department_id], references: [id])
+
+  @@map("employees")
+  @@index([company_id])
+  @@index([department_id])
+  @@index([email])
+}
+
+// ===== DEPARTAMENTOS =====
+model Department {
+  id          String     @id @default(uuid())
+  company_id  String
+  name        String
+  created_at  DateTime   @default(now())
+  updated_at  DateTime   @updatedAt
+
+  // Relações
+  company     Company    @relation(fields: [company_id], references: [id], onDelete: Cascade)
+  employees   Employee[]
+
+  @@map("departments")
+  @@index([company_id])
+}
+
+// ===== VÍDEOS =====
+model Video {
+  id          String   @id @default(uuid())
+  title       String
+  description String?
+  video_url   String
+  thumbnail   String?
+  duration    Int?
+  order_index Int      @default(0)
+  is_active   Boolean  @default(true)
+  created_at  DateTime @default(now())
+  updated_at  DateTime @updatedAt
+
+  @@map("videos")
+}
