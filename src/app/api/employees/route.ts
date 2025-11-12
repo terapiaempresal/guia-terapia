@@ -103,6 +103,32 @@ export async function POST(request: NextRequest) {
             )
         }
 
+        // Verificar se CPF já existe (se foi fornecido)
+        if (cpf) {
+            // Limpar o CPF (remover pontos e traços)
+            const cleanCPF = cpf.replace(/\D/g, '')
+
+            const { data: existingCPF } = await supabase
+                .from('employees')
+                .select('id, name, email, company_id')
+                .eq('cpf', cleanCPF)
+                .single()
+
+            if (existingCPF) {
+                return NextResponse.json(
+                    {
+                        error: 'CPF já cadastrado no sistema',
+                        message: `Este CPF já está cadastrado para o funcionário "${existingCPF.name}" (${existingCPF.email})`,
+                        existingEmployee: {
+                            name: existingCPF.name,
+                            email: existingCPF.email
+                        }
+                    },
+                    { status: 409 }
+                )
+            }
+        }
+
         // Criar funcionário
         const employeeData: any = {
             company_id,
