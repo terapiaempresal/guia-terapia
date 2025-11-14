@@ -3,7 +3,6 @@
 import { useState, useEffect } from 'react'
 import { supabase } from '@/lib/supabase'
 import { useRouter } from 'next/navigation'
-import { useToast } from '@/components/ToastProvider'
 
 // Lista de emails de administradores
 const ADMIN_EMAILS = [
@@ -66,7 +65,6 @@ interface CompanyWithManagers extends Company {
 
 export default function AdminPage() {
     const router = useRouter()
-    const { showSuccess, showError, showWarning } = useToast()
     const [companies, setCompanies] = useState<CompanyWithManagers[]>([])
     const [loading, setLoading] = useState(true)
     const [selectedCompany, setSelectedCompany] = useState<CompanyWithManagers | null>(null)
@@ -183,7 +181,7 @@ export default function AdminPage() {
             setCompanies(companiesWithManagers)
         } catch (error) {
             console.error('Erro ao carregar empresas:', error)
-            showError('Não foi possível carregar os dados das empresas', 'Erro ao Carregar')
+            alert('Não foi possível carregar os dados das empresas')
         } finally {
             setLoading(false)
         }
@@ -198,7 +196,7 @@ export default function AdminPage() {
             .eq('id', companyId)
 
         if (error) {
-            showError('Não foi possível atualizar o status da empresa', 'Erro')
+            alert('Não foi possível atualizar o status da empresa')
             return
         }
 
@@ -208,13 +206,13 @@ export default function AdminPage() {
             .update({ status: newStatus })
             .eq('company_id', companyId)
 
-        showSuccess(`Empresa ${newStatus === 'active' ? 'ativada' : 'desativada'} com sucesso!`, 'Status Atualizado')
+        alert(`Empresa ${newStatus === 'active' ? 'ativada' : 'desativada'} com sucesso!`)
         loadCompanies()
     }
 
     async function updateEmployeesQuota(companyId: string, newQuota: number) {
         if (newQuota < 5) {
-            showWarning('A quota mínima de funcionários é 5', 'Quota Inválida')
+            alert('A quota mínima de funcionários é 5')
             return
         }
 
@@ -224,11 +222,11 @@ export default function AdminPage() {
             .eq('id', companyId)
 
         if (error) {
-            showError('Não foi possível atualizar a quota de funcionários', 'Erro')
+            alert('Não foi possível atualizar a quota de funcionários')
             return
         }
 
-        showSuccess(`Quota atualizada para ${newQuota} funcionários`, 'Quota Atualizada')
+        alert(`Quota atualizada para ${newQuota} funcionários`)
         loadCompanies()
     }
 
@@ -255,7 +253,7 @@ export default function AdminPage() {
         const htmlToSave = editedHtml[employeeId]
 
         if (!htmlToSave) {
-            showWarning('Nenhuma alteração foi feita para salvar', 'Atenção')
+            alert('Nenhuma alteração foi feita para salvar')
             return
         }
 
@@ -276,10 +274,10 @@ export default function AdminPage() {
             }
 
             setEditingEmployeeId(null)
-            showSuccess('Mapa atualizado com sucesso!', '✅ Salvo')
+            alert('✅ Mapa atualizado com sucesso!')
         } catch (error) {
             console.error('Erro ao salvar:', error)
-            showError('Não foi possível salvar as alterações. Tente novamente.', 'Erro ao Salvar')
+            alert('Não foi possível salvar as alterações. Tente novamente.')
         }
     }
 
@@ -313,13 +311,13 @@ export default function AdminPage() {
             }
 
             if (!currentStatus) {
-                showSuccess('Mapa marcado para revisão com sucesso!', '🔍 Em Revisão')
+                alert('🔍 Mapa marcado para revisão com sucesso!')
             } else {
-                showSuccess('Mapa removido da revisão!', '✅ Revisão Concluída')
+                alert('✅ Mapa removido da revisão!')
             }
         } catch (error) {
             console.error('Erro ao atualizar status de revisão:', error)
-            showError('Não foi possível atualizar o status de revisão. Tente novamente.', 'Erro')
+            alert('Não foi possível atualizar o status de revisão. Tente novamente.')
         }
     }
 
@@ -340,7 +338,7 @@ export default function AdminPage() {
             }
 
             if (!data.respostas) {
-                showWarning('Funcionário não possui respostas salvas para regenerar o mapa', 'Sem Dados')
+                alert('Funcionário não possui respostas salvas para regenerar o mapa')
                 return
             }
 
@@ -348,7 +346,7 @@ export default function AdminPage() {
             // 1. Enviar as respostas para o webhook externo
             // 2. Ou mostrar um modal com as respostas para o usuário enviar manualmente
 
-            showSuccess('Respostas do mapa carregadas! Enviando para regeneração...', '🔄 Regenerando')
+            alert('🔄 Respostas do mapa carregadas! Enviando para regeneração...')
 
             // Enviar para o webhook externo
             const webhookUrl = 'https://webhook.terapiaempresarial.com.br/webhook/mapa-terapia'
@@ -365,7 +363,7 @@ export default function AdminPage() {
             const webhookData = await webhookResponse.json()
             console.log('Resposta do webhook:', webhookData)
 
-            showSuccess('Mapa regenerado com sucesso! Recarregue a página para ver as atualizações.', '✅ Concluído')
+            alert('✅ Mapa regenerado com sucesso! Recarregue a página para ver as atualizações.')
 
             // Recarregar os dados do funcionário
             if (selectedCompany) {
@@ -380,10 +378,7 @@ export default function AdminPage() {
 
         } catch (error) {
             console.error('Erro ao regenerar mapa:', error)
-            showError(
-                error instanceof Error ? error.message : 'Não foi possível regenerar o mapa',
-                'Erro ao Regenerar'
-            )
+            alert(error instanceof Error ? error.message : 'Não foi possível regenerar o mapa')
         } finally {
             setRegeneratingMapId(null)
         }

@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { supabase } from '@/lib/supabase'
 
+export const dynamic = 'force-dynamic'
+
 export async function GET(request: NextRequest) {
     try {
         const { searchParams } = new URL(request.url)
@@ -15,7 +17,7 @@ export async function GET(request: NextRequest) {
 
             if (!employeeError && employees && employees.length > 0) {
                 const employee_id = employees[0].id
-                
+
                 // Buscar progresso deste funcionário
                 const { data: progress, error } = await supabase
                     .from('employee_progress')
@@ -28,23 +30,23 @@ export async function GET(request: NextRequest) {
                 }
 
                 // Converter para objeto { video_id: completed }
-                const progressMap = progress.reduce((acc, item) => {
+                const progressMap = progress.reduce((acc: { [key: string]: boolean }, item: any) => {
                     acc[item.video_id] = item.completed
                     return acc
                 }, {} as { [key: string]: boolean })
 
-                return NextResponse.json({ 
-                    success: true, 
+                return NextResponse.json({
+                    success: true,
                     progress: progressMap,
-                    employee_id 
+                    employee_id
                 })
             }
         }
 
-        return NextResponse.json({ 
-            success: true, 
+        return NextResponse.json({
+            success: true,
             progress: {},
-            message: 'Nenhum funcionário encontrado' 
+            message: 'Nenhum funcionário encontrado'
         })
 
     } catch (error) {

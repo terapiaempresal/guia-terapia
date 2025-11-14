@@ -12,6 +12,9 @@ const nextConfig = {
         NEXT_PUBLIC_EMAIL_FROM: process.env.EMAIL_FROM,
         NEXT_PUBLIC_FLAG_ENABLE_EMAILS: process.env.FLAG_ENABLE_EMAILS,
     },
+    experimental: {
+        missingSuspenseWithCSRBailout: false,
+    },
 }
 
 module.exports = nextConfig
