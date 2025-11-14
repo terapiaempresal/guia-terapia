@@ -200,6 +200,24 @@ export async function POST(request: NextRequest) {
             )
         }
 
+        // Verificar se CPF já existe na empresa
+        if (cpf) {
+            const cleanCPF = cpf.replace(/\D/g, '')
+            const { data: existingCPF } = await supabase
+                .from('employees')
+                .select('id')
+                .eq('company_id', company_id)
+                .eq('cpf', cleanCPF)
+                .single()
+
+            if (existingCPF) {
+                return NextResponse.json(
+                    { error: 'Funcionário com este CPF já existe nesta empresa' },
+                    { status: 409 }
+                )
+            }
+        }
+
         // Criar funcionário
         const employeeData: any = {
             company_id,

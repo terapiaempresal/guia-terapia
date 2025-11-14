@@ -14,3 +14,9 @@ coverage/
 *~
 
 /generated/prisma
+
+# TypeScript build info
+tsconfig.tsbuildinfo
+
+# ESLint config (auto-generated)
+.eslintrc.json
