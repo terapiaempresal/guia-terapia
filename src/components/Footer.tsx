@@ -10,7 +10,7 @@ export default function Footer() {
                     </div>
                     <div className="flex items-center gap-2">
                         <span>Precisa de ajuda?</span>
-                        <Link 
+                        <Link
                             href="https://terapiaempresarial.com.br/ajuda"
                             target="_blank"
                             rel="noopener noreferrer"
