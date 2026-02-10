@@ -77,6 +77,12 @@ export default function AdminPage() {
     const [expandedEmployeeId, setExpandedEmployeeId] = useState<string | null>(null)
     const [editingEmployeeId, setEditingEmployeeId] = useState<string | null>(null)
     const [editedHtml, setEditedHtml] = useState<{ [key: string]: string }>({})
+    const [showPasswordModal, setShowPasswordModal] = useState(false)
+    const [selectedManagerId, setSelectedManagerId] = useState<string | null>(null)
+    const [selectedManagerName, setSelectedManagerName] = useState<string>('')
+    const [newPassword, setNewPassword] = useState('')
+    const [confirmPassword, setConfirmPassword] = useState('')
+    const [settingPassword, setSettingPassword] = useState(false)
 
     useEffect(() => {
         checkAdminAccess()
@@ -291,6 +297,69 @@ export default function AdminPage() {
         const newEditedHtml = { ...editedHtml }
         delete newEditedHtml[employeeId]
         setEditedHtml(newEditedHtml)
+    }
+
+    function openSetPasswordModal(managerId: string, managerName: string) {
+        setSelectedManagerId(managerId)
+        setSelectedManagerName(managerName)
+        setNewPassword('')
+        setConfirmPassword('')
+        setShowPasswordModal(true)
+    }
+
+    function closePasswordModal() {
+        setShowPasswordModal(false)
+        setSelectedManagerId(null)
+        setSelectedManagerName('')
+        setNewPassword('')
+        setConfirmPassword('')
+    }
+
+    async function handleSetPassword() {
+        if (!selectedManagerId) return
+
+        // Validações
+        if (!newPassword || !confirmPassword) {
+            showWarning('Por favor, preencha todos os campos', 'Campos obrigatórios')
+            return
+        }
+
+        if (newPassword.length < 6) {
+            showWarning('A senha deve ter pelo menos 6 caracteres', 'Senha muito curta')
+            return
+        }
+
+        if (newPassword !== confirmPassword) {
+            showWarning('As senhas não coincidem', 'Senhas diferentes')
+            return
+        }
+
+        try {
+            setSettingPassword(true)
+
+            const response = await fetch('/api/admin/managers/set-password', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    managerId: selectedManagerId,
+                    password: newPassword
+                })
+            })
+
+            const data = await response.json()
+
+            if (!response.ok || !data.success) {
+                throw new Error(data.error || 'Erro ao definir senha')
+            }
+
+            showSuccess('Senha definida com sucesso!', '✅ Senha atualizada')
+            closePasswordModal()
+        } catch (error) {
+            console.error('Erro ao definir senha:', error)
+            showError(error instanceof Error ? error.message : 'Erro ao definir senha', 'Erro')
+        } finally {
+            setSettingPassword(false)
+        }
     }
 
     async function toggleReviewStatus(employeeId: string, currentStatus: boolean) {
@@ -644,7 +713,7 @@ export default function AdminPage() {
                                     {selectedCompany.managers.map((manager) => (
                                         <div key={manager.id} className="border rounded-lg p-4">
                                             <div className="flex justify-between items-start">
-                                                <div>
+                                                <div className="flex-1">
                                                     <div className="font-semibold text-gray-900">
                                                         {manager.full_name || manager.name}
                                                     </div>
@@ -656,14 +725,25 @@ export default function AdminPage() {
                                                         Criado em {new Date(manager.created_at).toLocaleDateString('pt-BR')}
                                                     </div>
                                                 </div>
-                                                <span
-                                                    className={`px-3 py-1 text-xs rounded-full ${manager.status === 'active'
-                                                        ? 'bg-green-100 text-green-800'
-                                                        : 'bg-orange-100 text-orange-800'
-                                                        }`}
-                                                >
-                                                    {manager.status === 'active' ? 'Ativo' : 'Inativo'}
-                                                </span>
+                                                <div className="flex flex-col items-end gap-2">
+                                                    <span
+                                                        className={`px-3 py-1 text-xs rounded-full ${manager.status === 'active'
+                                                            ? 'bg-green-100 text-green-800'
+                                                            : 'bg-orange-100 text-orange-800'
+                                                            }`}
+                                                    >
+                                                        {manager.status === 'active' ? 'Ativo' : 'Inativo'}
+                                                    </span>
+                                                    <button
+                                                        onClick={() => openSetPasswordModal(manager.id, manager.full_name || manager.name)}
+                                                        className="flex items-center gap-2 px-3 py-1.5 bg-blue-600 text-white text-xs rounded-lg hover:bg-blue-700 transition-colors"
+                                                    >
+                                                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" />
+                                                        </svg>
+                                                        Definir Senha
+                                                    </button>
+                                                </div>
                                             </div>
                                         </div>
                                     ))}
@@ -845,6 +925,102 @@ export default function AdminPage() {
                                 className="w-full px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300"
                             >
                                 Fechar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* Modal de Definir Senha */}
+            {showPasswordModal && (
+                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+                    <div className="bg-white rounded-lg max-w-md w-full">
+                        <div className="p-6 border-b">
+                            <div className="flex justify-between items-start">
+                                <div>
+                                    <h2 className="text-xl font-bold text-gray-900">
+                                        🔑 Definir Senha
+                                    </h2>
+                                    <p className="text-gray-600 mt-1 text-sm">
+                                        Gestor: <strong>{selectedManagerName}</strong>
+                                    </p>
+                                </div>
+                                <button
+                                    onClick={closePasswordModal}
+                                    disabled={settingPassword}
+                                    className="text-gray-400 hover:text-gray-600"
+                                >
+                                    <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div className="p-6 space-y-4">
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-2">
+                                    Nova Senha
+                                </label>
+                                <input
+                                    type="password"
+                                    value={newPassword}
+                                    onChange={(e) => setNewPassword(e.target.value)}
+                                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                    placeholder="Digite a nova senha"
+                                    disabled={settingPassword}
+                                    minLength={6}
+                                />
+                                <p className="text-xs text-gray-500 mt-1">
+                                    Mínimo de 6 caracteres
+                                </p>
+                            </div>
+
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-2">
+                                    Confirmar Senha
+                                </label>
+                                <input
+                                    type="password"
+                                    value={confirmPassword}
+                                    onChange={(e) => setConfirmPassword(e.target.value)}
+                                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                    placeholder="Digite a senha novamente"
+                                    disabled={settingPassword}
+                                    minLength={6}
+                                />
+                            </div>
+                        </div>
+
+                        <div className="p-6 border-t bg-gray-50 flex gap-3">
+                            <button
+                                onClick={closePasswordModal}
+                                disabled={settingPassword}
+                                className="flex-1 px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 disabled:opacity-50 disabled:cursor-not-allowed"
+                            >
+                                Cancelar
+                            </button>
+                            <button
+                                onClick={handleSetPassword}
+                                disabled={settingPassword}
+                                className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                            >
+                                {settingPassword ? (
+                                    <>
+                                        <svg className="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                        </svg>
+                                        Definindo...
+                                    </>
+                                ) : (
+                                    <>
+                                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                                        </svg>
+                                        Definir Senha
+                                    </>
+                                )}
                             </button>
                         </div>
                     </div>
