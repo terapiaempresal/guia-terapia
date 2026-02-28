@@ -6,7 +6,7 @@ import { NextResponse } from 'next/server'
 
 export async function PATCH(
     request: Request,
-    { params }: { params: { id: string } }
+    { params }: { params: Promise<{ id: string }> }
 ) {
     return NextResponse.json({
         error: 'Esta rota está desabilitada. Use o Supabase client diretamente.',

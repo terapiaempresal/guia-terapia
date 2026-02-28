@@ -23,7 +23,7 @@
     "classnames": "^2.3.2",
     "dotenv": "^17.2.2",
     "jsonwebtoken": "^9.0.2",
-    "next": "^14.2.32",
+    "next": "^15.5.12",
     "node-fetch": "^3.3.2",
     "nodemailer": "^7.0.6",
     "postcss": "^8",
@@ -39,6 +39,6 @@
     "@types/jsonwebtoken": "^9.0.5",
     "@types/uuid": "^9.0.7",
     "eslint": "^8",
-    "eslint-config-next": "^14.0.4"
+    "eslint-config-next": "^15.5.12"
   }
 }
