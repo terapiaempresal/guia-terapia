@@ -1,0 +1,354 @@
+:root {
+    --pulse-color: #00CEA699;
+    --pulse-width: 32px;
+    --duration-pulse: 1.5s;
+    --duration-rotate: 10s;
+    --animated-icon-infinite:infinite;
+}
+
+.rkit-video-button-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: start;
+}
+
+.rkit-video-button-container {
+    position: relative;
+    width: 150px;
+    height: 150px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.rkit-video-button-container .rkit-video-button{
+    transform-origin: center;
+    position: absolute;
+    width: 142px;
+    height: 142px;
+}
+
+.rkit-animated-icon-container {
+    width: 84px;
+    height: 84px;
+    border-radius: 50%;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: antiquewhite;
+    z-index: 1;
+    cursor: pointer;
+}
+
+.rkit-animated-icon-container .rkit-animated-icon {
+    width: 29px;
+    height: 29px;
+    font-size: 29px;
+}
+
+.rkit-animation-shadowPulse {
+    animation: shadowPulse var(--duration-pulse) linear infinite;
+}
+
+@keyframes rotateText {
+    from {
+        transform: rotate(0deg);
+    }
+
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+@keyframes shadowPulse {
+    0% {
+        box-shadow: 0 0 0 0px var(--pulse-color);
+    }
+
+    100% {
+        box-shadow: 0 0 7px var(--pulse-width) rgba(0, 0, 0, 0);
+    }
+}
+
+@keyframes bounce-up-down {
+
+    0%,
+    100% {
+        transform: translateY(0);
+    }
+
+    50% {
+        transform: translateY(-8px);
+    }
+}
+
+.rotate-180 {
+    animation: rotate-180-animation 1s infinite alternate ease-in-out;
+}
+
+@keyframes rotate-180-animation {
+    from {
+        transform: rotate(0deg);
+    }
+
+    to {
+        transform: rotate(180deg);
+    }
+}
+
+/* animation hover */
+/* Grow */
+.rkit-video-button-container:hover.grow {
+    transform: scale(1.1);
+    transition: transform 0.3s ease;
+}
+
+/* Shrink */
+.rkit-video-button-container:hover.shrink {
+    transform: scale(0.9);
+    transition: transform 0.3s ease;
+}
+
+/* Pulse */
+.rkit-video-button-container:hover.pulse {
+    animation: pulseAnimation 0.6s ease-in-out;
+}
+
+@keyframes pulseAnimation {
+    0% {
+        transform: scale(1);
+    }
+
+    50% {
+        transform: scale(1.1);
+    }
+
+    100% {
+        transform: scale(1);
+    }
+}
+
+/* Wobble */
+.rkit-video-button-container:hover.wobble {
+    animation: wobbleAnimation 0.8s ease-in-out;
+}
+
+@keyframes wobbleAnimation {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    25% {
+        transform: rotate(5deg);
+    }
+
+    50% {
+        transform: rotate(-5deg);
+    }
+
+    75% {
+        transform: rotate(3deg);
+    }
+
+    100% {
+        transform: rotate(0deg);
+    }
+}
+
+/* Skew */
+.rkit-video-button-container:hover.skew {
+    transform: skewX(10deg);
+    transition: transform 0.3s ease;
+}
+
+/* Rotate */
+.rkit-video-button-container:hover.rotate {
+    transform: rotate(10deg);
+    transition: transform 0.3s ease;
+}
+
+/* Slide Up */
+.rkit-video-button-container:hover.slide-up {
+    transform: translateY(-10px);
+    transition: transform 0.3s ease;
+}
+
+/* Slide Down */
+.rkit-video-button-container:hover.slide-down {
+    transform: translateY(10px);
+    transition: transform 0.3s ease;
+}
+
+/* Slide Left */
+.rkit-video-button-container:hover.slide-left {
+    transform: translateX(-10px);
+    transition: transform 0.3s ease;
+}
+
+/* Slide Right */
+.rkit-video-button-container:hover.slide-right {
+    transform: translateX(10px);
+    transition: transform 0.3s ease;
+}
+
+/* Bounce */
+.rkit-video-button-container:hover.bounce {
+    animation: bounceAnimation 0.6s ease;
+}
+
+@keyframes bounceAnimation {
+
+    0%,
+    100% {
+        transform: translateY(0);
+    }
+
+    50% {
+        transform: translateY(-15px);
+    }
+}
+
+/* Flip */
+.rkit-video-button-container:hover.flip {
+    transform: rotateY(180deg);
+    transition: transform 0.6s ease;
+}
+
+/* Flip X */
+.rkit-video-button-container:hover.flip-x {
+    transform: rotateX(180deg);
+    transition: transform 0.6s ease;
+}
+
+/* Flip Y */
+.rkit-video-button-container:hover.flip-y {
+    transform: rotateY(180deg);
+    transition: transform 0.6s ease;
+}
+
+/* Zoom In */
+.rkit-video-button-container:hover.zoom-in {
+    transform: scale(1.2);
+    transition: transform 0.3s ease;
+}
+
+/* Zoom Out */
+.rkit-video-button-container:hover.zoom-out {
+    transform: scale(0.8);
+    transition: transform 0.3s ease;
+}
+
+/* Float (slow up and down loop) */
+.rkit-video-button-container:hover.float {
+    animation: floatAnimation 2s ease-in-out infinite;
+}
+
+@keyframes floatAnimation {
+    0% {
+        transform: translateY(0);
+    }
+
+    50% {
+        transform: translateY(-8px);
+    }
+
+    100% {
+        transform: translateY(0);
+    }
+}
+
+/* Tada */
+.rkit-video-button-container:hover.tada {
+    animation: tadaAnimation 0.8s ease;
+}
+
+@keyframes tadaAnimation {
+    0% {
+        transform: scale(1);
+    }
+
+    10%,
+    20% {
+        transform: scale(0.9) rotate(-3deg);
+    }
+
+    30%,
+    50%,
+    70%,
+    90% {
+        transform: scale(1.1) rotate(3deg);
+    }
+
+    40%,
+    60%,
+    80% {
+        transform: scale(1.1) rotate(-3deg);
+    }
+
+    100% {
+        transform: scale(1) rotate(0);
+    }
+}
+
+/* Shake */
+.rkit-video-button-container:hover.shake {
+    animation: shakeAnimation 0.5s ease;
+}
+
+@keyframes shakeAnimation {
+    0% {
+        transform: translateX(0);
+    }
+
+    25% {
+        transform: translateX(-5px);
+    }
+
+    50% {
+        transform: translateX(5px);
+    }
+
+    75% {
+        transform: translateX(-5px);
+    }
+
+    100% {
+        transform: translateX(0);
+    }
+}
+
+/* Rubber Band */
+.rkit-video-button-container:hover.rubber-band {
+    animation: rubberBandAnimation 1s ease;
+}
+
+@keyframes rubberBandAnimation {
+    0% {
+        transform: scale(1);
+    }
+
+    30% {
+        transform: scaleX(1.25) scaleY(0.75);
+    }
+
+    40% {
+        transform: scaleX(0.75) scaleY(1.25);
+    }
+
+    50% {
+        transform: scaleX(1.15) scaleY(0.85);
+    }
+
+    65% {
+        transform: scaleX(0.95) scaleY(1.05);
+    }
+
+    75% {
+        transform: scaleX(1.05) scaleY(0.95);
+    }
+
+    100% {
+        transform: scale(1);
+    }
+}

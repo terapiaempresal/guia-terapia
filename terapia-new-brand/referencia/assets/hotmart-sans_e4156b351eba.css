@@ -1,0 +1,53 @@
+/* Hotmart Sans Regular */
+@font-face {
+  font-family: 'Hotmart Sans';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("hotmart-sans-regular_af7707a30052.woff2") format('woff2');
+}
+
+/* Hotmart Sans Light */
+@font-face {
+  font-family: 'Hotmart Sans';
+  font-style: normal;
+  font-weight: 300;
+  font-display: swap;
+  src: url("hotmart-sans-light_557589328091.woff2") format('woff2');
+}
+
+/* Hotmart Sans Light Italic */
+@font-face {
+  font-family: 'Hotmart Sans';
+  font-style: italic;
+  font-weight: 300;
+  font-display: swap;
+  src: url("hotmart-sans-light-italic_5ad65f5581b4.woff2") format('woff2');
+}
+
+/* Hotmart Sans Italic */
+@font-face {
+  font-family: 'Hotmart Sans';
+  font-style: italic;
+  font-weight: 400;
+  font-display: swap;
+  src: url("hotmart-sans-italic_95f73da2c7f0.woff2") format('woff2');
+}
+
+/* Hotmart Sans Bold */
+@font-face {
+  font-family: 'Hotmart Sans';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url("hotmart-sans-bold_df6167c5f387.woff2") format('woff2');
+}
+
+/* Hotmart Sans Bold Italic */
+@font-face {
+  font-family: 'Hotmart Sans';
+  font-style: italic;
+  font-weight: 700;
+  font-display: swap;
+  src: url("hotmart-sans-bold-italic_8293a0d7efa6.woff2") format('woff2');
+}
