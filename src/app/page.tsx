@@ -137,9 +137,9 @@ export default function HomePage() {
                         <Image
                             src="/logo.png"
                             alt="Terapia Empresarial"
-                            width={180}
-                            height={48}
-                            className="h-8 w-auto"
+                            width={260}
+                            height={64}
+                            className="h-12 w-auto opacity-85"
                             priority
                         />
                     </Link>
@@ -160,9 +160,9 @@ export default function HomePage() {
 
             {/* ===== HERO ===== */}
             <section className="relative min-h-screen overflow-hidden">
-                {/* Background image - pessoa como elemento central, estilo Hotmart */}
-                <div className="absolute inset-0 z-0 bg-primary-700">
-                    {/* Imagem da pessoa — visivel, central, preenchendo */}
+                {/* Background — degrade azul marinho + pessoa posicionada a direita */}
+                <div className="absolute inset-0 z-0 bg-gradient-to-b from-primary-800 via-primary-700 to-primary-500">
+                    {/* Imagem da pessoa — posicionada a direita/centro, estilo Hotmart */}
                     <div className="absolute inset-0 flex items-end justify-center overflow-hidden">
                         <Image
                             src="/hero-person.png"
@@ -170,28 +170,28 @@ export default function HomePage() {
                             width={900}
                             height={1100}
                             className="object-contain object-bottom w-auto min-h-full max-w-none select-none"
-                            style={{ height: '92%' }}
+                            style={{ height: '92%', transform: 'translateX(8%)' }}
                             priority
                             draggable={false}
                         />
                     </div>
-                    {/* Overlays para legibilidade */}
-                    <div className="absolute inset-0 bg-gradient-to-r from-primary-800/95 via-primary-800/60 to-primary-800/80" />
-                    <div className="absolute inset-0 bg-gradient-to-t from-primary-800/90 via-transparent to-primary-800/70" />
+                    {/* Overlay esquerdo forte para texto limpo, direito mais leve para pessoa visivel */}
+                    <div className="absolute inset-0 bg-gradient-to-r from-primary-800/95 via-primary-800/70 to-transparent" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-primary-800/80 via-transparent to-primary-800/40" />
                 </div>
 
                 {/* Content */}
                 <div className="relative z-10 max-w-[1360px] mx-auto px-8 lg:px-12 pt-40 pb-16 min-h-screen flex items-center">
-                    <div className="grid lg:grid-cols-12 gap-8 lg:gap-16 w-full items-center">
+                    <div className="grid lg:grid-cols-12 gap-8 lg:gap-12 w-full items-center">
 
-                        {/* LEFT — 6 cols */}
-                        <div className="lg:col-span-6">
+                        {/* LEFT — 7 cols, texto bem à esquerda */}
+                        <div className="lg:col-span-7 lg:pr-8">
                             {/* Headline — conciso */}
                             <h1 className="font-grotesk font-bold tracking-[-0.02em] text-white mb-5">
-                                <span className="block text-[clamp(32px,5vw,56px)] leading-[1.08] italic">
+                                <span className="block text-[clamp(36px,5.5vw,64px)] leading-[1.08] italic">
                                     Saude mental corporativa
                                 </span>
-                                <span className="block text-[clamp(32px,5vw,56px)] leading-[1.08] italic">
+                                <span className="block text-[clamp(36px,5.5vw,64px)] leading-[1.08] italic">
                                     com <span className="text-sage-300">resultado real.</span>
                                 </span>
                             </h1>
@@ -226,8 +226,8 @@ export default function HomePage() {
                             </div>
                         </div>
 
-                        {/* RIGHT — 6 cols — Login Card */}
-                        <div className="lg:col-span-6 flex justify-end">
+                        {/* RIGHT — 5 cols — Login Card */}
+                        <div className="lg:col-span-5 flex justify-end">
                             <div className="bg-white rounded-2xl p-8 lg:p-9 relative shadow-2xl shadow-black/20 w-full max-w-[420px]">
 
                                 <h2 className="font-grotesk text-[22px] font-bold text-primary-600 mb-1">
