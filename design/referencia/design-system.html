@@ -1,0 +1,1125 @@
+<!DOCTYPE html>
+<html class="__className_7ed90d" lang="pt-BR" style="scroll-behavior: smooth;">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1" name="viewport"/>
+<title>Design System — Hotmart Monks</title>
+
+<!-- Same CSS assets as the original -->
+<link data-precedence="next" href="assets/163a6538d40437e4_f9f88b0f562b.css" rel="stylesheet"/>
+<link data-precedence="next" href="assets/b34ccb99dadacbed_5316231dc1a8.css" rel="stylesheet"/>
+<link data-precedence="next" href="assets/cedc5736a9392f5c_b9de636a9f47.css" rel="stylesheet"/>
+<link data-precedence="next" href="assets/27d8defc27821724_6ed7cc99f7b6.css" rel="stylesheet"/>
+<link data-precedence="next" href="assets/18b9b402b16470ae_edd1fd5aad03.css" rel="stylesheet"/>
+<link data-precedence="next" href="assets/106cef37356e04ca_a7d115f0e21f.css" rel="stylesheet"/>
+<link data-precedence="next" href="assets/16a9e445de993f03_c23ef84663fe.css" rel="stylesheet"/>
+<link data-precedence="next" href="assets/8f70ad79185a6653_93a872811427.css" rel="stylesheet"/>
+<link data-precedence="next" href="assets/c9d3ab6423b25f40_447898c736dc.css" rel="stylesheet"/>
+<link data-precedence="next" href="assets/0ec3bfba4c6ef170_42b027fa20c3.css" rel="stylesheet"/>
+<link data-precedence="next" href="assets/38e22cd1c9bdd77c_86c89e817ecf.css" rel="stylesheet"/>
+<link data-precedence="next" href="assets/2f84789b414712fb_93f7e5814ee4.css" rel="stylesheet"/>
+<link data-precedence="next" href="assets/316023ba1568f012_590f52a29196.css" rel="stylesheet"/>
+<link data-precedence="next" href="assets/d604c9c9bdd4a1ff_10f640938f9c.css" rel="stylesheet"/>
+<link data-precedence="next" href="assets/cf19d92eb57b810e_850510879fc3.css" rel="stylesheet"/>
+<link data-precedence="next" href="assets/80e61e8bf2a61903_17f79441238d.css" rel="stylesheet"/>
+<link data-precedence="next" href="assets/22920c3f96d8a292_dda90d5135fd.css" rel="stylesheet"/>
+<link href="assets/hotmart-sans_e4156b351eba.css" rel="stylesheet"/>
+<link href="assets/hotmart-display_20252f08bad2.css" rel="stylesheet"/>
+
+<style>
+/* Scroll fixes for offline viewing */
+html, body {
+    overflow: auto !important;
+    overflow-x: hidden !important;
+    height: auto !important;
+    min-height: 100% !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+}
+body, .wrapper, main, #__next, #app, .page, .content {
+    opacity: 1 !important;
+    visibility: visible !important;
+}
+
+/* ===== DESIGN SYSTEM NAV ===== */
+.ds-nav {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 9999;
+    background: #0d0d0d;
+    border-bottom: 1px solid rgba(245,243,239,0.1);
+    padding: 0 24px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    height: 48px;
+    overflow-x: auto;
+    white-space: nowrap;
+    font-family: var(--font-hotmart-sans, "Hotmart Sans", Arial, Helvetica, sans-serif);
+}
+.ds-nav a {
+    color: #f5f3ef;
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: 700;
+    padding: 6px 14px;
+    border-radius: 10px;
+    transition: background 0.3s, color 0.3s;
+    flex-shrink: 0;
+}
+.ds-nav a:hover {
+    background: #ff4000;
+    color: #f5f3ef;
+}
+.ds-nav .ds-nav-brand {
+    color: #ff4000;
+    font-size: 14px;
+    font-weight: 700;
+    margin-right: 12px;
+    padding: 0;
+}
+.ds-nav .ds-nav-brand:hover {
+    background: none;
+}
+
+/* ===== DESIGN SYSTEM SECTION STYLES ===== */
+.ds-section {
+    padding: 80px 24px 60px;
+    max-width: 1216px;
+    margin: 0 auto;
+}
+.ds-section:first-of-type {
+    padding-top: 0;
+}
+.ds-section-title {
+    font-family: var(--font-hotmart-display-regular, "Hotmart Display", Arial, Helvetica, sans-serif);
+    font-size: 2.5rem;
+    color: #0d0d0d;
+    margin-bottom: 12px;
+    padding-top: 80px;
+}
+.ds-section-subtitle {
+    font-family: var(--font-hotmart-sans, "Hotmart Sans", Arial, Helvetica, sans-serif);
+    font-size: 1rem;
+    color: #6b7480;
+    margin-bottom: 48px;
+    font-weight: 400;
+}
+.ds-divider {
+    border: none;
+    border-top: 1px solid #dfe2e6;
+    margin: 0;
+}
+
+/* ===== TYPOGRAPHY SPEC TABLE ===== */
+.ds-type-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+.ds-type-row {
+    display: flex;
+    align-items: baseline;
+    padding: 20px 0;
+    border-bottom: 1px solid #dfe2e6;
+    gap: 24px;
+}
+.ds-type-label {
+    font-family: var(--font-hotmart-sans, "Hotmart Sans", Arial, Helvetica, sans-serif);
+    font-size: 12px;
+    font-weight: 700;
+    color: #6b7480;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    min-width: 120px;
+    flex-shrink: 0;
+}
+.ds-type-preview {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+}
+.ds-type-spec {
+    font-family: var(--font-hotmart-sans, "Hotmart Sans", Arial, Helvetica, sans-serif);
+    font-size: 12px;
+    color: #6b7480;
+    white-space: nowrap;
+    flex-shrink: 0;
+    text-align: right;
+    min-width: 100px;
+}
+
+/* ===== COLOR SWATCHES ===== */
+.ds-color-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 24px;
+    margin-bottom: 48px;
+}
+.ds-color-card {
+    border-radius: 12px;
+    overflow: hidden;
+    border: 1px solid #dfe2e6;
+}
+.ds-color-swatch {
+    height: 100px;
+    width: 100%;
+}
+.ds-color-info {
+    padding: 12px 16px;
+    background: #fff;
+    font-family: var(--font-hotmart-sans, "Hotmart Sans", Arial, Helvetica, sans-serif);
+}
+.ds-color-name {
+    font-size: 14px;
+    font-weight: 700;
+    color: #0d0d0d;
+    margin-bottom: 4px;
+}
+.ds-color-value {
+    font-size: 12px;
+    color: #6b7480;
+}
+
+/* ===== COMPONENT SHOWCASE ===== */
+.ds-component-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+    align-items: center;
+    margin-bottom: 32px;
+}
+.ds-component-label {
+    font-family: var(--font-hotmart-sans, "Hotmart Sans", Arial, Helvetica, sans-serif);
+    font-size: 13px;
+    font-weight: 700;
+    color: #6b7480;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 12px;
+}
+
+/* ===== LAYOUT DEMO ===== */
+.ds-layout-demo {
+    border: 1px solid #dfe2e6;
+    border-radius: 12px;
+    overflow: hidden;
+    margin-bottom: 32px;
+}
+.ds-layout-demo-label {
+    font-family: var(--font-hotmart-sans, "Hotmart Sans", Arial, Helvetica, sans-serif);
+    font-size: 12px;
+    font-weight: 700;
+    color: #6b7480;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    padding: 12px 16px;
+    background: #fafbfc;
+    border-bottom: 1px solid #dfe2e6;
+}
+
+/* ===== MOTION GALLERY ===== */
+.ds-motion-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 24px;
+}
+.ds-motion-card {
+    border: 1px solid #dfe2e6;
+    border-radius: 12px;
+    padding: 32px 24px;
+    text-align: center;
+    background: #fff;
+}
+.ds-motion-card-label {
+    font-family: var(--font-hotmart-sans, "Hotmart Sans", Arial, Helvetica, sans-serif);
+    font-size: 13px;
+    font-weight: 700;
+    color: #6b7480;
+    margin-top: 16px;
+}
+
+/* ===== ICON GALLERY ===== */
+.ds-icon-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    gap: 24px;
+}
+.ds-icon-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    padding: 24px 12px;
+    border: 1px solid #dfe2e6;
+    border-radius: 12px;
+    background: #fff;
+}
+.ds-icon-card .icon {
+    color: #0d0d0d;
+}
+.ds-icon-card-label {
+    font-family: var(--font-hotmart-sans, "Hotmart Sans", Arial, Helvetica, sans-serif);
+    font-size: 11px;
+    color: #6b7480;
+    text-align: center;
+}
+
+/* ===== SURFACE DEMOS ===== */
+.ds-surface-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 24px;
+    margin-bottom: 48px;
+}
+.ds-surface-card {
+    border-radius: 12px;
+    padding: 32px 24px;
+    min-height: 120px;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+}
+.ds-surface-label {
+    font-family: var(--font-hotmart-sans, "Hotmart Sans", Arial, Helvetica, sans-serif);
+    font-size: 13px;
+    font-weight: 700;
+}
+.ds-surface-usage {
+    font-family: var(--font-hotmart-sans, "Hotmart Sans", Arial, Helvetica, sans-serif);
+    font-size: 12px;
+    margin-top: 4px;
+    opacity: 0.7;
+}
+
+/* Hero overrides for design system context */
+#ds-hero .hero-title {
+    opacity: 1 !important;
+    transform: none !important;
+    visibility: visible !important;
+}
+#ds-hero .hero-subtitle--bullets {
+    opacity: 1 !important;
+    transform: none !important;
+    visibility: visible !important;
+}
+
+/* FAQ override - force details to be styled correctly */
+.ds-faq-demo details {
+    cursor: pointer;
+}
+
+/* Ensure home-monks context for components */
+.ds-monks-context h1, .ds-monks-context h2, .ds-monks-context h3 {
+    font-family: var(--font-hotmart-display-regular, "Hotmart Display", Arial, Helvetica, sans-serif);
+}
+.ds-monks-context p, .ds-monks-context span, .ds-monks-context a {
+    font-family: var(--font-hotmart-sans, "Hotmart Sans", Arial, Helvetica, sans-serif);
+}
+
+@media (max-width: 768px) {
+    .ds-type-row { flex-direction: column; gap: 8px; }
+    .ds-type-spec { text-align: left; }
+    .ds-section-title { font-size: 1.75rem; }
+    .ds-color-grid { grid-template-columns: repeat(2, 1fr); }
+}
+</style>
+</head>
+
+<body style="scroll-behavior: smooth;">
+<!-- ===== TOP NAVIGATION ===== -->
+<nav class="ds-nav" id="ds-top">
+    <span class="ds-nav-brand">Design System</span>
+    <a href="#ds-hero">Hero</a>
+    <a href="#ds-typography">Typography</a>
+    <a href="#ds-colors">Colors</a>
+    <a href="#ds-components">Components</a>
+    <a href="#ds-layout">Layout</a>
+    <a href="#ds-motion">Motion</a>
+    <a href="#ds-icons">Icons</a>
+</nav>
+
+<main class="main">
+<div class="home-monks">
+
+<!-- ============================================================ -->
+<!-- SECTION 0: HERO (EXACT CLONE, TEXT ADAPTED)                  -->
+<!-- ============================================================ -->
+<div id="ds-hero">
+<header class="header-monks" id="header-monks">
+<div class="header__wrapper header-wrapper-topbar-space" data-testid="monks-header-wrapper">
+<div class="header__container">
+<div class="header__logo">
+<a aria-label="Página Inicial" href="#">
+<span class="header__logo-image header__logo-image--normal">
+<i class="icon header__logo--brand" data-testid="icon-test"><svg fill="none" height="37.682" viewbox="0 0 128 37.682" width="128" xmlns="http://www.w3.org/2000/svg"><path d="M33.005 30.23V11.959c0 -0.106 0.084 -0.191 0.187 -0.191h3.708c0.103 0 0.187 0.086 0.187 0.191v6.902c0.659 -1.172 1.952 -2.239 4.03 -2.239 3.321 0 4.563 2.16 4.563 5.154v8.451c0 0.106 -0.083 0.191 -0.187 0.191h-3.683a0.188 0.188 0 0 1 -0.187 -0.191V22.844c0 -1.823 -0.558 -2.889 -2.104 -2.889 -1.546 0 -2.458 1.093 -2.458 3.071v7.203c0 0.106 -0.083 0.191 -0.186 0.191h-3.683a0.188 0.188 0 0 1 -0.187 -0.191z" fill="#053d4e"></path><path d="M46.975 23.808v-0.26c0 -4.061 2.738 -6.925 6.87 -6.925s6.869 2.863 6.869 6.925v0.26c0 4.088 -2.712 6.951 -6.869 6.951s-6.87 -2.863 -6.87 -6.95m9.632 0v-0.26c0 -2.446 -0.836 -3.748 -2.763 -3.748 -1.926 0 -2.762 1.302 -2.762 3.748v0.26c0 2.473 0.861 3.774 2.763 3.774s2.763 -1.302 2.763 -3.774" fill="#053d4e"></path><path d="M63.688 26.36V19.955h-2.257a0.126 0.126 0 0 1 -0.124 -0.128v-2.736a0.126 0.126 0 0 1 0.124 -0.128h2.257v-5.064a0.126 0.126 0 0 1 0.124 -0.128h3.806a0.126 0.126 0 0 1 0.124 0.128v5.064h2.907a0.126 0.126 0 0 1 0.124 0.128v2.736a0.126 0.126 0 0 1 -0.124 0.128h-2.907v6.118c0 1.068 0.507 1.51 1.775 1.51 0.533 0 0.786 -0.099 1.146 -0.212l0.162 0.123v2.829a0.128 0.128 0 0 1 -0.091 0.125c-0.66 0.192 -1.382 0.311 -2.205 0.311 -3.32 0 -4.841 -1.51 -4.841 -4.4" fill="#053d4e"></path><path d="M72.561 30.292V17.09c0 -0.071 0.056 -0.128 0.125 -0.128h3.805a0.126 0.126 0 0 1 0.124 0.128v1.928c0.609 -1.198 1.825 -2.394 3.854 -2.394s3.295 0.807 3.954 2.5c0.912 -1.562 2.332 -2.5 4.233 -2.5 3.219 0 4.487 2.135 4.487 5.258v8.411a0.126 0.126 0 0 1 -0.125 0.128h-3.805a0.126 0.126 0 0 1 -0.124 -0.128V22.663c0 -1.849 -0.685 -2.733 -1.952 -2.733 -1.419 0 -2.256 1.041 -2.256 3.254v7.109a0.126 0.126 0 0 1 -0.124 0.127h-3.806a0.126 0.126 0 0 1 -0.124 -0.128v-7.602c0 -1.823 -0.608 -2.76 -1.901 -2.76 -1.394 0 -2.306 0.989 -2.306 3.229v7.135a0.126 0.126 0 0 1 -0.124 0.128h-3.805a0.126 0.126 0 0 1 -0.124 -0.128z" fill="#053d4e"></path><path d="M94.555 26.671c0 -2.316 1.444 -3.696 3.954 -4.009l4.563 -0.625v-0.859c0 -0.989 -0.633 -1.587 -1.952 -1.587s-2.024 0.508 -2.166 1.455a0.126 0.126 0 0 1 -0.125 0.107h-3.605a0.129 0.129 0 0 1 -0.127 -0.139c0.221 -2.778 2.584 -4.39 6.1 -4.39s5.83 1.77 5.83 4.582v9.086a0.126 0.126 0 0 1 -0.125 0.128h-3.559a0.126 0.126 0 0 1 -0.124 -0.12l-0.12 -1.884c-0.785 1.458 -2.256 2.342 -4.233 2.342 -2.535 0 -4.309 -1.717 -4.309 -4.087zm8.516 -1.144v-0.963l-3.092 0.417c-1.013 0.13 -1.495 0.625 -1.495 1.432 0 0.885 0.634 1.406 1.8 1.406 1.52 0 2.788 -0.911 2.788 -2.291z" fill="#053d4e"></path><path d="M120.598 19.955h-2.257a0.126 0.126 0 0 1 -0.125 -0.128v-2.736c0 -0.071 0.056 -0.128 0.125 -0.128h2.257v-5.064a0.126 0.126 0 0 1 0.124 -0.128h3.806a0.126 0.126 0 0 1 0.124 0.128v5.064h3.17a0.126 0.126 0 0 1 0.124 0.128v2.736a0.126 0.126 0 0 1 -0.124 0.128h-3.17v6.118c0 1.068 0.507 1.51 1.775 1.51 0.54 0 0.999 -0.103 1.416 -0.216a0.126 0.126 0 0 1 0.157 0.124v2.832a0.128 0.128 0 0 1 -0.091 0.125c-0.681 0.192 -1.645 0.312 -2.47 0.312 -3.32 0 -4.841 -1.51 -4.841 -4.399z" fill="#053d4e"></path><path d="M116.581 16.968c-2.189 -0.2 -3.302 0.562 -3.893 2.131v-2.009a0.126 0.126 0 0 0 -0.124 -0.128h-3.607a0.126 0.126 0 0 0 -0.125 0.128v13.202c0 0.071 0.056 0.128 0.125 0.128h3.607a0.126 0.126 0 0 0 0.124 -0.128V24.147c0 -4.027 1.596 -4.351 3.874 -4.209a0.126 0.126 0 0 0 0.133 -0.127v-2.714a0.132 0.132 0 0 0 -0.114 -0.129z" fill="#053d4e"></path><path d="M25.775 17.751a19.858 19.858 0 0 0 -2.148 -4.964h0.002s-0.927 -1.538 -1.316 -2.003H22.31c-0.096 -0.121 -0.289 0.013 -0.215 0.151 0.109 0.229 0.208 0.511 0.139 0.786 -0.114 0.336 -0.489 0.569 -0.834 0.45a0.748 0.748 0 0 1 -0.254 -0.17c-0.353 -0.365 -0.537 -0.969 -0.766 -1.736 -0.206 -0.683 -0.461 -1.531 -0.921 -2.449 -0.748 -1.492 -1.633 -2.182 -1.669 -2.211a0.126 0.126 0 0 0 -0.154 -0.001 0.138 0.138 0 0 0 -0.048 0.15c0.004 0.012 0.376 1.242 -0.342 2.173 -0.286 0.371 -0.721 0.595 -1.228 0.627 -0.51 0.033 -1.015 -0.136 -1.318 -0.44 -0.751 -0.755 -0.839 -2.093 -0.825 -2.823 0.047 -2.434 0.782 -4.139 1.165 -4.7a0.138 0.138 0 0 0 -0.005 -0.161 0.128 0.128 0 0 0 -0.152 -0.038C11.909 1.681 9.754 3.888 8.653 6.765c-0.619 1.711 -0.889 2.491 -1.108 2.982 -0.202 0.449 -0.389 0.656 -0.58 0.77 -0.105 0.064 -0.233 0.1 -0.365 0.105 -0.194 -0.02 -1.154 -0.196 -0.318 -1.802 0.069 -0.135 -0.114 -0.269 -0.216 -0.16l-0.658 0.727q-0.044 0.048 -0.088 0.096l-0.109 0.121q-0.028 0.032 -0.051 0.062C3.08 12.043 1.627 15.085 0.79 17.895 0.04 20.595 -0.007 22.752 0 23.572l0.001 0.182c0 3.634 1.382 7.05 3.891 9.62s5.847 3.985 9.395 3.985 6.886 -1.415 9.395 -3.985c2.51 -2.57 3.891 -5.987 3.891 -9.62 0 -2.315 -0.298 -4.201 -0.803 -6.003zM13.289 30.798c-3.798 0 -6.879 -3.152 -6.879 -7.043s3.08 -7.044 6.879 -7.044 6.879 3.154 6.879 7.044 -3.08 7.043 -6.879 7.043" fill="#FF4000"></path></svg></i>
+</span>
+</a>
+</div>
+<div class="header__navigation">
+<nav class="menu">
+<ul>
+<li class="menu__item menu__item--pt"><a class="link link--primary menu__link link--pt" href="#ds-typography"><span>Typography</span></a></li>
+<li class="menu__item menu__item--pt"><a class="link link--primary menu__link link--pt" href="#ds-colors"><span>Colors</span></a></li>
+<li class="menu__item menu__item--pt"><a class="link link--primary menu__link link--pt" href="#ds-components"><span>Components</span></a></li>
+<li class="menu__item menu__item--pt"><a class="link link--primary menu__link link--pt" href="#ds-layout"><span>Layout</span></a></li>
+<li class="menu__item menu__item--pt"><a class="link link--primary menu__link link--pt" href="#ds-motion"><span>Motion</span></a></li>
+</ul>
+</nav>
+<div class="header__navigation-plataform">
+<div>
+<ul>
+<li><a class="primary-button header__navigation-plataform-signup-button" href="#ds-components" target="_self">Explorar componentes</a></li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+</div>
+</header>
+
+<div><div class="hero-monks" id="hero-monks">
+<picture>
+<source media="(min-width: 1360px)" srcset="assets/monks-hero-desktop_a0d8a52a801c.webp"/>
+<source media="(min-width: 1280px)" srcset="assets/monks-hero-1280-desktop_383456a8afdf.webp"/>
+<source media="(min-width: 1024px)" srcset="assets/monks-hero-1024-desktop_376ec5dbcfdf.webp"/>
+<img alt="Hero background image" class="bg-image" data-nimg="1" decoding="async" fetchpriority="high" height="1600" loading="eager" src="assets/monks-hero-mobile_9cee5e42442a.webp" srcset="assets/monks-hero-mobile_753dba3ed3b4.webp 1x, assets/monks-hero-mobile_9cee5e42442a.webp 2x" style="color:transparent" width="720"/>
+</picture>
+<div class="hero--content hero-content-monks hero--brazil">
+<div class="hero--left" data-testid="monks-hero-left">
+<div class="title-and-subtitle">
+<h1 class="hero-title">Design System e Biblioteca de Padrões Visuais</h1>
+<ul class="hero-subtitle--bullets">
+<li><i class="icon icon-check-circle" data-testid="icon-test"><svg fill="none" height="14" viewbox="0 0 14 14" width="14" xmlns="http://www.w3.org/2000/svg"><path d="M13.563 6.781c0 3.746-3.063 6.782-6.782 6.782A6.78 6.78 0 0 1 0 6.78C0 3.063 3.035 0 6.781 0c3.719 0 6.782 3.063 6.782 6.781m-7.575 3.61 5.032-5.032a.463.463 0 0 0 0-.629l-.63-.601a.387.387 0 0 0-.6 0L5.687 8.23 3.746 6.316a.387.387 0 0 0-.601 0l-.63.602a.463.463 0 0 0 0 .629L5.36 10.39a.463.463 0 0 0 .63 0" fill="#21c45d"></path></svg></i>Tipografia, cores, componentes e layouts</li>
+<li><i class="icon icon-check-circle" data-testid="icon-test"><svg fill="none" height="14" viewbox="0 0 14 14" width="14" xmlns="http://www.w3.org/2000/svg"><path d="M13.563 6.781c0 3.746-3.063 6.782-6.782 6.782A6.78 6.78 0 0 1 0 6.78C0 3.063 3.035 0 6.781 0c3.719 0 6.782 3.063 6.782 6.781m-7.575 3.61 5.032-5.032a.463.463 0 0 0 0-.629l-.63-.601a.387.387 0 0 0-.6 0L5.687 8.23 3.746 6.316a.387.387 0 0 0-.601 0l-.63.602a.463.463 0 0 0 0 .629L5.36 10.39a.463.463 0 0 0 .63 0" fill="#21c45d"></path></svg></i>Referência completa do visual Hotmart Monks</li>
+</ul>
+<div class="button-wrapper">
+<a class="primary-button main white-hover" href="#ds-typography" target="_self">Explorar agora</a>
+</div>
+</div>
+<div class="rating">
+<p class="rating-text">Seguro e confiável</p>
+<div class="rating-star-wrapper">
+<img alt="5 estrelas" class="icon-rating" data-nimg="1" data-testid="monks-image" decoding="async" height="21" loading="eager" src="assets/monks-rating_edbf0941cf7a.webp" srcset="assets/monks-rating_15d0bd3147a2.webp 1x, assets/monks-rating_edbf0941cf7a.webp 2x" style="color:transparent" width="98"/>
+<p class="rating-text">4.6</p>
+<img alt="Playstore" class="icon-store icon-playstore" data-nimg="1" data-testid="monks-image" decoding="async" height="14" loading="eager" src="assets/monks-playstore-icon_05e7baeb8ff4.webp" srcset="assets/monks-playstore-icon_c6c189f6b508.webp 1x, assets/monks-playstore-icon_05e7baeb8ff4.webp 2x" style="color:transparent" width="13"/>
+<img alt="Apple Store" class="icon-store icon-playstore" data-nimg="1" data-testid="monks-image" decoding="async" height="14" loading="eager" src="assets/monks-apple-store-icon_6bed4acb0ae4.webp" srcset="assets/monks-apple-store-icon_316cb53f9bac.webp 1x, assets/monks-apple-store-icon_6bed4acb0ae4.webp 2x" style="color:transparent" width="14"/>
+</div>
+<p class="rating-text">Baseado em +200.000 avaliações</p>
+</div>
+</div>
+<div class="hero--right" data-testid="monks-hero-right">
+<div class="hero-monks__iframe">
+<div class="signup-iframe">
+<div><h2 class="custom"><span>Catálogo de referência visual.<br/> Design System v1</span></h2></div>
+<div class="iframe" style="display:flex;align-items:center;justify-content:center;min-height:300px;padding:32px;">
+<div style="text-align:center;">
+<p style="font-family:var(--font-hotmart-sans);color:#6b7480;font-size:16px;line-height:1.6;">Este documento apresenta todos os padrões visuais, componentes e tokens de design extraídos da interface original.</p>
+<br/>
+<a class="primary-button main" href="#ds-typography" style="display:inline-block;">Ver tipografia</a>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div></div>
+</div>
+
+<!-- ============================================================ -->
+<!-- SECTION 1: TYPOGRAPHY                                        -->
+<!-- ============================================================ -->
+<div id="ds-typography">
+<hr class="ds-divider"/>
+<div class="ds-section">
+<h2 class="ds-section-title">Typography</h2>
+<p class="ds-section-subtitle">Escala tipográfica completa usando Hotmart Display e Hotmart Sans</p>
+
+<div class="ds-type-table">
+
+<!-- Heading 1 — hero-title -->
+<div class="ds-type-row">
+    <span class="ds-type-label">Heading 1</span>
+    <div class="ds-type-preview">
+        <h1 class="hero-title" style="position:static;">Aqui o seu negócio digital acontece!</h1>
+    </div>
+    <span class="ds-type-spec">32px / 36px → 56px / 60px</span>
+</div>
+
+<!-- Heading 2 — introduction-text-with-emphasis h2 -->
+<div class="ds-type-row">
+    <span class="ds-type-label">Heading 2</span>
+    <div class="ds-type-preview">
+        <div class="introduction-text-with-emphasis"><h2 class="custom">Entre agora para a <span>maior plataforma de produtos digitais.</span></h2></div>
+    </div>
+    <span class="ds-type-spec">28px / 32px → 40px / 44px</span>
+</div>
+
+<!-- Heading 3 — normal-title -->
+<div class="ds-type-row">
+    <span class="ds-type-label">Heading 3</span>
+    <div class="ds-type-preview">
+        <h3 class="normal-title">Seu próximo passo no digital acontece aqui.</h3>
+    </div>
+    <span class="ds-type-spec">24px / 28px → 32px / 36px</span>
+</div>
+
+<!-- Heading 3 — introduction-text -->
+<div class="ds-type-row">
+    <span class="ds-type-label">Heading 3 Emphasis</span>
+    <div class="ds-type-preview">
+        <h3 class="introduction-text">Cresça ao lado dos melhores.</h3>
+        <h3 class="introduction-text emphasis">Faça parte da comunidade que lidera o digital.</h3>
+    </div>
+    <span class="ds-type-spec">32px / 36px → 56px / 56px</span>
+</div>
+
+<!-- Heading 4 — ecosystem-card-text-title -->
+<div class="ds-type-row">
+    <span class="ds-type-label">Heading 4</span>
+    <div class="ds-type-preview">
+        <h3 class="ecosystem-card-text-title">Crie o que você quiser, do seu jeito</h3>
+    </div>
+    <span class="ds-type-spec">20px / 24px → 24px / 28px</span>
+</div>
+
+<!-- Bold L — numbers-wrapper h3 -->
+<div class="ds-type-row">
+    <span class="ds-type-label">Bold L (Numbers)</span>
+    <div class="ds-type-preview">
+        <div class="numbers-wrapper"><h3 class="custom">+ 50 Bilhões</h3></div>
+    </div>
+    <span class="ds-type-spec">32px / 36px → 48px / 52px</span>
+</div>
+
+<!-- Bold M — creator-card-info-name -->
+<div class="ds-type-row">
+    <span class="ds-type-label">Bold M</span>
+    <div class="ds-type-preview">
+        <h5 class="creator-card-info-name">Pedro Sobral</h5>
+    </div>
+    <span class="ds-type-spec">18px / 22px</span>
+</div>
+
+<!-- Bold S — text-with-border -->
+<div class="ds-type-row">
+    <span class="ds-type-label">Bold S (Label)</span>
+    <div class="ds-type-preview">
+        <div class="text-with-border"><p class="custom">Inteligência artificial da Hotmart</p></div>
+    </div>
+    <span class="ds-type-spec">14px / 18px</span>
+</div>
+
+<!-- Paragraph — early-access__text -->
+<div class="ds-type-row">
+    <span class="ds-type-label">Paragraph</span>
+    <div class="ds-type-preview">
+        <p class="early-access__text">Desbloqueie as ferramentas e o suporte que os top players usam para escalar seus resultados: <strong>Canva PRO, Manychat PRO, gerente de contas</strong> e muito mais.</p>
+    </div>
+    <span class="ds-type-spec">16px / 24px → 18px / 28px</span>
+</div>
+
+<!-- Regular M — creator-card-info-bio -->
+<div class="ds-type-row">
+    <span class="ds-type-label">Regular M</span>
+    <div class="ds-type-preview">
+        <p class="creator-card-info-bio">Pioneiro no Brasil, seu método gerou mais de R$1 Bilhão em vendas para alunos.</p>
+    </div>
+    <span class="ds-type-spec">14px / 20px</span>
+</div>
+
+<!-- Regular S — rating-text -->
+<div class="ds-type-row">
+    <span class="ds-type-label">Regular S</span>
+    <div class="ds-type-preview">
+        <p class="rating-text">Seguro e confiável — Baseado em +200.000 avaliações</p>
+    </div>
+    <span class="ds-type-spec">12px / 16px</span>
+</div>
+
+<!-- CTA Text — cta-view -->
+<div class="ds-type-row">
+    <span class="ds-type-label">CTA Display</span>
+    <div class="ds-type-preview">
+        <h2 class="cta-view-introduction-top-title" style="position:static;">Aqui acontece</h2>
+    </div>
+    <span class="ds-type-spec">48px / 52px → 96px / 100px</span>
+</div>
+
+</div>
+</div>
+</div>
+
+<!-- ============================================================ -->
+<!-- SECTION 2: COLORS & SURFACES                                 -->
+<!-- ============================================================ -->
+<div id="ds-colors">
+<hr class="ds-divider"/>
+<div class="ds-section">
+<h2 class="ds-section-title">Colors & Surfaces</h2>
+<p class="ds-section-subtitle">Paleta de cores, backgrounds e gradientes do design</p>
+
+<!-- Primary Colors -->
+<p class="ds-component-label">Primary Colors</p>
+<div class="ds-color-grid">
+    <div class="ds-color-card">
+        <div class="ds-color-swatch" style="background:#ff4000;"></div>
+        <div class="ds-color-info"><div class="ds-color-name">Orange Primary</div><div class="ds-color-value">#FF4000 — Buttons, CTAs, accents</div></div>
+    </div>
+    <div class="ds-color-card">
+        <div class="ds-color-swatch" style="background:#f04e23;"></div>
+        <div class="ds-color-info"><div class="ds-color-name">Hotmart Primary</div><div class="ds-color-value">#F04E23 — Platform buttons</div></div>
+    </div>
+    <div class="ds-color-card">
+        <div class="ds-color-swatch" style="background:#EF4E23;"></div>
+        <div class="ds-color-info"><div class="ds-color-name">Accent Stroke</div><div class="ds-color-value">#EF4E23 — FAQ icons, strokes</div></div>
+    </div>
+    <div class="ds-color-card">
+        <div class="ds-color-swatch" style="background:#c5310a;"></div>
+        <div class="ds-color-info"><div class="ds-color-name">Primary Dark</div><div class="ds-color-value">#C5310A — Hover/pressed states</div></div>
+    </div>
+    <div class="ds-color-card">
+        <div class="ds-color-swatch" style="background:#9c2100;"></div>
+        <div class="ds-color-info"><div class="ds-color-name">Primary Darker</div><div class="ds-color-value">#9C2100 — Deep hover</div></div>
+    </div>
+</div>
+
+<!-- Neutral Colors -->
+<p class="ds-component-label">Neutrals</p>
+<div class="ds-color-grid">
+    <div class="ds-color-card">
+        <div class="ds-color-swatch" style="background:#0d0d0d;"></div>
+        <div class="ds-color-info"><div class="ds-color-name">Near Black</div><div class="ds-color-value">#0D0D0D — Text, dark surfaces</div></div>
+    </div>
+    <div class="ds-color-card">
+        <div class="ds-color-swatch" style="background:#053d4e;"></div>
+        <div class="ds-color-info"><div class="ds-color-name">Dark Teal</div><div class="ds-color-value">#053D4E — Logo wordmark</div></div>
+    </div>
+    <div class="ds-color-card">
+        <div class="ds-color-swatch" style="background:#353a40;"></div>
+        <div class="ds-color-info"><div class="ds-color-name">Gray 900</div><div class="ds-color-value">#353A40 — Body text</div></div>
+    </div>
+    <div class="ds-color-card">
+        <div class="ds-color-swatch" style="background:#6b7480;"></div>
+        <div class="ds-color-info"><div class="ds-color-name">Gray 500</div><div class="ds-color-value">#6B7480 — Secondary text</div></div>
+    </div>
+    <div class="ds-color-card">
+        <div class="ds-color-swatch" style="background:#dfe2e6;"></div>
+        <div class="ds-color-info"><div class="ds-color-name">Gray 300</div><div class="ds-color-value">#DFE2E6 — Borders, dividers</div></div>
+    </div>
+    <div class="ds-color-card">
+        <div class="ds-color-swatch" style="background:#f5f3ef;"></div>
+        <div class="ds-color-info"><div class="ds-color-name">Off White (Cream)</div><div class="ds-color-value">#F5F3EF — Monks backgrounds</div></div>
+    </div>
+    <div class="ds-color-card">
+        <div class="ds-color-swatch" style="background:#fafbfc; border-bottom:1px solid #dfe2e6;"></div>
+        <div class="ds-color-info"><div class="ds-color-name">Gray 100</div><div class="ds-color-value">#FAFBFC — Light backgrounds</div></div>
+    </div>
+    <div class="ds-color-card">
+        <div class="ds-color-swatch" style="background:#ffffff; border-bottom:1px solid #dfe2e6;"></div>
+        <div class="ds-color-info"><div class="ds-color-name">White</div><div class="ds-color-value">#FFFFFF — Cards, buttons</div></div>
+    </div>
+</div>
+
+<!-- Semantic Colors -->
+<p class="ds-component-label">Semantic</p>
+<div class="ds-color-grid">
+    <div class="ds-color-card">
+        <div class="ds-color-swatch" style="background:#21c45d;"></div>
+        <div class="ds-color-info"><div class="ds-color-name">Success Green</div><div class="ds-color-value">#21C45D — Checkmarks, bullets</div></div>
+    </div>
+</div>
+
+<!-- Surfaces -->
+<p class="ds-component-label">Surfaces & Backgrounds</p>
+<div class="ds-surface-grid">
+    <div class="ds-surface-card" style="background:#f5f3ef; color:#0d0d0d; border:1px solid #dfe2e6;">
+        <div class="ds-surface-label">Page Background</div>
+        <div class="ds-surface-usage">#F5F3EF — Main Monks sections</div>
+    </div>
+    <div class="ds-surface-card" style="background:#0d0d0d; color:#f5f3ef;">
+        <div class="ds-surface-label">Dark Section</div>
+        <div class="ds-surface-usage">#0D0D0D — CTA, boost-sales</div>
+    </div>
+    <div class="ds-surface-card" style="background:#ffffff; color:#0d0d0d; border:1px solid #dfe2e6;">
+        <div class="ds-surface-label">Card Surface</div>
+        <div class="ds-surface-usage">#FFFFFF — Cards, dropdowns</div>
+    </div>
+    <div class="ds-surface-card" style="background:linear-gradient(135deg, #ff4000 0%, #c5310a 100%); color:#fff;">
+        <div class="ds-surface-label">Gradient Accent</div>
+        <div class="ds-surface-usage">Orange gradient — Hero overlay</div>
+    </div>
+</div>
+
+</div>
+</div>
+
+<!-- ============================================================ -->
+<!-- SECTION 3: UI COMPONENTS                                     -->
+<!-- ============================================================ -->
+<div id="ds-components">
+<hr class="ds-divider"/>
+<div class="ds-section">
+<h2 class="ds-section-title">UI Components</h2>
+<p class="ds-section-subtitle">Botões, cards e elementos interativos do design</p>
+
+<!-- Monks Primary Button -->
+<p class="ds-component-label">Primary Button (Monks)</p>
+<div class="ds-component-row">
+    <a class="primary-button main" href="#">Cadastre-se agora</a>
+    <a class="primary-button main white-hover" href="#">Com hover branco</a>
+</div>
+
+<!-- Monks Primary Button with icon -->
+<p class="ds-component-label">Button with Icon</p>
+<div class="ds-component-row">
+    <a class="primary-button button-text-with-icon" href="#">Cadastre-se agora</a>
+</div>
+
+<!-- Platform Buttons -->
+<p class="ds-component-label">Platform Buttons</p>
+<div class="ds-component-row">
+    <a class="button button--primary button-size--medium" href="#"><span class="button__label">Primary Medium</span></a>
+    <a class="button button--secondary button--medium" href="#"><span><span class="button__label">Secondary Medium</span></span></a>
+</div>
+
+<!-- Header Button -->
+<p class="ds-component-label">Header CTA Button</p>
+<div class="ds-component-row">
+    <a class="primary-button header__navigation-plataform-signup-button" href="#">Comece gratuitamente</a>
+</div>
+
+<!-- Ecosystem Card -->
+<p class="ds-component-label">Ecosystem Card</p>
+<div style="max-width:680px;">
+<div class="ecosystem-card">
+    <div class="ecosystem-card-image-wrapper">
+        <img alt="Card image" data-nimg="1" data-testid="monks-image" decoding="async" height="382" loading="lazy" src="assets/1-3_0ae03f079995.webp" srcset="assets/1-3_967aee4026f5.webp 1x, assets/1-3_0ae03f079995.webp 2x" style="color: transparent;" width="680"/>
+    </div>
+    <div>
+        <div class="ecosystem-card-texts-wrapper">
+            <h3 class="ecosystem-card-text-title">Crie o que você quiser, do seu jeito</h3>
+            <p class="ecosystem-card-text-long">Você escolhe o formato, a Hotmart prepara para sua venda acontecer.</p>
+        </div>
+    </div>
+</div>
+</div>
+
+<!-- Creator Card -->
+<p class="ds-component-label" style="margin-top:48px;">Creator Card</p>
+<div style="max-width:385px;">
+<div class="creator-card">
+    <div class="creator-card-image">
+        <img alt="Foto de Pedro Sobral" class="create-images-img" data-nimg="1" data-testid="monks-image" decoding="async" height="557" loading="lazy" src="assets/Pedro-Sobral_893a444a5082.webp" srcset="assets/Pedro-Sobral_cac405a16fcb.webp 1x, assets/Pedro-Sobral_893a444a5082.webp 2x" style="color: transparent;" width="272"/>
+        <img alt="moldura de celular" class="create-images-img-phone-schema" data-nimg="1" data-testid="monks-image" decoding="async" height="557" loading="lazy" src="assets/monks-cell-schema_e6d1df813fa4.webp" srcset="assets/monks-cell-schema_a5bb3b11a6f1.webp 1x, assets/monks-cell-schema_e6d1df813fa4.webp 2x" style="color: transparent;" width="272"/>
+    </div>
+    <div class="creator-card-info">
+        <h5 class="creator-card-info-name">Pedro Sobral</h5>
+        <p class="creator-card-info-bio">Fundador da maior comunidade no Brasil de gestores de tráfego, com +50 Mil alunos.</p>
+    </div>
+    <div class="creator-card-background"></div>
+</div>
+</div>
+
+<!-- Boost Sales Card -->
+<p class="ds-component-label" style="margin-top:48px;">Boost Sales Card</p>
+<div style="max-width:411px;">
+<div class="boost-sales-card">
+    <div class="boost-sales-card-image">
+        <img alt="Card image" data-nimg="1" data-testid="monks-image" decoding="async" height="511" loading="lazy" src="assets/2-new-dimension_5690ef7717fe.webp" srcset="assets/2-new-dimension_e7095e0f2322.webp 1x, assets/2-new-dimension_5690ef7717fe.webp 2x" style="color:transparent" width="411"/>
+    </div>
+    <div class="boost-sales-card-text">
+        <h4 class="custom">A gente recomenda, você fatura</h4>
+        <p>Recomendações automáticas: seu cliente compra um produto e já indicamos o próximo. <strong>Ticket médio até 48% maior.</strong></p>
+    </div>
+</div>
+</div>
+
+<!-- FAQ Card -->
+<p class="ds-component-label" style="margin-top:48px;">FAQ Accordion</p>
+<div class="ds-faq-demo" style="max-width:800px;">
+<div class="faq-card">
+<details>
+<summary>
+<span class="faq-card-summary-number">01</span>
+<p class="faq-card-summary-question">Qual a melhor plataforma para vender cursos online?</p>
+<i class="icon faq-card-summary-icon-plus" data-testid="icon-test"><svg fill="none" height="17" viewbox="0 0 17 17" width="17" xmlns="http://www.w3.org/2000/svg"><path d="M8.5 0.848633V16.8486" stroke="#EF4E23" stroke-width="2"></path><path d="M16.5 8.84863L0.5 8.84863" stroke="#EF4E23" stroke-width="2"></path></svg></i>
+<i class="icon faq-card-summary-icon-minus" data-testid="icon-test"><svg fill="none" height="16" viewbox="0 0 17 16" width="17" xmlns="http://www.w3.org/2000/svg"><path d="M16.5 8L0.5 8" stroke="#EF4E23" stroke-width="2"></path></svg></i>
+</summary>
+<div class="faq-card-answer">
+<div class="faq-card-answer-grid active-grid">
+<div class="faq-card-answer-text-wrapper">
+<div class="faq-card-answer-text">
+<p>A melhor plataforma para vender cursos online é aquela que se alinha com seus objetivos. Nesse sentido, a Hotmart se destaca como uma excelente opção.</p>
+</div>
+</div>
+</div>
+</div>
+</details>
+</div>
+<div class="faq-card">
+<details>
+<summary>
+<span class="faq-card-summary-number">02</span>
+<p class="faq-card-summary-question">O que é a Hotmart e como funciona?</p>
+<i class="icon faq-card-summary-icon-plus" data-testid="icon-test"><svg fill="none" height="17" viewbox="0 0 17 17" width="17" xmlns="http://www.w3.org/2000/svg"><path d="M8.5 0.848633V16.8486" stroke="#EF4E23" stroke-width="2"></path><path d="M16.5 8.84863L0.5 8.84863" stroke="#EF4E23" stroke-width="2"></path></svg></i>
+<i class="icon faq-card-summary-icon-minus" data-testid="icon-test"><svg fill="none" height="16" viewbox="0 0 17 16" width="17" xmlns="http://www.w3.org/2000/svg"><path d="M16.5 8L0.5 8" stroke="#EF4E23" stroke-width="2"></path></svg></i>
+</summary>
+<div class="faq-card-answer">
+<div class="faq-card-answer-grid active-grid">
+<div class="faq-card-answer-text-wrapper">
+<div class="faq-card-answer-text">
+<p>A Hotmart é uma plataforma global completa, líder na América Latina para a venda online de produtos digitais e físicos.</p>
+</div>
+</div>
+</div>
+</div>
+</details>
+</div>
+</div>
+
+<!-- Management Card -->
+<p class="ds-component-label" style="margin-top:48px;">Management Card</p>
+<div style="max-width:386px;">
+<div class="management-view-carousel-card">
+    <img alt="Card image" class="management-view-carousel-card-image" data-nimg="1" data-testid="monks-image" decoding="async" height="207" loading="lazy" src="assets/img1_ee4e317a826f.webp" srcset="assets/img1_82108ca11ccc.webp 1x, assets/img1_ee4e317a826f.webp 2x" style="color: transparent;" width="386"/>
+    <p class="management-view-carousel-card-text"><strong>Suporte especializado quando precisar</strong>. Nossos especialistas conhecem seu negócio e sabem exatamente como te ajudar.</p>
+    <div class="management-view-carousel-card-button">
+        <a class="primary-button button-text-with-icon" href="#">Cadastre-se agora</a>
+        <i class="icon" data-testid="icon-test"><svg fill="none" height="18" viewbox="0 0 25 18" width="25" xmlns="http://www.w3.org/2000/svg"><path d="M15.2395 4.13312e-05L13.1012 2.1408L18.4054 7.4511L0.816406 7.4511L0.816406 10.4769L18.4054 10.4769L13.1012 15.7796L15.2395 17.9204L24.1855 8.96401L15.2395 4.13312e-05Z" fill="#0D0D0D"></path></svg></i>
+    </div>
+</div>
+</div>
+
+<!-- Enchant Card -->
+<p class="ds-component-label" style="margin-top:48px;">Enchant Card</p>
+<div style="max-width:100%;">
+<div class="enchant-card is-active-card">
+    <div class="enchant-card-texts">
+        <div class="loading-bar-container"><div class="progress-bar loading"></div></div>
+        <button type="button"><h4 class="enchant-card-title">Suporte de IA que aprende com você, atende como você, mas nunca dorme.</h4></button>
+        <p class="enchant-card-text">Nosso assistente inteligente 24 horas oferece suporte em tempo real.</p>
+    </div>
+    <div class="enchant-card-image">
+        <img alt="Enchant card image" data-nimg="1" data-testid="monks-image" decoding="async" height="575" loading="lazy" src="assets/view-2-desk-new-dimension_b34c6b40c73d.webp" srcset="assets/view-2-desk-new-dimension_0ca3889ae35a.webp 1x, assets/view-2-desk-new-dimension_b34c6b40c73d.webp 2x" style="color:transparent" width="549"/>
+    </div>
+</div>
+</div>
+
+</div>
+</div>
+
+<!-- ============================================================ -->
+<!-- SECTION 4: LAYOUT & SPACING                                  -->
+<!-- ============================================================ -->
+<div id="ds-layout">
+<hr class="ds-divider"/>
+<div class="ds-section">
+<h2 class="ds-section-title">Layout & Spacing</h2>
+<p class="ds-section-subtitle">Containers, grids e padrões de layout do design</p>
+
+<!-- Pattern 1: Hero Split Layout -->
+<p class="ds-component-label">Hero Split Layout (Left Content + Right Form)</p>
+<div class="ds-layout-demo">
+<div class="ds-layout-demo-label">hero--content hero-content-monks — Flexbox split, gap 32px</div>
+<div style="padding:24px;background:#f5f3ef;">
+    <div style="display:flex;gap:32px;flex-wrap:wrap;">
+        <div style="flex:1;min-width:280px;background:#fff;border-radius:12px;padding:24px;border:1px dashed #dfe2e6;">
+            <p style="font-family:var(--font-hotmart-sans);color:#6b7480;font-size:13px;font-weight:700;">hero--left</p>
+            <p style="font-family:var(--font-hotmart-sans);color:#6b7480;font-size:12px;margin-top:8px;">Title + Bullets + CTA + Rating</p>
+        </div>
+        <div style="flex:1;min-width:280px;background:#fff;border-radius:12px;padding:24px;border:1px dashed #dfe2e6;">
+            <p style="font-family:var(--font-hotmart-sans);color:#6b7480;font-size:13px;font-weight:700;">hero--right</p>
+            <p style="font-family:var(--font-hotmart-sans);color:#6b7480;font-size:12px;margin-top:8px;">Signup iframe / Form</p>
+        </div>
+    </div>
+</div>
+</div>
+
+<!-- Pattern 2: Numbers Grid -->
+<p class="ds-component-label">Numbers Grid (monks-our-numbers)</p>
+<div class="ds-layout-demo">
+<div class="ds-layout-demo-label">monks-our-numbers-wrapper — Flex split with 3-column grid</div>
+<div style="padding:24px;background:#f5f3ef;">
+<div class="monks-our-numbers-wrapper" style="position:static;">
+    <div class="numbers-wrapper-left">
+        <div class="introduction-text-with-emphasis"><h2 class="custom">Entre agora para a <span>maior plataforma.</span></h2></div>
+        <div class="numbers-wrapper-content">
+            <div class="numbers-wrapper"><h3 class="custom">+ 50 Bilhões</h3><p class="custom">De reais em vendas</p></div>
+            <div class="numbers-wrapper"><h3 class="custom">+ 25 Milhões</h3><p class="custom">De compradores</p></div>
+            <div class="numbers-wrapper"><h3 class="custom">+ 200 Mil</h3><p class="custom">Produtores vendendo aqui</p></div>
+        </div>
+    </div>
+</div>
+</div>
+</div>
+
+<!-- Pattern 3: Cards Grid (3-col) -->
+<p class="ds-component-label">Boost Sales Grid (3 columns)</p>
+<div class="ds-layout-demo">
+<div class="ds-layout-demo-label">boost-sales-grid — CSS Grid 3 columns with gap 24px</div>
+<div style="padding:24px;background:#0d0d0d;">
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:24px;">
+        <div style="background:#1a1a1a;border-radius:12px;padding:24px;border:1px dashed #333;">
+            <p style="font-family:var(--font-hotmart-sans);color:#6b7480;font-size:12px;">Card 1</p>
+        </div>
+        <div style="background:#1a1a1a;border-radius:12px;padding:24px;border:1px dashed #333;">
+            <p style="font-family:var(--font-hotmart-sans);color:#6b7480;font-size:12px;">Card 2</p>
+        </div>
+        <div style="background:#1a1a1a;border-radius:12px;padding:24px;border:1px dashed #333;">
+            <p style="font-family:var(--font-hotmart-sans);color:#6b7480;font-size:12px;">Card 3</p>
+        </div>
+    </div>
+</div>
+</div>
+
+<!-- Spacing Tokens -->
+<p class="ds-component-label" style="margin-top:48px;">Spacing Scale (Modular)</p>
+<div style="display:flex;flex-direction:column;gap:8px;max-width:600px;">
+    <div style="display:flex;align-items:center;gap:16px;">
+        <span style="font-family:var(--font-hotmart-sans);font-size:12px;color:#6b7480;min-width:60px;">6px</span>
+        <div style="width:6px;height:16px;background:#ff4000;border-radius:2px;"></div>
+        <span style="font-family:var(--font-hotmart-sans);font-size:11px;color:#6b7480;">--ms-3</span>
+    </div>
+    <div style="display:flex;align-items:center;gap:16px;">
+        <span style="font-family:var(--font-hotmart-sans);font-size:12px;color:#6b7480;min-width:60px;">8px</span>
+        <div style="width:8px;height:16px;background:#ff4000;border-radius:2px;"></div>
+        <span style="font-family:var(--font-hotmart-sans);font-size:11px;color:#6b7480;">--ms-2</span>
+    </div>
+    <div style="display:flex;align-items:center;gap:16px;">
+        <span style="font-family:var(--font-hotmart-sans);font-size:12px;color:#6b7480;min-width:60px;">12px</span>
+        <div style="width:12px;height:16px;background:#ff4000;border-radius:2px;"></div>
+        <span style="font-family:var(--font-hotmart-sans);font-size:11px;color:#6b7480;">--ms0 (base)</span>
+    </div>
+    <div style="display:flex;align-items:center;gap:16px;">
+        <span style="font-family:var(--font-hotmart-sans);font-size:12px;color:#6b7480;min-width:60px;">16px</span>
+        <div style="width:16px;height:16px;background:#ff4000;border-radius:2px;"></div>
+        <span style="font-family:var(--font-hotmart-sans);font-size:11px;color:#6b7480;">--ms2</span>
+    </div>
+    <div style="display:flex;align-items:center;gap:16px;">
+        <span style="font-family:var(--font-hotmart-sans);font-size:12px;color:#6b7480;min-width:60px;">24px</span>
+        <div style="width:24px;height:16px;background:#ff4000;border-radius:2px;"></div>
+        <span style="font-family:var(--font-hotmart-sans);font-size:11px;color:#6b7480;">--ms4 (gap)</span>
+    </div>
+    <div style="display:flex;align-items:center;gap:16px;">
+        <span style="font-family:var(--font-hotmart-sans);font-size:12px;color:#6b7480;min-width:60px;">32px</span>
+        <div style="width:32px;height:16px;background:#ff4000;border-radius:2px;"></div>
+        <span style="font-family:var(--font-hotmart-sans);font-size:11px;color:#6b7480;">--container-padding</span>
+    </div>
+    <div style="display:flex;align-items:center;gap:16px;">
+        <span style="font-family:var(--font-hotmart-sans);font-size:12px;color:#6b7480;min-width:60px;">48px</span>
+        <div style="width:48px;height:16px;background:#ff4000;border-radius:2px;"></div>
+        <span style="font-family:var(--font-hotmart-sans);font-size:11px;color:#6b7480;">Section gap</span>
+    </div>
+    <div style="display:flex;align-items:center;gap:16px;">
+        <span style="font-family:var(--font-hotmart-sans);font-size:12px;color:#6b7480;min-width:60px;">1216px</span>
+        <div style="width:120px;height:16px;background:#ff4000;border-radius:2px;"></div>
+        <span style="font-family:var(--font-hotmart-sans);font-size:11px;color:#6b7480;">--container-max-width</span>
+    </div>
+</div>
+
+</div>
+</div>
+
+<!-- ============================================================ -->
+<!-- SECTION 5: MOTION & INTERACTION                              -->
+<!-- ============================================================ -->
+<div id="ds-motion">
+<hr class="ds-divider"/>
+<div class="ds-section">
+<h2 class="ds-section-title">Motion & Interaction</h2>
+<p class="ds-section-subtitle">Transições, hover states e comportamentos de animação</p>
+
+<div class="ds-motion-grid">
+
+<!-- Button hover transition -->
+<div class="ds-motion-card">
+    <a class="primary-button main" href="#" style="pointer-events:auto;">Hover me</a>
+    <p class="ds-motion-card-label">Button Hover — 0.5s ease-in-out<br/>Background: #ff4000 → #0d0d0d</p>
+</div>
+
+<!-- Button white hover -->
+<div class="ds-motion-card">
+    <a class="primary-button main white-hover" href="#" style="pointer-events:auto;">Hover me (white)</a>
+    <p class="ds-motion-card-label">White Hover variant<br/>Background: #ff4000 → #ffffff</p>
+</div>
+
+<!-- Platform button hover -->
+<div class="ds-motion-card">
+    <a class="button button--primary button-size--medium" href="#" style="pointer-events:auto;"><span class="button__label">Platform button</span></a>
+    <p class="ds-motion-card-label">Platform Button Hover — 0.5s cubic-bezier<br/>Background: var(--hotmart-primary) → darker</p>
+</div>
+
+<!-- Loading bar animation -->
+<div class="ds-motion-card">
+    <div style="width:100%;max-width:240px;margin:0 auto;">
+        <div class="loading-bar-container"><div class="progress-bar loading"></div></div>
+    </div>
+    <p class="ds-motion-card-label">Progress Bar — Loading animation<br/>Width: 0% → 100% over time</p>
+</div>
+
+<!-- Link hover -->
+<div class="ds-motion-card">
+    <a class="link link--primary" href="#" style="pointer-events:auto;"><span>Link hover effect</span></a>
+    <p class="ds-motion-card-label">Link Hover — underline transition<br/>Color + underline on hover</p>
+</div>
+
+<!-- FAQ expand/collapse -->
+<div class="ds-motion-card">
+    <div style="max-width:240px;margin:0 auto;">
+        <div class="faq-card">
+            <details>
+                <summary>
+                    <span class="faq-card-summary-number">01</span>
+                    <p class="faq-card-summary-question" style="font-size:13px;">Click to expand</p>
+                    <i class="icon faq-card-summary-icon-plus" data-testid="icon-test"><svg fill="none" height="17" viewbox="0 0 17 17" width="17" xmlns="http://www.w3.org/2000/svg"><path d="M8.5 0.848633V16.8486" stroke="#EF4E23" stroke-width="2"></path><path d="M16.5 8.84863L0.5 8.84863" stroke="#EF4E23" stroke-width="2"></path></svg></i>
+                    <i class="icon faq-card-summary-icon-minus" data-testid="icon-test"><svg fill="none" height="16" viewbox="0 0 17 16" width="17" xmlns="http://www.w3.org/2000/svg"><path d="M16.5 8L0.5 8" stroke="#EF4E23" stroke-width="2"></path></svg></i>
+                </summary>
+                <div class="faq-card-answer"><div class="faq-card-answer-grid active-grid"><div class="faq-card-answer-text-wrapper"><div class="faq-card-answer-text"><p>Expanded content.</p></div></div></div></div>
+            </details>
+        </div>
+    </div>
+    <p class="ds-motion-card-label">FAQ Accordion — expand/collapse<br/>Icon rotates, content reveals</p>
+</div>
+
+</div>
+
+<!-- Easing tokens -->
+<p class="ds-component-label" style="margin-top:48px;">Easing & Timing Tokens</p>
+<div style="font-family:var(--font-hotmart-sans);font-size:14px;color:#353a40;line-height:2;">
+    <code style="background:#f5f3ef;padding:4px 8px;border-radius:4px;">--ease-in-out: cubic-bezier(0.4, 0, 0.14, 1)</code><br/>
+    <code style="background:#f5f3ef;padding:4px 8px;border-radius:4px;">--ease-out: cubic-bezier(0.4, 0, 0, 1)</code><br/>
+    <code style="background:#f5f3ef;padding:4px 8px;border-radius:4px;">Button transition: 0.5s ease-in-out</code><br/>
+    <code style="background:#f5f3ef;padding:4px 8px;border-radius:4px;">Link transition: 0.3s ease</code><br/>
+    <code style="background:#f5f3ef;padding:4px 8px;border-radius:4px;">Footer city rotation: 0.75s with 0.375s delay</code>
+</div>
+
+</div>
+</div>
+
+<!-- ============================================================ -->
+<!-- SECTION 6: ICONS                                             -->
+<!-- ============================================================ -->
+<div id="ds-icons">
+<hr class="ds-divider"/>
+<div class="ds-section">
+<h2 class="ds-section-title">Icons</h2>
+<p class="ds-section-subtitle">Ícones SVG inline usados no design original</p>
+
+<div class="ds-icon-grid">
+
+<!-- Checkmark -->
+<div class="ds-icon-card">
+    <i class="icon icon-check-circle" data-testid="icon-test"><svg fill="none" height="14" viewbox="0 0 14 14" width="14" xmlns="http://www.w3.org/2000/svg"><path d="M13.563 6.781c0 3.746-3.063 6.782-6.782 6.782A6.78 6.78 0 0 1 0 6.78C0 3.063 3.035 0 6.781 0c3.719 0 6.782 3.063 6.782 6.781m-7.575 3.61 5.032-5.032a.463.463 0 0 0 0-.629l-.63-.601a.387.387 0 0 0-.6 0L5.687 8.23 3.746 6.316a.387.387 0 0 0-.601 0l-.63.602a.463.463 0 0 0 0 .629L5.36 10.39a.463.463 0 0 0 .63 0" fill="#21c45d"></path></svg></i>
+    <span class="ds-icon-card-label">Check Circle</span>
+</div>
+
+<!-- Chevron Down -->
+<div class="ds-icon-card">
+    <i class="icon menu__icon" data-testid="icon-test"><svg fill="none" height="11" viewbox="0 0 18 11" width="18" xmlns="http://www.w3.org/2000/svg"><path d="M8.05449 10.4319L0.466927 2.88324C0.116732 2.49414 0.116732 1.91048 0.466927 1.56028L1.36187 0.665341C1.71207 0.315145 2.29573 0.315145 2.68483 0.665341L8.71597 6.65757L14.7082 0.665341C15.0973 0.315145 15.681 0.315145 16.0312 0.665341L16.9261 1.56028C17.2763 1.91048 17.2763 2.49414 16.9261 2.88324L9.33854 10.4319C8.98835 10.7821 8.40469 10.7821 8.05449 10.4319Z" fill="currentColor"></path></svg></i>
+    <span class="ds-icon-card-label">Chevron Down</span>
+</div>
+
+<!-- Arrow Right -->
+<div class="ds-icon-card">
+    <i class="icon" data-testid="icon-test"><svg fill="none" height="18" viewbox="0 0 25 18" width="25" xmlns="http://www.w3.org/2000/svg"><path d="M15.2395 4.13312e-05L13.1012 2.1408L18.4054 7.4511L0.816406 7.4511L0.816406 10.4769L18.4054 10.4769L13.1012 15.7796L15.2395 17.9204L24.1855 8.96401L15.2395 4.13312e-05Z" fill="#0D0D0D"></path></svg></i>
+    <span class="ds-icon-card-label">Arrow Right</span>
+</div>
+
+<!-- Arrow Left -->
+<div class="ds-icon-card">
+    <i class="icon" data-testid="icon-test"><svg fill="none" height="18" viewbox="0 0 25 18" width="25" xmlns="http://www.w3.org/2000/svg"><path d="M9.76049 17.9204L11.8988 15.7796L6.59464 10.4693L24.1836 10.4693L24.1836 7.4435L6.59464 7.4435L11.8988 2.14076L9.76049 -6.30454e-07L0.814518 8.9564L9.76049 17.9204Z" fill="#0D0D0D"></path></svg></i>
+    <span class="ds-icon-card-label">Arrow Left</span>
+</div>
+
+<!-- Plus (FAQ) -->
+<div class="ds-icon-card">
+    <i class="icon" data-testid="icon-test"><svg fill="none" height="17" viewbox="0 0 17 17" width="17" xmlns="http://www.w3.org/2000/svg"><path d="M8.5 0.848633V16.8486" stroke="#EF4E23" stroke-width="2"></path><path d="M16.5 8.84863L0.5 8.84863" stroke="#EF4E23" stroke-width="2"></path></svg></i>
+    <span class="ds-icon-card-label">Plus (FAQ)</span>
+</div>
+
+<!-- Minus (FAQ) -->
+<div class="ds-icon-card">
+    <i class="icon" data-testid="icon-test"><svg fill="none" height="16" viewbox="0 0 17 16" width="17" xmlns="http://www.w3.org/2000/svg"><path d="M16.5 8L0.5 8" stroke="#EF4E23" stroke-width="2"></path></svg></i>
+    <span class="ds-icon-card-label">Minus (FAQ)</span>
+</div>
+
+<!-- Hamburger -->
+<div class="ds-icon-card">
+    <i class="icon" data-testid="icon-test"><svg aria-hidden="true" focusable="false" role="img" viewbox="0 0 448 512" width="24" height="24" xmlns="http://www.w3.org/2000/svg"><path d="M0 88C0 74.7 10.7 64 24 64l400 0c13.3 0 24 10.7 24 24s-10.7 24-24 24L24 112C10.7 112 0 101.3 0 88zM0 248c0-13.3 10.7-24 24-24l400 0c13.3 0 24 10.7 24 24s-10.7 24-24 24L24 272c-13.3 0-24-10.7-24-24zM448 408c0 13.3-10.7 24-24 24L24 432c-13.3 0-24-10.7-24-24s10.7-24 24-24l400 0c13.3 0 24 10.7 24 24z" fill="currentColor"></path></svg></i>
+    <span class="ds-icon-card-label">Hamburger Menu</span>
+</div>
+
+<!-- Play -->
+<div class="ds-icon-card">
+    <i class="icon" data-testid="icon-test"><svg fill="none" height="40" viewbox="0 0 60 61" width="40" xmlns="http://www.w3.org/2000/svg"><rect height="56" rx="28" stroke="#0d0d0d" stroke-width="4" width="56" x="2" y="2.42041"></rect><path d="M20.729 18.565L40.4092 29.4278C40.5884 29.5269 40.7376 29.671 40.8415 29.8453C40.9453 30.0196 41 30.2178 41 30.4197C41 30.6216 40.9453 30.8198 40.8415 30.9941C40.7376 31.1684 40.5884 31.3125 40.4092 31.4116L20.729 42.2744C20.5523 42.3718 20.3528 42.4221 20.1501 42.4204C19.9475 42.4186 19.7489 42.3648 19.574 42.2644C19.3992 42.1639 19.2542 42.0203 19.1535 41.8477C19.0528 41.6752 18.9998 41.4798 19 41.281V19.5584C19.0001 19.3597 19.0532 19.1645 19.154 18.9922C19.2548 18.8198 19.3998 18.6764 19.5747 18.5761C19.7495 18.4758 19.948 18.4221 20.1505 18.4205C20.353 18.4188 20.5524 18.4677 20.729 18.565Z" fill="#0d0d0d"></path></svg></i>
+    <span class="ds-icon-card-label">Play Button</span>
+</div>
+
+<!-- Heart -->
+<div class="ds-icon-card">
+    <i class="icon made-with-love__heart-icon" data-testid="icon-test" style="color:#ff4000;"><svg aria-hidden="true" focusable="false" role="img" viewbox="0 0 512 512" width="20" height="20" xmlns="http://www.w3.org/2000/svg"><path d="M462.3 62.6C407.5 15.9 326 24.3 275.7 76.2L256 96.5l-19.7-20.3C186.1 24.3 104.5 15.9 49.7 62.6c-62.8 53.6-66.1 149.8-9.9 207.9l193.5 199.8c12.5 12.9 32.8 12.9 45.3 0l193.5-199.8c56.3-58.1 53-154.3-9.8-207.9z" fill="currentColor"></path></svg></i>
+    <span class="ds-icon-card-label">Heart</span>
+</div>
+
+<!-- Fire -->
+<div class="ds-icon-card">
+    <i class="icon made-with-love__fire-icon" data-testid="icon-test" style="color:#ff4000;"><svg aria-hidden="true" focusable="false" role="img" viewbox="0 0 448 512" width="20" height="20" xmlns="http://www.w3.org/2000/svg"><path d="M323.56 51.2c-20.8 19.3-39.58 39.59-56.22 59.97C240.08 73.62 206.28 35.53 168 0 69.74 91.17 0 209.96 0 281.6 0 408.85 100.29 512 224 512s224-103.15 224-230.4c0-53.27-51.98-163.14-124.44-230.4zm-19.47 340.65C282.43 407.01 255.72 416 226.86 416 154.71 416 96 368.26 96 290.75c0-38.61 24.31-72.63 72.79-130.75 6.93 7.98 98.83 125.34 98.83 125.34l58.63-66.88c4.14 6.85 7.91 13.55 11.27 19.97 27.35 52.19 15.81 118.97-33.43 153.42z" fill="currentColor"></path></svg></i>
+    <span class="ds-icon-card-label">Fire</span>
+</div>
+
+<!-- Hotmart Logo Icon -->
+<div class="ds-icon-card">
+    <i class="icon" data-testid="icon-test"><svg fill="none" height="36" viewbox="0 0 26.709 36" width="26.709" xmlns="http://www.w3.org/2000/svg"><path d="M25.904 16.911a19.004 19.004 0 0 0 -2.159 -4.833h0.003S22.816 10.581 22.425 10.129h-0.003c-0.096 -0.119 -0.291 0.012 -0.217 0.147 0.111 0.223 0.21 0.497 0.141 0.765 -0.115 0.327 -0.492 0.554 -0.838 0.439a0.719 0.719 0 0 1 -0.255 -0.165c-0.355 -0.355 -0.539 -0.943 -0.77 -1.69 -0.206 -0.665 -0.462 -1.492 -0.925 -2.385 -0.752 -1.453 -1.642 -2.123 -1.679 -2.151a0.134 0.134 0 0 0 -0.155 -0.001 0.134 0.134 0 0 0 -0.049 0.147c0.004 0.011 0.378 1.207 -0.343 2.115 -0.287 0.361 -0.725 0.579 -1.234 0.61 -0.512 0.033 -1.019 -0.131 -1.324 -0.427 -0.754 -0.734 -0.843 -2.038 -0.83 -2.748 0.047 -2.371 0.786 -4.029 1.171 -4.575a0.129 0.129 0 0 0 -0.157 -0.194c-2.988 1.258 -5.152 3.405 -6.259 6.206 -0.623 1.666 -0.895 2.425 -1.115 2.903 -0.201 0.436 -0.39 0.638 -0.583 0.751a0.822 0.822 0 0 1 -0.367 0.103c-0.194 -0.02 -1.159 -0.191 -0.319 -1.755 0.07 -0.13 -0.114 -0.263 -0.218 -0.155l-0.663 0.706 -0.088 0.093 -0.111 0.117q-0.028 0.031 -0.05 0.061C3.096 11.357 1.635 14.318 0.792 17.053 0.04 19.681 -0.008 21.78 0 22.58l0.001 0.177a13.098 13.098 0 0 0 3.912 9.364A13.324 13.324 0 0 0 13.355 36.001c3.566 0 6.922 -1.377 9.442 -3.88A13.098 13.098 0 0 0 26.709 22.755c0 -2.254 -0.299 -4.09 -0.806 -5.844zM13.355 29.611c-3.817 0 -6.914 -3.068 -6.914 -6.856s3.094 -6.857 6.914 -6.857c3.817 0 6.912 3.069 6.912 6.857 0 3.785 -3.094 6.856 -6.912 6.856" fill="#FF4000"></path></svg></i>
+    <span class="ds-icon-card-label">Hotmart Logo</span>
+</div>
+
+<!-- Star sparkle -->
+<div class="ds-icon-card">
+    <i class="icon" data-testid="icon-test"><svg fill="none" height="24" viewbox="0 0 25 24" width="25" xmlns="http://www.w3.org/2000/svg"><path d="M1.4002 12.1143C1.28203 12.0973 1.28203 11.9027 1.40021 11.8857C11.2291 10.4703 11.9779 4.65028 12.4071 0.811746C12.4202 0.694453 12.5798 0.694451 12.5929 0.811744C13.0221 4.65028 13.7709 10.4703 23.5998 11.8857C23.718 11.9027 23.718 12.0973 23.5998 12.1143C13.7709 13.5297 13.0221 19.3497 12.5929 23.1883C12.5798 23.3055 12.4202 23.3055 12.4071 23.1883C11.9779 19.3497 11.2291 13.5297 1.4002 12.1143Z" stroke="#0d0d0d" stroke-linejoin="round" stroke-width="2"></path></svg></i>
+    <span class="ds-icon-card-label">AI Sparkle</span>
+</div>
+
+</div>
+
+<!-- Social Icons -->
+<p class="ds-component-label" style="margin-top:48px;">Social Media Icons</p>
+<div class="ds-icon-grid" style="grid-template-columns:repeat(auto-fill, minmax(80px, 1fr));">
+    <div class="ds-icon-card">
+        <svg fill="none" height="16" viewbox="0 0 16 16" width="16" xmlns="http://www.w3.org/2000/svg"><path d="M4.44444 0C1.99022 0 0 1.99022 0 4.44444V11.5556C0 14.0098 1.99022 16 4.44444 16H11.5556C14.0098 16 16 14.0098 16 11.5556V4.44444C16 1.99022 14.0098 0 11.5556 0H4.44444ZM13.3333 1.77778C13.824 1.77778 14.2222 2.176 14.2222 2.66667C14.2222 3.15733 13.824 3.55556 13.3333 3.55556C12.8427 3.55556 12.4444 3.15733 12.4444 2.66667C12.4444 2.176 12.8427 1.77778 13.3333 1.77778ZM8 3.55556C10.4542 3.55556 12.4444 5.54578 12.4444 8C12.4444 10.4542 10.4542 12.4444 8 12.4444C5.54578 12.4444 3.55556 10.4542 3.55556 8C3.55556 5.54578 5.54578 3.55556 8 3.55556ZM8 5.33333C7.29276 5.33333 6.61448 5.61428 6.11438 6.11438C5.61428 6.61448 5.33333 7.29276 5.33333 8C5.33333 8.70724 5.61428 9.38552 6.11438 9.88562C6.61448 10.3857 7.29276 10.6667 8 10.6667C8.70724 10.6667 9.38552 10.3857 9.88562 9.88562C10.3857 9.38552 10.6667 8.70724 10.6667 8C10.6667 7.29276 10.3857 6.61448 9.88562 6.11438C9.38552 5.61428 8.70724 5.33333 8 5.33333Z" fill="#FF4000"></path></svg>
+        <span class="ds-icon-card-label">Instagram</span>
+    </div>
+    <div class="ds-icon-card">
+        <svg fill="none" height="16" viewbox="0 0 16 16" width="16" xmlns="http://www.w3.org/2000/svg"><path clip-rule="evenodd" d="M2.90909 0C2.13755 0 1.39761 0.306493 0.852053 0.852053C0.306493 1.39761 0 2.13755 0 2.90909V13.0909C0 13.8624 0.306493 14.6024 0.852053 15.1479C1.39761 15.6935 2.13755 16 2.90909 16H13.0909C13.8624 16 14.6024 15.6935 15.1479 15.1479C15.6935 14.6024 16 13.8624 16 13.0909V2.90909C16 2.13755 15.6935 1.39761 15.1479 0.852053C14.6024 0.306493 13.8624 0 13.0909 0H2.90909ZM2.54545 8C2.54545 7.21891 2.58182 6.48218 2.63055 5.864C2.66145 5.41913 2.85225 5.00045 3.16771 4.68526C3.48318 4.37006 3.90201 4.17962 4.34691 4.14909C5.56285 4.06721 6.78131 4.02839 8 4.03273C9.56873 4.03273 10.7724 4.08655 11.6531 4.14909C12.098 4.17962 12.5168 4.37006 12.8323 4.68526C13.1478 5.00045 13.3385 5.41913 13.3695 5.864C13.4175 6.48218 13.4545 7.21891 13.4545 8C13.4545 8.80945 13.4153 9.57091 13.3644 10.2022C13.2916 11.1033 12.6051 11.7913 11.7193 11.8531C10.4812 11.9334 9.2407 11.9715 8 11.9673C6.416 11.9673 5.17091 11.9149 4.28073 11.8531C3.39491 11.7913 2.70836 11.1033 2.63564 10.2022C2.57631 9.46961 2.54622 8.73497 2.54545 8ZM6.64436 6.14909L9.73527 8L6.64436 9.85164V6.14909Z" fill="#FF4000" fill-rule="evenodd"></path></svg>
+        <span class="ds-icon-card-label">YouTube</span>
+    </div>
+    <div class="ds-icon-card">
+        <svg fill="none" height="16" viewbox="0 0 16 16" width="16" xmlns="http://www.w3.org/2000/svg"><path clip-rule="evenodd" d="M2.90909 0C2.13755 0 1.39761 0.306493 0.852053 0.852053C0.306493 1.39761 0 2.13755 0 2.90909V13.0909C0 13.8624 0.306493 14.6024 0.852053 15.1479C1.39761 15.6935 2.13755 16 2.90909 16H13.0909C13.8624 16 14.6024 15.6935 15.1479 15.1479C15.6935 14.6024 16 13.8624 16 13.0909V2.90909C16 2.13755 15.6935 1.39761 15.1479 0.852053C14.6024 0.306493 13.8624 0 13.0909 0H2.90909ZM8.24727 2.54545H9.98327C9.98327 3.70909 10.9665 5.02545 12.4633 5.02545V6.76073C11.4327 6.68945 10.552 6.52073 9.98327 6.01673V10.4793C9.98327 11.7193 9.00291 13.4545 6.76073 13.4545C4.02182 13.4545 3.53745 10.9745 3.53745 10.2313C3.53745 9.488 3.97382 7.008 7.008 7.008V8.744C6.21455 8.576 5.27273 9.23927 5.27273 10.2313C5.27273 11.4713 6.01673 11.7193 6.76073 11.7193C7.50473 11.7193 8.248 10.9753 8.248 10.2313L8.24727 2.54545Z" fill="#FF4000" fill-rule="evenodd"></path></svg>
+        <span class="ds-icon-card-label">TikTok</span>
+    </div>
+    <div class="ds-icon-card">
+        <svg fill="none" height="16" viewbox="0 0 16 16" width="16" xmlns="http://www.w3.org/2000/svg"><path d="M14.2222 0H1.77778C0.795556 0 0 0.795556 0 1.77778V14.2222C0 15.2044 0.795556 16 1.77778 16H14.2222C15.2044 16 16 15.2044 16 14.2222V1.77778C16 0.795556 15.2044 0 14.2222 0ZM5.33333 12.4444H3.09067V6.22222H5.33333V12.4444ZM4.17244 5.08178C3.48711 5.08178 3.02933 4.62489 3.02933 4.01511C3.02933 3.40533 3.48622 2.94844 4.248 2.94844C4.93333 2.94844 5.39111 3.40533 5.39111 4.01511C5.39111 4.62489 4.93422 5.08178 4.17244 5.08178ZM13.3333 12.4444H11.1627V9.04356C11.1627 8.10311 10.584 7.88622 10.3671 7.88622C10.1502 7.88622 9.42667 8.03111 9.42667 9.04356C9.42667 9.18844 9.42667 12.4444 9.42667 12.4444H7.184V6.22222H9.42667V7.09067C9.71556 6.584 10.2942 6.22222 11.3796 6.22222C12.4649 6.22222 13.3333 7.09067 13.3333 9.04356V12.4444Z" fill="#FF4000"></path></svg>
+        <span class="ds-icon-card-label">LinkedIn</span>
+    </div>
+    <div class="ds-icon-card">
+        <svg fill="none" height="16" viewbox="0 0 16 16" width="16" xmlns="http://www.w3.org/2000/svg"><path d="M6.26933 4.43378L11.2747 11.5662H9.944L4.94756 4.43378H6.26933ZM16 2.66667V13.3333C16 14.8062 14.8062 16 13.3333 16H2.66667C1.19378 16 0 14.8062 0 13.3333V2.66667C0 1.19378 1.19378 0 2.66667 0H13.3333C14.8062 0 16 1.19378 16 2.66667ZM12.9227 12.4444L9.20178 7.12L12.2436 3.55556H11.0782L8.67467 6.36444L6.71289 3.55556H3.29067L6.79378 8.56267L3.472 12.4444H4.65689L7.32444 9.31911L9.50933 12.4444H12.9227Z" fill="#FF4000"></path></svg>
+        <span class="ds-icon-card-label">X (Twitter)</span>
+    </div>
+    <div class="ds-icon-card">
+        <svg fill="none" height="16" viewbox="0 0 16 16" width="16" xmlns="http://www.w3.org/2000/svg"><path d="M14.2222 0H1.77778C0.795556 0 0 0.795556 0 1.77778V14.2222C0 15.2044 0.795556 16 1.77778 16H8.552V9.81244H6.46933V7.39022H8.552V5.608C8.552 3.54222 9.81511 2.416 11.6587 2.416C12.28 2.41422 12.9004 2.44622 13.5182 2.50933V4.66933H12.2489C11.2444 4.66933 11.0489 5.144 11.0489 5.84444V7.38667H13.4489L13.1369 9.80889H11.0347V16H14.2222C15.2044 16 16 15.2044 16 14.2222V1.77778C16 0.795556 15.2044 0 14.2222 0Z" fill="#FF4000"></path></svg>
+        <span class="ds-icon-card-label">Facebook</span>
+    </div>
+</div>
+
+</div>
+</div>
+
+<!-- Footer spacer -->
+<div style="height:120px;"></div>
+
+</div><!-- end .home-monks -->
+</main>
+
+</body>
+</html>

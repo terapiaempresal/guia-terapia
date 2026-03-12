@@ -1,0 +1,1744 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1" name="viewport"/>
+<title>Design System — Terapia Empresarial</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* ================================================================
+   TERAPIA EMPRESARIAL — DESIGN SYSTEM v2
+   Inspired by Hotmart Monks structural patterns
+   Built on actual brand identity & color system
+   ================================================================ */
+
+/* ===== CSS RESET ===== */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; -webkit-font-smoothing: antialiased; }
+body { font-family: 'Sora', -apple-system, BlinkMacSystemFont, sans-serif; color: var(--text-primary); background: var(--bg-page); line-height: 1.6; }
+img { max-width: 100%; height: auto; display: block; }
+a { text-decoration: none; color: inherit; }
+button { cursor: pointer; border: none; background: none; font-family: inherit; }
+
+/* ===== DESIGN TOKENS ===== */
+:root {
+    /* — Primary: Deep Navy (authority, trust, professionalism) — */
+    --primary-50:  #E6EDF2;
+    --primary-100: #C0D3E0;
+    --primary-200: #8FAFCA;
+    --primary-300: #5A8AB1;
+    --primary-400: #2D6896;
+    --primary-500: #1C3D5A;  /* ← brand navy */
+    --primary-600: #012840;  /* ← main / deepest brand color */
+    --primary-700: #002135;
+    --primary-800: #0F172A;
+    --primary-900: #090E1B;
+
+    /* — Accent: Sage Green (wellness, calm, nature, health) — */
+    --sage-50:  #EFF5F1;
+    --sage-100: #D5E6DA;
+    --sage-200: #B8D4C0;
+    --sage-300: #9BC2A6;
+    --sage-400: #7A9E89;  /* ← main sage from brand */
+    --sage-500: #5F8A6F;
+    --sage-600: #4A7259;
+    --sage-700: #375A44;
+    --sage-800: #264230;
+    --sage-900: #162A1E;
+
+    /* — Warm: Beige/Cream (human touch, warmth, approachability) — */
+    --warm-50:  #FDF9F4;
+    --warm-100: #F7F0E5;
+    --warm-200: #F0E4D2;
+    --warm-300: #E7DCCB;  /* ← main warm from brand */
+    --warm-400: #D9C9B0;
+    --warm-500: #C4AD8E;
+    --warm-600: #A8916F;
+    --warm-700: #8A7354;
+    --warm-800: #6B573C;
+    --warm-900: #4C3D2A;
+
+    /* — Blue Accents (technology, innovation, digital) — */
+    --blue-50:  #EBF3FF;
+    --blue-100: #D0E4FF;
+    --blue-200: #A8CCFF;
+    --blue-300: #5AB2FF;  /* ← light blue from brand */
+    --blue-400: #3484F7;  /* ← bright blue from brand */
+    --blue-500: #0476D9;  /* ← deep blue from brand */
+    --blue-600: #035AA6;
+    --blue-700: #024580;
+    --blue-800: #01315A;
+    --blue-900: #001E38;
+
+    /* — Neutrals — */
+    --gray-50:  #F7F8FA;
+    --gray-100: #EFF1F5;
+    --gray-200: #E2E5EB;
+    --gray-300: #CDD2DA;
+    --gray-400: #A0A8B8;
+    --gray-500: #636363;  /* ← body text from brand */
+    --gray-600: #4B5563;
+    --gray-700: #374151;
+    --gray-800: #1F2937;
+    --gray-900: #111827;
+
+    /* — Semantic — */
+    --success: #22C55E;
+    --warning: #FFBC7D;  /* ← peachy orange from brand */
+    --error:   #EF4444;
+    --info:    var(--blue-400);
+
+    /* — Surfaces — */
+    --bg-page:       #FFFFFF;
+    --bg-section:    var(--gray-50);
+    --bg-warm:       var(--warm-50);
+    --bg-sage:       var(--sage-50);
+    --bg-dark:       var(--primary-600);
+    --bg-darker:     var(--primary-900);
+    --bg-dark-card:  var(--primary-500);
+    --bg-mint-badge: #E8F5F0;
+
+    /* — Text — */
+    --text-primary:   var(--primary-600);
+    --text-secondary: var(--gray-500);
+    --text-muted:     var(--gray-400);
+    --text-on-dark:   #FFFFFF;
+    --text-on-warm:   var(--primary-600);
+
+    /* — Shadows — */
+    --shadow-sm:  0 1px 3px rgba(1,40,64,0.06), 0 1px 2px rgba(1,40,64,0.04);
+    --shadow-md:  0 4px 12px rgba(1,40,64,0.08), 0 2px 4px rgba(1,40,64,0.04);
+    --shadow-lg:  0 12px 32px rgba(1,40,64,0.10), 0 4px 8px rgba(1,40,64,0.04);
+    --shadow-xl:  0 24px 56px rgba(1,40,64,0.14), 0 8px 16px rgba(1,40,64,0.06);
+
+    /* — Border Radius — */
+    --radius-sm:   6px;
+    --radius-md:   10px;
+    --radius-lg:   16px;
+    --radius-xl:   24px;
+    --radius-2xl:  32px;
+    --radius-full: 9999px;
+
+    /* — Spacing Scale — */
+    --sp-1: 4px;   --sp-2: 8px;   --sp-3: 12px;  --sp-4: 16px;
+    --sp-5: 20px;  --sp-6: 24px;  --sp-8: 32px;  --sp-10: 40px;
+    --sp-12: 48px; --sp-16: 64px; --sp-20: 80px; --sp-24: 96px;
+
+    /* — Container — */
+    --container-max: 1216px;
+    --container-padding: 24px;
+
+    /* — Transitions — */
+    --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+    --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+    --duration-fast:   0.2s;
+    --duration-normal: 0.35s;
+    --duration-slow:   0.5s;
+}
+
+/* ===== LAYOUT ===== */
+.container { max-width: var(--container-max); margin: 0 auto; padding: 0 var(--container-padding); }
+.section { padding: var(--sp-24) 0; }
+.section--dark { background: var(--bg-dark); color: var(--text-on-dark); }
+.section--warm { background: var(--bg-warm); }
+.section--sage { background: var(--bg-sage); }
+.section--gray { background: var(--bg-section); }
+
+/* ===== DESIGN SYSTEM NAV ===== */
+.ds-nav {
+    position: sticky; top: 0; z-index: 100;
+    background: var(--primary-600);
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+    backdrop-filter: blur(12px);
+}
+.ds-nav .container { display: flex; align-items: center; gap: var(--sp-6); padding-top: var(--sp-3); padding-bottom: var(--sp-3); overflow-x: auto; }
+.ds-nav a { color: rgba(255,255,255,0.7); font-size: 13px; font-weight: 500; white-space: nowrap; padding: var(--sp-2) var(--sp-3); border-radius: var(--radius-full); transition: all var(--duration-fast) var(--ease-out); letter-spacing: 0.02em; }
+.ds-nav a:hover { color: #fff; background: rgba(255,255,255,0.1); }
+.ds-nav .ds-logo { color: #fff; font-weight: 700; font-size: 14px; letter-spacing: 0.04em; margin-right: var(--sp-4); }
+
+/* ===== SECTION HEADERS ===== */
+.ds-section-title { font-family: 'Space Grotesk', sans-serif; font-size: clamp(28px, 4vw, 40px); font-weight: 700; margin-bottom: var(--sp-3); line-height: 1.15; }
+.ds-section-sub { font-size: 16px; color: var(--text-secondary); margin-bottom: var(--sp-12); max-width: 640px; }
+.section--dark .ds-section-title { color: #fff; }
+.section--dark .ds-section-sub { color: rgba(255,255,255,0.6); }
+.ds-label { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.1em; color: var(--sage-400); margin-bottom: var(--sp-2); }
+.section--dark .ds-label { color: var(--sage-300); }
+
+/* ===== GRID HELPERS ===== */
+.grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--sp-6); }
+.grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--sp-6); }
+.grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--sp-6); }
+.grid-5 { display: grid; grid-template-columns: repeat(5, 1fr); gap: var(--sp-4); }
+@media (max-width: 768px) {
+    .grid-2, .grid-3, .grid-4, .grid-5 { grid-template-columns: 1fr; }
+}
+
+/* =====================================================
+   1. HERO — Exact structural clone (Hotmart-inspired)
+   ===================================================== */
+.hero {
+    background: var(--primary-600);
+    min-height: 92vh;
+    display: flex;
+    align-items: center;
+    position: relative;
+    overflow: hidden;
+}
+.hero::before {
+    content: '';
+    position: absolute;
+    top: -30%; right: -20%;
+    width: 70%; height: 120%;
+    background: radial-gradient(ellipse, rgba(122,158,137,0.15) 0%, transparent 70%);
+    pointer-events: none;
+}
+.hero::after {
+    content: '';
+    position: absolute;
+    bottom: -20%; left: 10%;
+    width: 50%; height: 80%;
+    background: radial-gradient(ellipse, rgba(52,132,247,0.08) 0%, transparent 70%);
+    pointer-events: none;
+}
+.hero .container {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--sp-16);
+    align-items: center;
+    position: relative;
+    z-index: 1;
+}
+.hero-content { color: var(--text-on-dark); }
+.hero-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--sp-2);
+    background: rgba(122,158,137,0.2);
+    border: 1px solid rgba(122,158,137,0.3);
+    color: var(--sage-200);
+    font-size: 12px;
+    font-weight: 600;
+    padding: var(--sp-2) var(--sp-4);
+    border-radius: var(--radius-full);
+    margin-bottom: var(--sp-6);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+}
+.hero-title {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: clamp(36px, 5vw, 64px);
+    font-weight: 700;
+    line-height: 1.08;
+    margin-bottom: var(--sp-6);
+    letter-spacing: -0.02em;
+}
+.hero-title span { color: var(--sage-300); }
+.hero-text {
+    font-size: clamp(16px, 1.8vw, 19px);
+    line-height: 1.7;
+    color: rgba(255,255,255,0.75);
+    margin-bottom: var(--sp-8);
+    max-width: 520px;
+}
+.hero-actions { display: flex; gap: var(--sp-4); align-items: center; flex-wrap: wrap; }
+.hero-visual {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+}
+.hero-image-frame {
+    width: 100%;
+    max-width: 500px;
+    aspect-ratio: 4/3;
+    background: linear-gradient(135deg, var(--primary-500), var(--primary-700));
+    border-radius: var(--radius-2xl);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 32px 64px rgba(0,0,0,0.3);
+}
+.hero-image-frame::before {
+    content: '';
+    position: absolute; inset: 0;
+    background: linear-gradient(135deg, rgba(122,158,137,0.15), transparent 60%);
+}
+.hero-image-placeholder {
+    color: rgba(255,255,255,0.3);
+    font-size: 14px;
+    text-align: center;
+    position: relative;
+    z-index: 1;
+}
+.hero-float-card {
+    position: absolute;
+    background: rgba(255,255,255,0.1);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255,255,255,0.15);
+    border-radius: var(--radius-lg);
+    padding: var(--sp-4) var(--sp-5);
+    color: #fff;
+}
+.hero-float-card.top-right { top: -10px; right: -30px; }
+.hero-float-card.bottom-left { bottom: -10px; left: -30px; }
+.hero-float-card .card-stat { font-family: 'Space Grotesk', sans-serif; font-size: 28px; font-weight: 700; }
+.hero-float-card .card-label { font-size: 12px; opacity: 0.7; }
+
+@media (max-width: 768px) {
+    .hero .container { grid-template-columns: 1fr; text-align: center; }
+    .hero-text { margin-left: auto; margin-right: auto; }
+    .hero-actions { justify-content: center; }
+    .hero-visual { margin-top: var(--sp-8); }
+}
+
+
+/* =====================================================
+   2. LOGO — Brand Identity
+   ===================================================== */
+.logo-showcase { display: flex; flex-direction: column; gap: var(--sp-12); }
+
+.logo-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--sp-6); align-items: stretch; }
+.logo-card {
+    border-radius: var(--radius-lg);
+    padding: var(--sp-12) var(--sp-8);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: var(--sp-6);
+    min-height: 200px;
+    position: relative;
+}
+.logo-card--dark { background: var(--primary-600); }
+.logo-card--light { background: var(--gray-50); border: 1px solid var(--gray-200); }
+.logo-card--sage { background: var(--sage-50); border: 1px solid var(--sage-200); }
+.logo-card--warm { background: var(--warm-300); }
+.logo-card__label {
+    position: absolute; top: var(--sp-3); left: var(--sp-4);
+    font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em;
+    opacity: 0.5;
+}
+.logo-card--dark .logo-card__label { color: #fff; }
+
+/* Logo SVG reproductions */
+.logo-full { display: flex; align-items: center; gap: var(--sp-3); }
+.logo-monogram {
+    width: 48px; height: 48px;
+    border-radius: var(--radius-md);
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 700;
+    font-size: 24px;
+}
+.logo-monogram--dark { background: var(--primary-500); color: #fff; }
+.logo-monogram--light { background: var(--primary-600); color: #fff; }
+.logo-wordmark { font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 20px; line-height: 1.2; }
+.logo-wordmark small { display: block; font-weight: 400; font-size: 14px; opacity: 0.7; letter-spacing: 0.08em; }
+
+.logo-clear-space {
+    border: 2px dashed var(--sage-400);
+    border-radius: var(--radius-md);
+    padding: var(--sp-8);
+    display: flex; align-items: center; justify-content: center;
+    position: relative;
+}
+.logo-clear-space::before {
+    content: 'Zona de proteção: 1x a altura do "T"';
+    position: absolute; bottom: -24px; left: 50%; transform: translateX(-50%);
+    font-size: 11px; color: var(--gray-400); white-space: nowrap;
+}
+
+.logo-sizes { display: flex; align-items: flex-end; gap: var(--sp-8); flex-wrap: wrap; }
+.logo-size-item { text-align: center; }
+.logo-size-item span { display: block; font-size: 11px; color: var(--gray-400); margin-top: var(--sp-2); }
+
+.logo-misuse-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--sp-4); }
+.logo-misuse {
+    background: var(--gray-50);
+    border: 1px solid var(--gray-200);
+    border-radius: var(--radius-md);
+    padding: var(--sp-6);
+    text-align: center;
+    position: relative;
+}
+.logo-misuse::after {
+    content: '';
+    position: absolute; top: 8px; right: 8px;
+    width: 20px; height: 20px;
+    background: var(--error);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+}
+.logo-misuse p { font-size: 11px; color: var(--gray-500); margin-top: var(--sp-3); }
+
+@media (max-width: 768px) {
+    .logo-row { grid-template-columns: 1fr; }
+    .logo-misuse-grid { grid-template-columns: repeat(2, 1fr); }
+}
+
+
+/* =====================================================
+   3. TYPOGRAPHY
+   ===================================================== */
+.type-specimen {
+    padding: var(--sp-6) 0;
+    border-bottom: 1px solid var(--gray-200);
+    display: grid;
+    grid-template-columns: 200px 1fr;
+    gap: var(--sp-6);
+    align-items: baseline;
+}
+.type-specimen:last-child { border-bottom: none; }
+.type-meta { font-size: 12px; color: var(--gray-400); }
+.type-meta strong { display: block; color: var(--text-primary); font-size: 13px; margin-bottom: 2px; }
+.type-meta code { font-size: 11px; background: var(--gray-100); padding: 2px 6px; border-radius: 4px; }
+
+@media (max-width: 768px) {
+    .type-specimen { grid-template-columns: 1fr; }
+}
+
+
+/* =====================================================
+   4. COLORS
+   ===================================================== */
+.color-group { margin-bottom: var(--sp-8); }
+.color-group-title { font-size: 14px; font-weight: 600; margin-bottom: var(--sp-4); }
+.color-palette { display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: var(--sp-3); }
+.color-chip {
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    border: 1px solid var(--gray-200);
+}
+.color-chip__swatch { height: 64px; }
+.color-chip__info { padding: var(--sp-2) var(--sp-3); font-size: 11px; }
+.color-chip__info strong { display: block; font-size: 12px; }
+
+.surface-card {
+    border-radius: var(--radius-lg);
+    padding: var(--sp-8);
+    min-height: 120px;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+}
+.surface-card span { font-size: 13px; font-weight: 600; }
+.surface-card code { font-size: 11px; opacity: 0.7; }
+
+
+/* =====================================================
+   5. COMPONENTS
+   ===================================================== */
+
+/* -- Buttons -- */
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--sp-2);
+    font-family: 'Sora', sans-serif;
+    font-weight: 600;
+    font-size: 15px;
+    padding: 14px 32px;
+    border-radius: var(--radius-md);
+    transition: all var(--duration-normal) var(--ease-out);
+    white-space: nowrap;
+    letter-spacing: 0.01em;
+}
+.btn--primary {
+    background: var(--sage-400);
+    color: #fff;
+}
+.btn--primary:hover {
+    background: var(--sage-500);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(122,158,137,0.3);
+}
+.btn--secondary {
+    background: transparent;
+    color: #fff;
+    border: 2px solid rgba(255,255,255,0.3);
+}
+.btn--secondary:hover {
+    border-color: #fff;
+    background: rgba(255,255,255,0.08);
+}
+.btn--dark {
+    background: var(--primary-600);
+    color: #fff;
+}
+.btn--dark:hover {
+    background: var(--primary-700);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(1,40,64,0.3);
+}
+.btn--outline {
+    background: transparent;
+    color: var(--primary-600);
+    border: 2px solid var(--primary-600);
+}
+.btn--outline:hover {
+    background: var(--primary-600);
+    color: #fff;
+}
+.btn--warm {
+    background: var(--warm-300);
+    color: var(--primary-600);
+}
+.btn--warm:hover {
+    background: var(--warm-400);
+    transform: translateY(-2px);
+}
+.btn--ghost {
+    background: transparent;
+    color: var(--primary-600);
+    padding: 14px 16px;
+}
+.btn--ghost:hover {
+    background: var(--gray-100);
+}
+.btn--blue {
+    background: var(--blue-400);
+    color: #fff;
+}
+.btn--blue:hover {
+    background: var(--blue-500);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(52,132,247,0.3);
+}
+.btn--sm { font-size: 13px; padding: 10px 20px; }
+.btn--lg { font-size: 17px; padding: 18px 40px; }
+.btn--pill { border-radius: var(--radius-full); }
+.btn--icon-only { padding: 12px; border-radius: var(--radius-md); }
+
+/* -- Inputs -- */
+.input-group { margin-bottom: var(--sp-5); }
+.input-group label {
+    display: block;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--primary-600);
+    margin-bottom: var(--sp-2);
+}
+.input {
+    width: 100%;
+    padding: 14px 16px;
+    border: 2px solid var(--gray-200);
+    border-radius: var(--radius-md);
+    font-family: 'Sora', sans-serif;
+    font-size: 15px;
+    color: var(--primary-600);
+    background: #fff;
+    transition: all var(--duration-fast) var(--ease-out);
+}
+.input:focus {
+    outline: none;
+    border-color: var(--blue-400);
+    box-shadow: 0 0 0 4px rgba(52,132,247,0.1);
+}
+.input--error { border-color: var(--error); }
+.input--error:focus { box-shadow: 0 0 0 4px rgba(239,68,68,0.1); }
+.input-hint { font-size: 12px; color: var(--gray-400); margin-top: var(--sp-1); }
+.input-error-msg { font-size: 12px; color: var(--error); margin-top: var(--sp-1); }
+
+/* -- Cards -- */
+.card {
+    background: #fff;
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--gray-200);
+    overflow: hidden;
+    transition: all var(--duration-normal) var(--ease-out);
+}
+.card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-lg);
+    border-color: transparent;
+}
+.card__body { padding: var(--sp-6); }
+.card__tag {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--sage-500);
+    background: var(--sage-50);
+    padding: var(--sp-1) var(--sp-3);
+    border-radius: var(--radius-full);
+    margin-bottom: var(--sp-3);
+}
+.card__title { font-family: 'Space Grotesk', sans-serif; font-size: 18px; font-weight: 600; margin-bottom: var(--sp-2); }
+.card__desc { font-size: 14px; color: var(--gray-500); line-height: 1.6; }
+
+/* -- Service Card (Icon Box) -- */
+.service-card {
+    background: #fff;
+    border-radius: var(--radius-lg);
+    padding: var(--sp-8);
+    border: 1px solid var(--gray-200);
+    transition: all var(--duration-normal) var(--ease-out);
+}
+.service-card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-lg);
+    border-color: transparent;
+}
+.service-card__icon {
+    width: 56px; height: 56px;
+    background: var(--bg-mint-badge);
+    border-radius: var(--radius-lg);
+    display: flex; align-items: center; justify-content: center;
+    margin-bottom: var(--sp-5);
+}
+.service-card__icon svg { width: 28px; height: 28px; stroke: var(--blue-500); fill: none; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }
+.service-card__title { font-family: 'Space Grotesk', sans-serif; font-size: 18px; font-weight: 600; margin-bottom: var(--sp-2); color: var(--primary-600); }
+.service-card__desc { font-size: 14px; color: var(--gray-500); line-height: 1.6; }
+
+/* -- Dark Feature Card -- */
+.feature-card {
+    background: var(--primary-500);
+    border-radius: var(--radius-xl);
+    padding: var(--sp-8);
+    color: #fff;
+    transition: all var(--duration-normal) var(--ease-out);
+    position: relative;
+    overflow: hidden;
+}
+.feature-card::before {
+    content: '';
+    position: absolute; top: 0; right: 0;
+    width: 50%; height: 50%;
+    background: radial-gradient(ellipse, rgba(122,158,137,0.12) 0%, transparent 70%);
+}
+.feature-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-xl); }
+.feature-card__number { font-family: 'Space Grotesk', sans-serif; font-size: 48px; font-weight: 700; color: rgba(255,255,255,0.15); margin-bottom: var(--sp-4); }
+.feature-card__title { font-family: 'Space Grotesk', sans-serif; font-size: 20px; font-weight: 600; margin-bottom: var(--sp-3); }
+.feature-card__desc { font-size: 14px; color: rgba(255,255,255,0.7); line-height: 1.7; }
+
+/* -- Step Card -- */
+.step-card {
+    display: flex;
+    gap: var(--sp-5);
+    padding: var(--sp-6);
+    background: #fff;
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--gray-200);
+    transition: all var(--duration-normal) var(--ease-out);
+}
+.step-card:hover {
+    border-color: var(--sage-300);
+    box-shadow: var(--shadow-md);
+}
+.step-card__number {
+    flex-shrink: 0;
+    width: 44px; height: 44px;
+    background: var(--primary-600);
+    color: #fff;
+    border-radius: var(--radius-md);
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 700;
+    font-size: 16px;
+}
+.step-card__title { font-family: 'Space Grotesk', sans-serif; font-weight: 600; font-size: 16px; margin-bottom: var(--sp-1); color: var(--primary-600); }
+.step-card__desc { font-size: 13px; color: var(--gray-500); line-height: 1.6; }
+
+/* -- Stat Card -- */
+.stat-card {
+    text-align: center;
+    padding: var(--sp-8);
+}
+.stat-card__value {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: clamp(36px, 5vw, 56px);
+    font-weight: 700;
+    line-height: 1;
+    margin-bottom: var(--sp-2);
+}
+.stat-card__value--sage { color: var(--sage-400); }
+.stat-card__value--blue { color: var(--blue-400); }
+.stat-card__value--warm { color: var(--warm-600); }
+.stat-card__label { font-size: 14px; color: var(--gray-500); }
+.section--dark .stat-card__label { color: rgba(255,255,255,0.6); }
+.section--dark .stat-card__value { color: #fff; }
+
+/* -- FAQ Accordion -- */
+.faq-item {
+    border: 1px solid var(--gray-200);
+    border-radius: var(--radius-lg);
+    margin-bottom: var(--sp-3);
+    overflow: hidden;
+    transition: all var(--duration-fast) var(--ease-out);
+}
+.faq-item:hover { border-color: var(--sage-300); }
+.faq-item__q {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--sp-5) var(--sp-6);
+    cursor: pointer;
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 600;
+    font-size: 15px;
+    color: var(--primary-600);
+}
+.faq-item__q svg { width: 20px; height: 20px; stroke: var(--gray-400); fill: none; stroke-width: 2; transition: transform var(--duration-fast) var(--ease-out); flex-shrink: 0; }
+.faq-item[open] .faq-item__q svg { transform: rotate(180deg); }
+.faq-item__a { padding: 0 var(--sp-6) var(--sp-5); font-size: 14px; color: var(--gray-500); line-height: 1.7; }
+
+/* -- Badge / Tag -- */
+.badge {
+    display: inline-flex; align-items: center; gap: var(--sp-1);
+    font-size: 12px; font-weight: 600; padding: var(--sp-1) var(--sp-3);
+    border-radius: var(--radius-full); letter-spacing: 0.04em;
+}
+.badge--sage { background: var(--sage-50); color: var(--sage-600); }
+.badge--blue { background: var(--blue-50); color: var(--blue-500); }
+.badge--warm { background: var(--warm-100); color: var(--warm-700); }
+.badge--dark { background: var(--primary-600); color: #fff; }
+
+/* -- Icon Badge (brand signature style) -- */
+.icon-badge {
+    width: 56px; height: 56px;
+    background: var(--bg-mint-badge);
+    border-radius: var(--radius-lg);
+    display: flex; align-items: center; justify-content: center;
+}
+.icon-badge svg { width: 28px; height: 28px; stroke: var(--blue-500); fill: none; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }
+.icon-badge--sm { width: 40px; height: 40px; border-radius: var(--radius-md); }
+.icon-badge--sm svg { width: 20px; height: 20px; }
+.icon-badge--lg { width: 72px; height: 72px; border-radius: var(--radius-xl); }
+.icon-badge--lg svg { width: 36px; height: 36px; }
+
+
+/* =====================================================
+   6. MOTION
+   ===================================================== */
+.motion-demo {
+    display: flex; align-items: center; gap: var(--sp-4);
+    padding: var(--sp-4) 0;
+    border-bottom: 1px solid var(--gray-200);
+}
+.motion-demo:last-child { border-bottom: none; }
+.motion-demo__box {
+    width: 48px; height: 48px;
+    background: var(--primary-600);
+    border-radius: var(--radius-md);
+    transition: all var(--duration-normal) var(--ease-out);
+    flex-shrink: 0;
+}
+.motion-demo:hover .motion-demo__box--translate { transform: translateX(20px); }
+.motion-demo:hover .motion-demo__box--scale { transform: scale(1.15); }
+.motion-demo:hover .motion-demo__box--rotate { transform: rotate(90deg); }
+.motion-demo:hover .motion-demo__box--opacity { opacity: 0.3; }
+.motion-demo:hover .motion-demo__box--shadow { box-shadow: var(--shadow-xl); }
+.motion-demo:hover .motion-demo__box--color { background: var(--sage-400); }
+.motion-demo__label { font-size: 13px; color: var(--gray-500); }
+.motion-demo__label strong { color: var(--text-primary); }
+
+
+/* =====================================================
+   7. ICONS
+   ===================================================== */
+.icon-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: var(--sp-4); }
+.icon-item {
+    display: flex; flex-direction: column; align-items: center; gap: var(--sp-2);
+    padding: var(--sp-5);
+    border-radius: var(--radius-md);
+    border: 1px solid var(--gray-200);
+    transition: all var(--duration-fast) var(--ease-out);
+}
+.icon-item:hover { border-color: var(--blue-300); background: var(--blue-50); }
+.icon-item svg { width: 24px; height: 24px; stroke: var(--primary-600); fill: none; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }
+.icon-item span { font-size: 11px; color: var(--gray-400); text-align: center; }
+
+.icon-sizes { display: flex; align-items: flex-end; gap: var(--sp-6); }
+.icon-size-demo { text-align: center; }
+.icon-size-demo svg { stroke: var(--primary-600); fill: none; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }
+.icon-size-demo span { display: block; font-size: 11px; color: var(--gray-400); margin-top: var(--sp-2); }
+
+/* ===== UTILITIES ===== */
+.mt-2 { margin-top: var(--sp-2); }
+.mt-4 { margin-top: var(--sp-4); }
+.mt-6 { margin-top: var(--sp-6); }
+.mt-8 { margin-top: var(--sp-8); }
+.mt-12 { margin-top: var(--sp-12); }
+.mb-6 { margin-bottom: var(--sp-6); }
+.mb-8 { margin-bottom: var(--sp-8); }
+.text-sm { font-size: 13px; }
+.text-muted { color: var(--gray-400); }
+.flex-gap-4 { display: flex; gap: var(--sp-4); flex-wrap: wrap; align-items: center; }
+.flex-gap-3 { display: flex; gap: var(--sp-3); flex-wrap: wrap; align-items: center; }
+</style>
+</head>
+<body>
+
+<!-- ==================== NAV ==================== -->
+<nav class="ds-nav">
+    <div class="container">
+        <span class="ds-logo">TERAPIA DS</span>
+        <a href="#hero">Hero</a>
+        <a href="#logo">Logo</a>
+        <a href="#typography">Tipografia</a>
+        <a href="#colors">Cores</a>
+        <a href="#components">Componentes</a>
+        <a href="#layout">Layout</a>
+        <a href="#motion">Motion</a>
+        <a href="#icons">Ícones</a>
+    </div>
+</nav>
+
+
+<!-- ==================== 1. HERO ==================== -->
+<section class="hero" id="hero">
+    <div class="container">
+        <div class="hero-content">
+            <div class="hero-badge">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 12l2 2 4-4"/><circle cx="12" cy="12" r="10"/></svg>
+                Conformidade NR-1
+            </div>
+            <h1 class="hero-title">
+                Saúde mental<br>
+                corporativa com<br>
+                <span>resultado real</span>
+            </h1>
+            <p class="hero-text">
+                A Terapia Empresarial une tecnologia, psicologia organizacional e dados
+                para gerar eficiência no cuidado emocional e melhores resultados para sua empresa.
+            </p>
+            <div class="hero-actions">
+                <a class="btn btn--primary btn--lg btn--pill" href="#">Falar com um profissional</a>
+                <a class="btn btn--secondary btn--lg btn--pill" href="#">Ver como funciona</a>
+            </div>
+        </div>
+        <div class="hero-visual">
+            <div class="hero-image-frame">
+                <div class="hero-image-placeholder">
+                    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" opacity="0.4"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
+                    <p style="margin-top:8px; font-size: 12px;">Imagem principal</p>
+                </div>
+                <div class="hero-float-card top-right">
+                    <div class="card-stat">98%</div>
+                    <div class="card-label">Satisfação</div>
+                </div>
+                <div class="hero-float-card bottom-left">
+                    <div class="card-stat">R$500bi</div>
+                    <div class="card-label">Custo evitável / ano</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+<!-- ==================== 2. LOGO ==================== -->
+<section class="section" id="logo">
+    <div class="container">
+        <div class="ds-label">Identidade</div>
+        <h2 class="ds-section-title">Logo & Marca</h2>
+        <p class="ds-section-sub">
+            Regras de uso, variações e zona de proteção. O logo combina o monograma "T"
+            com a tipografia em Space Grotesk para transmitir profissionalismo e confiança.
+        </p>
+
+        <!-- Variações -->
+        <h3 class="color-group-title">Variações do logo</h3>
+        <div class="logo-row mb-8">
+            <div class="logo-card logo-card--dark">
+                <span class="logo-card__label" style="color:#fff">Fundo escuro (principal)</span>
+                <div class="logo-full">
+                    <div class="logo-monogram logo-monogram--dark">T</div>
+                    <div class="logo-wordmark" style="color: #fff;">
+                        Terapia
+                        <small>EMPRESARIAL</small>
+                    </div>
+                </div>
+            </div>
+            <div class="logo-card logo-card--light">
+                <span class="logo-card__label">Fundo claro</span>
+                <div class="logo-full">
+                    <div class="logo-monogram logo-monogram--light">T</div>
+                    <div class="logo-wordmark" style="color: var(--primary-600);">
+                        Terapia
+                        <small>EMPRESARIAL</small>
+                    </div>
+                </div>
+            </div>
+            <div class="logo-card logo-card--warm">
+                <span class="logo-card__label">Fundo quente</span>
+                <div class="logo-full">
+                    <div class="logo-monogram logo-monogram--light">T</div>
+                    <div class="logo-wordmark" style="color: var(--primary-600);">
+                        Terapia
+                        <small>EMPRESARIAL</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Monograma -->
+        <h3 class="color-group-title mt-8">Monograma</h3>
+        <p class="text-sm text-muted mb-6">O monograma "T" pode ser usado sozinho em favicons, avatares e espaços reduzidos.</p>
+        <div class="flex-gap-4 mb-8">
+            <div style="width:72px;height:72px;background:var(--primary-600);border-radius:var(--radius-lg);display:flex;align-items:center;justify-content:center;color:#fff;font-family:'Space Grotesk',sans-serif;font-size:36px;font-weight:700;">T</div>
+            <div style="width:56px;height:56px;background:var(--primary-500);border-radius:var(--radius-md);display:flex;align-items:center;justify-content:center;color:#fff;font-family:'Space Grotesk',sans-serif;font-size:28px;font-weight:700;">T</div>
+            <div style="width:40px;height:40px;background:var(--primary-600);border-radius:var(--radius-sm);display:flex;align-items:center;justify-content:center;color:#fff;font-family:'Space Grotesk',sans-serif;font-size:20px;font-weight:700;">T</div>
+            <div style="width:32px;height:32px;background:var(--primary-600);border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;font-family:'Space Grotesk',sans-serif;font-size:16px;font-weight:700;">T</div>
+            <div style="width:24px;height:24px;background:var(--primary-600);border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;font-family:'Space Grotesk',sans-serif;font-size:12px;font-weight:700;">T</div>
+        </div>
+
+        <!-- Zona de proteção -->
+        <h3 class="color-group-title mt-8">Zona de proteção</h3>
+        <p class="text-sm text-muted mb-6">Manter distância mínima equivalente à altura do "T" monograma ao redor do logo.</p>
+        <div style="max-width:400px; margin-bottom: var(--sp-12);">
+            <div class="logo-clear-space">
+                <div class="logo-full">
+                    <div class="logo-monogram logo-monogram--light">T</div>
+                    <div class="logo-wordmark" style="color: var(--primary-600);">
+                        Terapia
+                        <small>EMPRESARIAL</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tamanhos mínimos -->
+        <h3 class="color-group-title mt-8">Tamanhos mínimos</h3>
+        <div class="logo-sizes mb-8">
+            <div class="logo-size-item">
+                <div style="width:160px;height:40px;background:var(--primary-600);border-radius:var(--radius-sm);display:flex;align-items:center;justify-content:center;gap:8px;color:#fff;font-family:'Space Grotesk',sans-serif;font-size:14px;font-weight:700;">
+                    <span style="width:24px;height:24px;background:var(--primary-500);border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:12px;">T</span>
+                    Terapia
+                </div>
+                <span>Mínimo digital: 160px</span>
+            </div>
+            <div class="logo-size-item">
+                <div style="width:120px;height:32px;background:var(--primary-600);border-radius:var(--radius-sm);display:flex;align-items:center;justify-content:center;gap:6px;color:#fff;font-family:'Space Grotesk',sans-serif;font-size:11px;font-weight:700;">
+                    <span style="width:20px;height:20px;background:var(--primary-500);border-radius:3px;display:flex;align-items:center;justify-content:center;font-size:10px;">T</span>
+                    Terapia
+                </div>
+                <span>Mínimo compacto: 120px</span>
+            </div>
+            <div class="logo-size-item">
+                <div style="width:32px;height:32px;background:var(--primary-600);border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;font-family:'Space Grotesk',sans-serif;font-size:16px;font-weight:700;">T</div>
+                <span>Favicon: 32px</span>
+            </div>
+        </div>
+
+        <!-- Usos incorretos -->
+        <h3 class="color-group-title mt-8">Usos incorretos</h3>
+        <div class="logo-misuse-grid">
+            <div class="logo-misuse">
+                <div style="font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:16px;color:var(--primary-600);transform:rotate(15deg);display:inline-block;">Terapia</div>
+                <p>Não rotacione</p>
+            </div>
+            <div class="logo-misuse">
+                <div style="font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:16px;color:var(--primary-600);transform:scaleX(1.5);display:inline-block;">Terapia</div>
+                <p>Não distorça</p>
+            </div>
+            <div class="logo-misuse">
+                <div style="font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:16px;color:var(--error);display:inline-block;">Terapia</div>
+                <p>Não mude a cor</p>
+            </div>
+            <div class="logo-misuse">
+                <div style="font-family:serif;font-weight:700;font-size:16px;color:var(--primary-600);display:inline-block;">Terapia</div>
+                <p>Não mude a fonte</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+<!-- ==================== 3. TYPOGRAPHY ==================== -->
+<section class="section section--gray" id="typography">
+    <div class="container">
+        <div class="ds-label">Fundação</div>
+        <h2 class="ds-section-title">Tipografia</h2>
+        <p class="ds-section-sub">
+            <strong>Space Grotesk</strong> para títulos e destaques — geométrica, moderna, com personalidade.<br>
+            <strong>Sora</strong> para corpo de texto — limpa, legível, profissional.
+        </p>
+
+        <div class="type-specimen">
+            <div class="type-meta">
+                <strong>Display XL</strong>
+                Space Grotesk 700<br>
+                <code>clamp(48px, 6vw, 72px)</code>
+            </div>
+            <div style="font-family:'Space Grotesk',sans-serif; font-size:clamp(48px,6vw,72px); font-weight:700; line-height:1.05; letter-spacing:-0.03em; color:var(--primary-600);">
+                Saúde mental
+            </div>
+        </div>
+
+        <div class="type-specimen">
+            <div class="type-meta">
+                <strong>Display LG</strong>
+                Space Grotesk 700<br>
+                <code>clamp(36px, 5vw, 56px)</code>
+            </div>
+            <div style="font-family:'Space Grotesk',sans-serif; font-size:clamp(36px,5vw,56px); font-weight:700; line-height:1.08; letter-spacing:-0.02em; color:var(--primary-600);">
+                Resultado real
+            </div>
+        </div>
+
+        <div class="type-specimen">
+            <div class="type-meta">
+                <strong>Display MD</strong>
+                Space Grotesk 700<br>
+                <code>clamp(28px, 3.5vw, 40px)</code>
+            </div>
+            <div style="font-family:'Space Grotesk',sans-serif; font-size:clamp(28px,3.5vw,40px); font-weight:700; line-height:1.12; letter-spacing:-0.01em; color:var(--primary-600);">
+                Cuidado coordenado
+            </div>
+        </div>
+
+        <div class="type-specimen">
+            <div class="type-meta">
+                <strong>Heading LG</strong>
+                Space Grotesk 600<br>
+                <code>clamp(22px, 2.8vw, 28px)</code>
+            </div>
+            <div style="font-family:'Space Grotesk',sans-serif; font-size:clamp(22px,2.8vw,28px); font-weight:600; line-height:1.2; color:var(--primary-600);">
+                Programa de Gerenciamento de Riscos
+            </div>
+        </div>
+
+        <div class="type-specimen">
+            <div class="type-meta">
+                <strong>Heading MD</strong>
+                Space Grotesk 600<br>
+                <code>20px</code>
+            </div>
+            <div style="font-family:'Space Grotesk',sans-serif; font-size:20px; font-weight:600; line-height:1.3; color:var(--primary-600);">
+                Mapeamento Coletivo de Riscos Psicossociais
+            </div>
+        </div>
+
+        <div class="type-specimen">
+            <div class="type-meta">
+                <strong>Heading SM</strong>
+                Space Grotesk 600<br>
+                <code>16px</code>
+            </div>
+            <div style="font-family:'Space Grotesk',sans-serif; font-size:16px; font-weight:600; line-height:1.35; color:var(--primary-600);">
+                Avaliação psicológica individual
+            </div>
+        </div>
+
+        <div class="type-specimen">
+            <div class="type-meta">
+                <strong>Stat / Number</strong>
+                Space Grotesk 700<br>
+                <code>clamp(36px, 5vw, 56px)</code>
+            </div>
+            <div style="font-family:'Space Grotesk',sans-serif; font-size:clamp(36px,5vw,56px); font-weight:700; line-height:1; color:var(--sage-400);">
+                R$500bi
+            </div>
+        </div>
+
+        <div class="type-specimen">
+            <div class="type-meta">
+                <strong>Label / Overline</strong>
+                Sora 600<br>
+                <code>11px uppercase 0.1em</code>
+            </div>
+            <div style="font-family:'Sora',sans-serif; font-size:11px; font-weight:600; text-transform:uppercase; letter-spacing:0.1em; color:var(--sage-400);">
+                Como funciona?
+            </div>
+        </div>
+
+        <div class="type-specimen">
+            <div class="type-meta">
+                <strong>Body LG</strong>
+                Sora 400<br>
+                <code>18px / 1.7</code>
+            </div>
+            <div style="font-family:'Sora',sans-serif; font-size:18px; font-weight:400; line-height:1.7; color:var(--gray-500);">
+                A Terapia Empresarial une tecnologia, psicologia organizacional e dados para gerar eficiência no cuidado emocional e melhores resultados para sua empresa.
+            </div>
+        </div>
+
+        <div class="type-specimen">
+            <div class="type-meta">
+                <strong>Body MD</strong>
+                Sora 400<br>
+                <code>15px / 1.65</code>
+            </div>
+            <div style="font-family:'Sora',sans-serif; font-size:15px; font-weight:400; line-height:1.65; color:var(--gray-500);">
+                Aplicação de screening a 100% dos colaboradores para mapear riscos psicossociais no ambiente de trabalho, com identificação antecipada de setores e grupos vulneráveis.
+            </div>
+        </div>
+
+        <div class="type-specimen">
+            <div class="type-meta">
+                <strong>Body SM</strong>
+                Sora 400<br>
+                <code>13px / 1.6</code>
+            </div>
+            <div style="font-family:'Sora',sans-serif; font-size:13px; font-weight:400; line-height:1.6; color:var(--gray-500);">
+                Consolidação dos dados em um relatório gerencial para subsidiar os programas de saúde e segurança como PCMSO e PGR.
+            </div>
+        </div>
+
+        <div class="type-specimen">
+            <div class="type-meta">
+                <strong>Caption</strong>
+                Sora 500<br>
+                <code>12px / 1.5</code>
+            </div>
+            <div style="font-family:'Sora',sans-serif; font-size:12px; font-weight:500; line-height:1.5; color:var(--gray-400);">
+                Copyright 2025 © Todos direitos reservados — Terapia Empresarial
+            </div>
+        </div>
+    </div>
+</section>
+
+
+<!-- ==================== 4. COLORS ==================== -->
+<section class="section" id="colors">
+    <div class="container">
+        <div class="ds-label">Fundação</div>
+        <h2 class="ds-section-title">Cores & Superfícies</h2>
+        <p class="ds-section-sub">
+            Paleta baseada na identidade real da marca: navy profundo como autoridade, sage green como saúde,
+            beige como calor humano, e azul como tecnologia e inovação.
+        </p>
+
+        <!-- Primary Navy -->
+        <div class="color-group">
+            <div class="color-group-title">Primary — Deep Navy</div>
+            <div class="color-palette">
+                <div class="color-chip"><div class="color-chip__swatch" style="background:#E6EDF2"></div><div class="color-chip__info"><strong>50</strong>#E6EDF2</div></div>
+                <div class="color-chip"><div class="color-chip__swatch" style="background:#C0D3E0"></div><div class="color-chip__info"><strong>100</strong>#C0D3E0</div></div>
+                <div class="color-chip"><div class="color-chip__swatch" style="background:#8FAFCA"></div><div class="color-chip__info"><strong>200</strong>#8FAFCA</div></div>
+                <div class="color-chip"><div class="color-chip__swatch" style="background:#5A8AB1"></div><div class="color-chip__info"><strong>300</strong>#5A8AB1</div></div>
+                <div class="color-chip"><div class="color-chip__swatch" style="background:#2D6896"></div><div class="color-chip__info"><strong>400</strong>#2D6896</div></div>
+                <div class="color-chip"><div class="color-chip__swatch" style="background:#1C3D5A"></div><div class="color-chip__info"><strong>500</strong>#1C3D5A</div></div>
+                <div class="color-chip"><div class="color-chip__swatch" style="background:#012840"></div><div class="color-chip__info"><strong>600 ★</strong>#012840</div></div>
+                <div class="color-chip"><div class="color-chip__swatch" style="background:#002135"></div><div class="color-chip__info"><strong>700</strong>#002135</div></div>
+                <div class="color-chip"><div class="color-chip__swatch" style="background:#0F172A"></div><div class="color-chip__info"><strong>800</strong>#0F172A</div></div>
+                <div class="color-chip"><div class="color-chip__swatch" style="background:#090E1B"></div><div class="color-chip__info"><strong>900</strong>#090E1B</div></div>
+            </div>
+        </div>
+
+        <!-- Sage Green -->
+        <div class="color-group">
+            <div class="color-group-title">Accent — Sage Green</div>
+            <div class="color-palette">
+                <div class="color-chip"><div class="color-chip__swatch" style="background:#EFF5F1"></div><div class="color-chip__info"><strong>50</strong>#EFF5F1</div></div>
+                <div class="color-chip"><div class="color-chip__swatch" style="background:#D5E6DA"></div><div class="color-chip__info"><strong>100</strong>#D5E6DA</div></div>
+                <div class="color-chip"><div class="color-chip__swatch" style="background:#B8D4C0"></div><div class="color-chip__info"><strong>200</strong>#B8D4C0</div></div>
+                <div class="color-chip"><div class="color-chip__swatch" style="background:#9BC2A6"></div><div class="color-chip__info"><strong>300</strong>#9BC2A6</div></div>
+                <div class="color-chip"><div class="color-chip__swatch" style="background:#7A9E89"></div><div class="color-chip__info"><strong>400 ★</strong>#7A9E89</div></div>
+                <div class="color-chip"><div class="color-chip__swatch" style="background:#5F8A6F"></div><div class="color-chip__info"><strong>500</strong>#5F8A6F</div></div>
+                <div class="color-chip"><div class="color-chip__swatch" style="background:#4A7259"></div><div class="color-chip__info"><strong>600</strong>#4A7259</div></div>
+                <div class="color-chip"><div class="color-chip__swatch" style="background:#375A44"></div><div class="color-chip__info"><strong>700</strong>#375A44</div></div>
+                <div class="color-chip"><div class="color-chip__swatch" style="background:#264230"></div><div class="color-chip__info"><strong>800</strong>#264230</div></div>
+                <div class="color-chip"><div class="color-chip__swatch" style="background:#162A1E"></div><div class="color-chip__info"><strong>900</strong>#162A1E</div></div>
+            </div>
+        </div>
+
+        <!-- Warm -->
+        <div class="color-group">
+            <div class="color-group-title">Warm — Beige/Cream</div>
+            <div class="color-palette">
+                <div class="color-chip"><div class="color-chip__swatch" style="background:#FDF9F4"></div><div class="color-chip__info"><strong>50</strong>#FDF9F4</div></div>
+                <div class="color-chip"><div class="color-chip__swatch" style="background:#F7F0E5"></div><div class="color-chip__info"><strong>100</strong>#F7F0E5</div></div>
+                <div class="color-chip"><div class="color-chip__swatch" style="background:#F0E4D2"></div><div class="color-chip__info"><strong>200</strong>#F0E4D2</div></div>
+                <div class="color-chip"><div class="color-chip__swatch" style="background:#E7DCCB"></div><div class="color-chip__info"><strong>300 ★</strong>#E7DCCB</div></div>
+                <div class="color-chip"><div class="color-chip__swatch" style="background:#D9C9B0"></div><div class="color-chip__info"><strong>400</strong>#D9C9B0</div></div>
+                <div class="color-chip"><div class="color-chip__swatch" style="background:#C4AD8E"></div><div class="color-chip__info"><strong>500</strong>#C4AD8E</div></div>
+                <div class="color-chip"><div class="color-chip__swatch" style="background:#A8916F"></div><div class="color-chip__info"><strong>600</strong>#A8916F</div></div>
+                <div class="color-chip"><div class="color-chip__swatch" style="background:#8A7354"></div><div class="color-chip__info"><strong>700</strong>#8A7354</div></div>
+                <div class="color-chip"><div class="color-chip__swatch" style="background:#6B573C"></div><div class="color-chip__info"><strong>800</strong>#6B573C</div></div>
+                <div class="color-chip"><div class="color-chip__swatch" style="background:#4C3D2A"></div><div class="color-chip__info"><strong>900</strong>#4C3D2A</div></div>
+            </div>
+        </div>
+
+        <!-- Blue -->
+        <div class="color-group">
+            <div class="color-group-title">Digital — Blue Accents</div>
+            <div class="color-palette">
+                <div class="color-chip"><div class="color-chip__swatch" style="background:#EBF3FF"></div><div class="color-chip__info"><strong>50</strong>#EBF3FF</div></div>
+                <div class="color-chip"><div class="color-chip__swatch" style="background:#D0E4FF"></div><div class="color-chip__info"><strong>100</strong>#D0E4FF</div></div>
+                <div class="color-chip"><div class="color-chip__swatch" style="background:#A8CCFF"></div><div class="color-chip__info"><strong>200</strong>#A8CCFF</div></div>
+                <div class="color-chip"><div class="color-chip__swatch" style="background:#5AB2FF"></div><div class="color-chip__info"><strong>300</strong>#5AB2FF</div></div>
+                <div class="color-chip"><div class="color-chip__swatch" style="background:#3484F7"></div><div class="color-chip__info"><strong>400 ★</strong>#3484F7</div></div>
+                <div class="color-chip"><div class="color-chip__swatch" style="background:#0476D9"></div><div class="color-chip__info"><strong>500</strong>#0476D9</div></div>
+                <div class="color-chip"><div class="color-chip__swatch" style="background:#035AA6"></div><div class="color-chip__info"><strong>600</strong>#035AA6</div></div>
+                <div class="color-chip"><div class="color-chip__swatch" style="background:#024580"></div><div class="color-chip__info"><strong>700</strong>#024580</div></div>
+                <div class="color-chip"><div class="color-chip__swatch" style="background:#01315A"></div><div class="color-chip__info"><strong>800</strong>#01315A</div></div>
+                <div class="color-chip"><div class="color-chip__swatch" style="background:#001E38"></div><div class="color-chip__info"><strong>900</strong>#001E38</div></div>
+            </div>
+        </div>
+
+        <!-- Neutrals -->
+        <div class="color-group">
+            <div class="color-group-title">Neutrals</div>
+            <div class="color-palette">
+                <div class="color-chip"><div class="color-chip__swatch" style="background:#F7F8FA"></div><div class="color-chip__info"><strong>50</strong>#F7F8FA</div></div>
+                <div class="color-chip"><div class="color-chip__swatch" style="background:#EFF1F5"></div><div class="color-chip__info"><strong>100</strong>#EFF1F5</div></div>
+                <div class="color-chip"><div class="color-chip__swatch" style="background:#E2E5EB"></div><div class="color-chip__info"><strong>200</strong>#E2E5EB</div></div>
+                <div class="color-chip"><div class="color-chip__swatch" style="background:#CDD2DA"></div><div class="color-chip__info"><strong>300</strong>#CDD2DA</div></div>
+                <div class="color-chip"><div class="color-chip__swatch" style="background:#A0A8B8"></div><div class="color-chip__info"><strong>400</strong>#A0A8B8</div></div>
+                <div class="color-chip"><div class="color-chip__swatch" style="background:#636363"></div><div class="color-chip__info"><strong>500</strong>#636363</div></div>
+                <div class="color-chip"><div class="color-chip__swatch" style="background:#4B5563"></div><div class="color-chip__info"><strong>600</strong>#4B5563</div></div>
+                <div class="color-chip"><div class="color-chip__swatch" style="background:#374151"></div><div class="color-chip__info"><strong>700</strong>#374151</div></div>
+                <div class="color-chip"><div class="color-chip__swatch" style="background:#1F2937"></div><div class="color-chip__info"><strong>800</strong>#1F2937</div></div>
+                <div class="color-chip"><div class="color-chip__swatch" style="background:#111827"></div><div class="color-chip__info"><strong>900</strong>#111827</div></div>
+            </div>
+        </div>
+
+        <!-- Semantic -->
+        <div class="color-group">
+            <div class="color-group-title">Semânticas</div>
+            <div class="color-palette" style="grid-template-columns: repeat(4, 1fr);">
+                <div class="color-chip"><div class="color-chip__swatch" style="background:#22C55E"></div><div class="color-chip__info"><strong>Success</strong>#22C55E</div></div>
+                <div class="color-chip"><div class="color-chip__swatch" style="background:#FFBC7D"></div><div class="color-chip__info"><strong>Warning</strong>#FFBC7D</div></div>
+                <div class="color-chip"><div class="color-chip__swatch" style="background:#EF4444"></div><div class="color-chip__info"><strong>Error</strong>#EF4444</div></div>
+                <div class="color-chip"><div class="color-chip__swatch" style="background:#3484F7"></div><div class="color-chip__info"><strong>Info</strong>#3484F7</div></div>
+            </div>
+        </div>
+
+        <!-- Surfaces -->
+        <h3 class="color-group-title mt-12">Superfícies</h3>
+        <div class="grid-4 mt-4">
+            <div class="surface-card" style="background:#fff;border:1px solid var(--gray-200);color:var(--primary-600);">
+                <span>White</span>
+                <code>#FFFFFF</code>
+            </div>
+            <div class="surface-card" style="background:var(--gray-50);border:1px solid var(--gray-200);color:var(--primary-600);">
+                <span>Section Gray</span>
+                <code>#F7F8FA</code>
+            </div>
+            <div class="surface-card" style="background:var(--warm-50);border:1px solid var(--warm-200);color:var(--primary-600);">
+                <span>Section Warm</span>
+                <code>#FDF9F4</code>
+            </div>
+            <div class="surface-card" style="background:var(--sage-50);border:1px solid var(--sage-200);color:var(--primary-600);">
+                <span>Section Sage</span>
+                <code>#EFF5F1</code>
+            </div>
+            <div class="surface-card" style="background:var(--bg-mint-badge);color:var(--blue-500);">
+                <span>Icon Badge</span>
+                <code>#E8F5F0</code>
+            </div>
+            <div class="surface-card" style="background:var(--primary-500);color:#fff;">
+                <span>Dark Card</span>
+                <code>#1C3D5A</code>
+            </div>
+            <div class="surface-card" style="background:var(--primary-600);color:#fff;">
+                <span>Dark BG</span>
+                <code>#012840</code>
+            </div>
+            <div class="surface-card" style="background:var(--primary-900);color:#fff;">
+                <span>Deepest</span>
+                <code>#090E1B</code>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+<!-- ==================== 5. COMPONENTS ==================== -->
+<section class="section section--gray" id="components">
+    <div class="container">
+        <div class="ds-label">UI</div>
+        <h2 class="ds-section-title">Componentes</h2>
+        <p class="ds-section-sub">
+            Sistema modular de componentes para construir toda a interface. Inspirado nos padrões
+            estruturais da Hotmart, adaptado para a identidade Terapia Empresarial.
+        </p>
+
+        <!-- Buttons -->
+        <h3 class="color-group-title">Botões</h3>
+        <div style="padding: var(--sp-8); background: var(--primary-600); border-radius: var(--radius-lg); margin-bottom: var(--sp-4);">
+            <div class="flex-gap-4">
+                <a class="btn btn--primary btn--pill">Sage Primary</a>
+                <a class="btn btn--secondary btn--pill">Secondary</a>
+                <a class="btn btn--blue btn--pill">Blue Accent</a>
+                <a class="btn btn--warm btn--pill">Warm CTA</a>
+            </div>
+        </div>
+        <div style="padding: var(--sp-8); background: #fff; border-radius: var(--radius-lg); border:1px solid var(--gray-200); margin-bottom: var(--sp-4);">
+            <div class="flex-gap-4">
+                <a class="btn btn--dark btn--pill">Navy Primary</a>
+                <a class="btn btn--outline btn--pill">Outline</a>
+                <a class="btn btn--ghost">Ghost Link &rarr;</a>
+                <a class="btn btn--blue btn--pill">Blue Action</a>
+            </div>
+        </div>
+        <div class="flex-gap-4 mt-4">
+            <a class="btn btn--dark btn--sm btn--pill">Small</a>
+            <a class="btn btn--dark btn--pill">Default</a>
+            <a class="btn btn--dark btn--lg btn--pill">Large</a>
+        </div>
+
+        <!-- Badges -->
+        <h3 class="color-group-title mt-12">Badges & Tags</h3>
+        <div class="flex-gap-3">
+            <span class="badge badge--sage">NR-1</span>
+            <span class="badge badge--blue">Tecnologia</span>
+            <span class="badge badge--warm">Saúde Mental</span>
+            <span class="badge badge--dark">Corporativo</span>
+        </div>
+
+        <!-- Icon Badges (brand signature) -->
+        <h3 class="color-group-title mt-12">Icon Badges (assinatura visual)</h3>
+        <p class="text-sm text-muted mb-6">Ícones azuis sobre fundo mint — padrão visual característico da marca nas imagens do site.</p>
+        <div class="flex-gap-4">
+            <div class="icon-badge icon-badge--sm">
+                <svg viewBox="0 0 24 24"><path d="M9 12l2 2 4-4"/><circle cx="12" cy="12" r="10"/></svg>
+            </div>
+            <div class="icon-badge">
+                <svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+            </div>
+            <div class="icon-badge icon-badge--lg">
+                <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+            </div>
+        </div>
+
+        <!-- Inputs -->
+        <h3 class="color-group-title mt-12">Campos de entrada</h3>
+        <div class="grid-3 mt-4">
+            <div class="input-group">
+                <label>Nome da empresa</label>
+                <input class="input" placeholder="Terapia Empresarial" type="text"/>
+            </div>
+            <div class="input-group">
+                <label>E-mail corporativo</label>
+                <input class="input" placeholder="contato@empresa.com.br" type="email" value="contato@terapia.com.br"/>
+            </div>
+            <div class="input-group">
+                <label>Telefone</label>
+                <input class="input input--error" value="31996"/>
+                <div class="input-error-msg">Número incompleto</div>
+            </div>
+        </div>
+
+        <!-- Service Cards (Icon Box style) -->
+        <h3 class="color-group-title mt-12">Service Cards</h3>
+        <div class="grid-3 mt-4">
+            <div class="service-card">
+                <div class="service-card__icon">
+                    <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg>
+                </div>
+                <h4 class="service-card__title">Mapeamento Coletivo</h4>
+                <p class="service-card__desc">Screening a 100% dos colaboradores para mapear riscos psicossociais no ambiente de trabalho.</p>
+            </div>
+            <div class="service-card">
+                <div class="service-card__icon">
+                    <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M16 13H8"/><path d="M16 17H8"/></svg>
+                </div>
+                <h4 class="service-card__title">Relatório Integrado</h4>
+                <p class="service-card__desc">Consolidação dos dados em relatório gerencial para subsidiar programas de saúde e segurança.</p>
+            </div>
+            <div class="service-card">
+                <div class="service-card__icon">
+                    <svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                </div>
+                <h4 class="service-card__title">Conformidade Legal</h4>
+                <p class="service-card__desc">Atendimento às exigências da NR-1 e NR-7 com respaldo técnico e legal completo.</p>
+            </div>
+        </div>
+
+        <!-- Dark Feature Cards -->
+        <h3 class="color-group-title mt-12">Feature Cards (Dark)</h3>
+        <div class="grid-3 mt-4">
+            <div class="feature-card">
+                <div class="feature-card__number">01</div>
+                <h4 class="feature-card__title">Interoperabilidade</h4>
+                <p class="feature-card__desc">Integração fluida com dados clínicos e assistenciais, promovendo continuidade e eficiência.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-card__number">02</div>
+                <h4 class="feature-card__title">Mensuração Estratégica</h4>
+                <p class="feature-card__desc">Relatórios completos com dados qualitativos e quantitativos para embasar decisões.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-card__number">03</div>
+                <h4 class="feature-card__title">Suporte Especializado</h4>
+                <p class="feature-card__desc">Acompanhamento da equipe de especialistas com reuniões regulares de alinhamento.</p>
+            </div>
+        </div>
+
+        <!-- Step Cards -->
+        <h3 class="color-group-title mt-12">Step Cards</h3>
+        <div class="grid-2 mt-4">
+            <div class="step-card">
+                <div class="step-card__number">01</div>
+                <div>
+                    <div class="step-card__title">Mapeamento Coletivo</div>
+                    <div class="step-card__desc">Aplicação de screening a 100% dos colaboradores para mapear riscos psicossociais.</div>
+                </div>
+            </div>
+            <div class="step-card">
+                <div class="step-card__number">02</div>
+                <div>
+                    <div class="step-card__title">Avaliação Online</div>
+                    <div class="step-card__desc">Avaliação psicológica individual para trabalhadores identificados como de risco.</div>
+                </div>
+            </div>
+            <div class="step-card">
+                <div class="step-card__number">03</div>
+                <div>
+                    <div class="step-card__title">Promoção & Prevenção</div>
+                    <div class="step-card__desc">Ações educativas e preventivas para fortalecer a saúde mental no trabalho.</div>
+                </div>
+            </div>
+            <div class="step-card">
+                <div class="step-card__number">04</div>
+                <div>
+                    <div class="step-card__title">Relatório Integrado</div>
+                    <div class="step-card__desc">Consolidação dos dados em relatório gerencial para PCMSO e PGR.</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Stats -->
+        <h3 class="color-group-title mt-12">Stat Cards</h3>
+        <div class="grid-4 mt-4">
+            <div class="stat-card">
+                <div class="stat-card__value stat-card__value--sage">53%</div>
+                <div class="stat-card__label">Despesas assistenciais desperdiçadas</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-card__value stat-card__value--blue">R$500bi</div>
+                <div class="stat-card__label">Custo anual com saúde mental</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-card__value stat-card__value--warm">100%</div>
+                <div class="stat-card__label">Colaboradores mapeados</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-card__value stat-card__value--sage">6</div>
+                <div class="stat-card__label">Etapas do programa</div>
+            </div>
+        </div>
+
+        <!-- FAQ -->
+        <h3 class="color-group-title mt-12">FAQ Accordion</h3>
+        <div class="mt-4" style="max-width: 720px;">
+            <details class="faq-item" open>
+                <summary class="faq-item__q">
+                    O que é a NR-1 e por que minha empresa precisa se adequar?
+                    <svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+                </summary>
+                <div class="faq-item__a">
+                    A NR-1 é a Norma Regulamentadora que estabelece disposições gerais sobre segurança e saúde no trabalho. Com as atualizações recentes, inclui a obrigatoriedade de gerenciamento de riscos psicossociais, exigindo que empresas identifiquem e mitiguem fatores como estresse e assédio.
+                </div>
+            </details>
+            <details class="faq-item">
+                <summary class="faq-item__q">
+                    Como funciona o Programa de Gerenciamento de Riscos Psicossociais?
+                    <svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+                </summary>
+                <div class="faq-item__a">
+                    O programa é realizado em 6 etapas: mapeamento coletivo, avaliação online, promoção e prevenção, relatório integrado, integração com programa de cuidado e integração com PCMSO/PGR.
+                </div>
+            </details>
+            <details class="faq-item">
+                <summary class="faq-item__q">
+                    Quais os benefícios para a empresa?
+                    <svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+                </summary>
+                <div class="faq-item__a">
+                    Redução de custos assistenciais, conformidade legal, diminuição de absenteísmo e turnover, e construção de um ambiente de trabalho mais saudável e produtivo.
+                </div>
+            </details>
+        </div>
+    </div>
+</section>
+
+
+<!-- ==================== 6. LAYOUT ==================== -->
+<section class="section" id="layout">
+    <div class="container">
+        <div class="ds-label">Estrutura</div>
+        <h2 class="ds-section-title">Layout & Espaçamento</h2>
+        <p class="ds-section-sub">
+            Container de 1216px com padding de 24px. Grid flexível de 2 a 5 colunas.
+            Escala de espaçamento baseada em múltiplos de 4px.
+        </p>
+
+        <!-- Grid demos -->
+        <h3 class="color-group-title">Grids</h3>
+        <div class="grid-2 mt-4 mb-6">
+            <div style="background:var(--primary-50);padding:var(--sp-6);border-radius:var(--radius-md);text-align:center;font-size:13px;color:var(--primary-600);">1/2</div>
+            <div style="background:var(--primary-50);padding:var(--sp-6);border-radius:var(--radius-md);text-align:center;font-size:13px;color:var(--primary-600);">1/2</div>
+        </div>
+        <div class="grid-3 mb-6">
+            <div style="background:var(--sage-100);padding:var(--sp-6);border-radius:var(--radius-md);text-align:center;font-size:13px;color:var(--sage-700);">1/3</div>
+            <div style="background:var(--sage-100);padding:var(--sp-6);border-radius:var(--radius-md);text-align:center;font-size:13px;color:var(--sage-700);">1/3</div>
+            <div style="background:var(--sage-100);padding:var(--sp-6);border-radius:var(--radius-md);text-align:center;font-size:13px;color:var(--sage-700);">1/3</div>
+        </div>
+        <div class="grid-4 mb-8">
+            <div style="background:var(--blue-50);padding:var(--sp-6);border-radius:var(--radius-md);text-align:center;font-size:13px;color:var(--blue-600);">1/4</div>
+            <div style="background:var(--blue-50);padding:var(--sp-6);border-radius:var(--radius-md);text-align:center;font-size:13px;color:var(--blue-600);">1/4</div>
+            <div style="background:var(--blue-50);padding:var(--sp-6);border-radius:var(--radius-md);text-align:center;font-size:13px;color:var(--blue-600);">1/4</div>
+            <div style="background:var(--blue-50);padding:var(--sp-6);border-radius:var(--radius-md);text-align:center;font-size:13px;color:var(--blue-600);">1/4</div>
+        </div>
+
+        <!-- Spacing scale -->
+        <h3 class="color-group-title mt-8">Escala de espaçamento</h3>
+        <div class="mt-4" style="display: flex; flex-direction: column; gap: var(--sp-2);">
+            <div style="display:flex;align-items:center;gap:var(--sp-4);">
+                <code style="width:60px;font-size:11px;color:var(--gray-400);">sp-1 4px</code>
+                <div style="height:12px;width:4px;background:var(--primary-600);border-radius:2px;"></div>
+            </div>
+            <div style="display:flex;align-items:center;gap:var(--sp-4);">
+                <code style="width:60px;font-size:11px;color:var(--gray-400);">sp-2 8px</code>
+                <div style="height:12px;width:8px;background:var(--primary-600);border-radius:2px;"></div>
+            </div>
+            <div style="display:flex;align-items:center;gap:var(--sp-4);">
+                <code style="width:60px;font-size:11px;color:var(--gray-400);">sp-4 16px</code>
+                <div style="height:12px;width:16px;background:var(--primary-600);border-radius:2px;"></div>
+            </div>
+            <div style="display:flex;align-items:center;gap:var(--sp-4);">
+                <code style="width:60px;font-size:11px;color:var(--gray-400);">sp-6 24px</code>
+                <div style="height:12px;width:24px;background:var(--sage-400);border-radius:2px;"></div>
+            </div>
+            <div style="display:flex;align-items:center;gap:var(--sp-4);">
+                <code style="width:60px;font-size:11px;color:var(--gray-400);">sp-8 32px</code>
+                <div style="height:12px;width:32px;background:var(--sage-400);border-radius:2px;"></div>
+            </div>
+            <div style="display:flex;align-items:center;gap:var(--sp-4);">
+                <code style="width:60px;font-size:11px;color:var(--gray-400);">sp-12 48px</code>
+                <div style="height:12px;width:48px;background:var(--blue-400);border-radius:2px;"></div>
+            </div>
+            <div style="display:flex;align-items:center;gap:var(--sp-4);">
+                <code style="width:60px;font-size:11px;color:var(--gray-400);">sp-16 64px</code>
+                <div style="height:12px;width:64px;background:var(--blue-400);border-radius:2px;"></div>
+            </div>
+            <div style="display:flex;align-items:center;gap:var(--sp-4);">
+                <code style="width:60px;font-size:11px;color:var(--gray-400);">sp-24 96px</code>
+                <div style="height:12px;width:96px;background:var(--warm-500);border-radius:2px;"></div>
+            </div>
+        </div>
+
+        <!-- Border radius -->
+        <h3 class="color-group-title mt-12">Border Radius</h3>
+        <div class="flex-gap-4 mt-4">
+            <div style="text-align:center;">
+                <div style="width:64px;height:64px;background:var(--primary-600);border-radius:var(--radius-sm);"></div>
+                <span style="font-size:11px;color:var(--gray-400);margin-top:4px;display:block;">sm 6px</span>
+            </div>
+            <div style="text-align:center;">
+                <div style="width:64px;height:64px;background:var(--primary-600);border-radius:var(--radius-md);"></div>
+                <span style="font-size:11px;color:var(--gray-400);margin-top:4px;display:block;">md 10px</span>
+            </div>
+            <div style="text-align:center;">
+                <div style="width:64px;height:64px;background:var(--primary-600);border-radius:var(--radius-lg);"></div>
+                <span style="font-size:11px;color:var(--gray-400);margin-top:4px;display:block;">lg 16px</span>
+            </div>
+            <div style="text-align:center;">
+                <div style="width:64px;height:64px;background:var(--primary-600);border-radius:var(--radius-xl);"></div>
+                <span style="font-size:11px;color:var(--gray-400);margin-top:4px;display:block;">xl 24px</span>
+            </div>
+            <div style="text-align:center;">
+                <div style="width:64px;height:64px;background:var(--primary-600);border-radius:var(--radius-2xl);"></div>
+                <span style="font-size:11px;color:var(--gray-400);margin-top:4px;display:block;">2xl 32px</span>
+            </div>
+            <div style="text-align:center;">
+                <div style="width:64px;height:64px;background:var(--primary-600);border-radius:var(--radius-full);"></div>
+                <span style="font-size:11px;color:var(--gray-400);margin-top:4px;display:block;">full</span>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+<!-- ==================== 7. MOTION ==================== -->
+<section class="section section--gray" id="motion">
+    <div class="container">
+        <div class="ds-label">Interação</div>
+        <h2 class="ds-section-title">Motion & Transições</h2>
+        <p class="ds-section-sub">
+            Transições suaves e profissionais. Hover sobre cada demo para ver o efeito.
+        </p>
+
+        <div class="motion-demo">
+            <div class="motion-demo__box motion-demo__box--translate"></div>
+            <div class="motion-demo__label"><strong>Translate</strong> — translateX(20px) · 0.35s ease-out</div>
+        </div>
+        <div class="motion-demo">
+            <div class="motion-demo__box motion-demo__box--scale"></div>
+            <div class="motion-demo__label"><strong>Scale</strong> — scale(1.15) · 0.35s ease-out</div>
+        </div>
+        <div class="motion-demo">
+            <div class="motion-demo__box motion-demo__box--rotate"></div>
+            <div class="motion-demo__label"><strong>Rotate</strong> — rotate(90deg) · 0.35s ease-out</div>
+        </div>
+        <div class="motion-demo">
+            <div class="motion-demo__box motion-demo__box--opacity"></div>
+            <div class="motion-demo__label"><strong>Opacity</strong> — opacity(0.3) · 0.35s ease-out</div>
+        </div>
+        <div class="motion-demo">
+            <div class="motion-demo__box motion-demo__box--shadow"></div>
+            <div class="motion-demo__label"><strong>Shadow</strong> — shadow-xl · 0.35s ease-out</div>
+        </div>
+        <div class="motion-demo">
+            <div class="motion-demo__box motion-demo__box--color" style="background:var(--primary-600);"></div>
+            <div class="motion-demo__label"><strong>Color</strong> — Navy → Sage · 0.35s ease-out</div>
+        </div>
+
+        <h3 class="color-group-title mt-12">Tokens de timing</h3>
+        <div class="grid-3 mt-4">
+            <div style="padding:var(--sp-5);background:#fff;border-radius:var(--radius-md);border:1px solid var(--gray-200);">
+                <div style="font-size:13px;font-weight:600;color:var(--primary-600);">--duration-fast</div>
+                <div style="font-size:12px;color:var(--gray-400);">0.2s — micro-feedback</div>
+            </div>
+            <div style="padding:var(--sp-5);background:#fff;border-radius:var(--radius-md);border:1px solid var(--gray-200);">
+                <div style="font-size:13px;font-weight:600;color:var(--primary-600);">--duration-normal</div>
+                <div style="font-size:12px;color:var(--gray-400);">0.35s — hover, focus</div>
+            </div>
+            <div style="padding:var(--sp-5);background:#fff;border-radius:var(--radius-md);border:1px solid var(--gray-200);">
+                <div style="font-size:13px;font-weight:600;color:var(--primary-600);">--duration-slow</div>
+                <div style="font-size:12px;color:var(--gray-400);">0.5s — page transitions</div>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+<!-- ==================== 8. ICONS ==================== -->
+<section class="section" id="icons">
+    <div class="container">
+        <div class="ds-label">Visual</div>
+        <h2 class="ds-section-title">Ícones</h2>
+        <p class="ds-section-sub">
+            Estilo outline com stroke de 1.5px, linecap e linejoin arredondados.
+            Usados dentro de icon-badges (fundo mint, ícone azul) como assinatura visual.
+        </p>
+
+        <div class="icon-grid">
+            <div class="icon-item">
+                <svg viewBox="0 0 24 24"><path d="M9 12l2 2 4-4"/><circle cx="12" cy="12" r="10"/></svg>
+                <span>check-circle</span>
+            </div>
+            <div class="icon-item">
+                <svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                <span>shield</span>
+            </div>
+            <div class="icon-item">
+                <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                <span>users</span>
+            </div>
+            <div class="icon-item">
+                <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg>
+                <span>smile</span>
+            </div>
+            <div class="icon-item">
+                <svg viewBox="0 0 24 24"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+                <span>activity</span>
+            </div>
+            <div class="icon-item">
+                <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+                <span>file-text</span>
+            </div>
+            <div class="icon-item">
+                <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+                <span>grid</span>
+            </div>
+            <div class="icon-item">
+                <svg viewBox="0 0 24 24"><path d="M18 20V10"/><path d="M12 20V4"/><path d="M6 20v-6"/></svg>
+                <span>bar-chart</span>
+            </div>
+            <div class="icon-item">
+                <svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+                <span>layers</span>
+            </div>
+            <div class="icon-item">
+                <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+                <span>settings</span>
+            </div>
+            <div class="icon-item">
+                <svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                <span>message</span>
+            </div>
+            <div class="icon-item">
+                <svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+                <span>heart</span>
+            </div>
+            <div class="icon-item">
+                <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                <span>search</span>
+            </div>
+            <div class="icon-item">
+                <svg viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+                <span>mail</span>
+            </div>
+            <div class="icon-item">
+                <svg viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+                <span>phone</span>
+            </div>
+            <div class="icon-item">
+                <svg viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                <span>map-pin</span>
+            </div>
+        </div>
+
+        <!-- Icon sizes -->
+        <h3 class="color-group-title mt-12">Tamanhos de ícone</h3>
+        <div class="icon-sizes mt-4">
+            <div class="icon-size-demo">
+                <svg width="16" height="16" viewBox="0 0 24 24"><path d="M9 12l2 2 4-4"/><circle cx="12" cy="12" r="10"/></svg>
+                <span>16px</span>
+            </div>
+            <div class="icon-size-demo">
+                <svg width="20" height="20" viewBox="0 0 24 24"><path d="M9 12l2 2 4-4"/><circle cx="12" cy="12" r="10"/></svg>
+                <span>20px</span>
+            </div>
+            <div class="icon-size-demo">
+                <svg width="24" height="24" viewBox="0 0 24 24"><path d="M9 12l2 2 4-4"/><circle cx="12" cy="12" r="10"/></svg>
+                <span>24px</span>
+            </div>
+            <div class="icon-size-demo">
+                <svg width="32" height="32" viewBox="0 0 24 24"><path d="M9 12l2 2 4-4"/><circle cx="12" cy="12" r="10"/></svg>
+                <span>32px</span>
+            </div>
+            <div class="icon-size-demo">
+                <svg width="48" height="48" viewBox="0 0 24 24"><path d="M9 12l2 2 4-4"/><circle cx="12" cy="12" r="10"/></svg>
+                <span>48px</span>
+            </div>
+        </div>
+
+        <!-- Social Icons -->
+        <h3 class="color-group-title mt-12">Redes Sociais</h3>
+        <div class="flex-gap-4 mt-4">
+            <div style="width:44px;height:44px;background:var(--primary-600);border-radius:50%;display:flex;align-items:center;justify-content:center;">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
+            </div>
+            <div style="width:44px;height:44px;background:var(--primary-600);border-radius:50%;display:flex;align-items:center;justify-content:center;">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg>
+            </div>
+            <div style="width:44px;height:44px;background:var(--primary-600);border-radius:50%;display:flex;align-items:center;justify-content:center;">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22.54 6.42a2.78 2.78 0 0 0-1.94-2C18.88 4 12 4 12 4s-6.88 0-8.6.46a2.78 2.78 0 0 0-1.94 2A29 29 0 0 0 1 11.75a29 29 0 0 0 .46 5.33A2.78 2.78 0 0 0 3.4 19.1c1.72.46 8.6.46 8.6.46s6.88 0 8.6-.46a2.78 2.78 0 0 0 1.94-2 29 29 0 0 0 .46-5.25 29 29 0 0 0-.46-5.43z"/><polygon points="9.75 15.02 15.5 11.75 9.75 8.48 9.75 15.02"/></svg>
+            </div>
+            <div style="width:44px;height:44px;background:#25D366;border-radius:50%;display:flex;align-items:center;justify-content:center;">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
+            </div>
+            <div style="width:44px;height:44px;background:var(--primary-600);border-radius:50%;display:flex;align-items:center;justify-content:center;">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+<!-- ==================== FOOTER ==================== -->
+<footer style="background:var(--primary-900);color:rgba(255,255,255,0.4);padding:var(--sp-10) 0;text-align:center;font-size:12px;">
+    <div class="container">
+        <div style="font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:16px;color:#fff;margin-bottom:var(--sp-2);">
+            Terapia Empresarial — Design System v2
+        </div>
+        <p>Baseado na identidade real da marca · Padrões estruturais inspirados em Hotmart</p>
+        <p style="margin-top:var(--sp-2);">Cores extraídas de terapiaempresarial.com.br · Fontes: Space Grotesk + Sora</p>
+    </div>
+</footer>
+
+</body>
+</html>

@@ -1,14 +1,28 @@
 import './globals.css'
 import type { Metadata } from 'next'
-import { Inter } from 'next/font/google'
+import { Sora, Space_Grotesk } from 'next/font/google'
 import ToastProvider from '@/components/ToastProvider'
-import Footer from '@/components/Footer'
 
-const inter = Inter({ subsets: ['latin'] })
+const sora = Sora({
+    subsets: ['latin'],
+    variable: '--font-sora',
+    display: 'swap',
+})
+
+const spaceGrotesk = Space_Grotesk({
+    subsets: ['latin'],
+    variable: '--font-grotesk',
+    display: 'swap',
+})
 
 export const metadata: Metadata = {
-    title: 'Guia de Terapia - Jornada de Equipe',
-    description: 'Plataforma de desenvolvimento de equipes e liderança',
+    title: 'Terapia Empresarial - Inteligencia Organizacional com Conformidade Legal',
+    description: 'Mais que um laudo. Uma solucao estrategica para saude mental corporativa. Atendimento a NR-1, mapeamento de riscos psicossociais e plataforma pratica.',
+    icons: {
+        icon: '/favicon.png',
+        shortcut: '/favicon.png',
+        apple: '/favicon.png',
+    },
 }
 
 export default function RootLayout({
@@ -17,14 +31,11 @@ export default function RootLayout({
     children: React.ReactNode
 }) {
     return (
-        <html lang="pt-BR">
-            <body className={inter.className}>
-                <div className="flex flex-col min-h-screen">
-                    <ToastProvider>
-                        {children}
-                    </ToastProvider>
-                    <Footer />
-                </div>
+        <html lang="pt-BR" className={`${sora.variable} ${spaceGrotesk.variable}`}>
+            <body className="font-sora">
+                <ToastProvider>
+                    {children}
+                </ToastProvider>
             </body>
         </html>
     )
