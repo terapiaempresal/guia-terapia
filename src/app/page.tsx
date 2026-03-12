@@ -704,7 +704,6 @@ export default function HomePage() {
                                 <div className="flex -space-x-2">
                                     {[
                                         { src: '/images/empresas/bhcospace.png', alt: 'BHCoSpace' },
-                                        { src: '/images/empresas/faculdade-eaula.png', alt: 'Faculdade EAula' },
                                         { src: '/images/empresas/intensa-digital.png', alt: 'Intensa Digital' },
                                         { src: '/images/empresas/promosystem.png', alt: 'Promosystem' },
                                         { src: '/images/empresas/nasp.jpg', alt: 'Nasp' },
