@@ -6,7 +6,32 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { useToast } from '@/components/ToastProvider'
 import { ClipboardList, BarChart3, FileText, ChevronDown, ArrowRight, Shield, Activity, Users, Package, CheckCircle } from 'lucide-react'
-import { motion, useScroll, useTransform } from 'framer-motion'
+import { motion, useScroll, useTransform, AnimatePresence } from 'framer-motion'
+
+// Depoimentos completos para tooltips
+const FULL_TESTIMONIALS = {
+    'intensa': `Como uma empresa de tecnologia focada em IA e dados, buscamos a Terapia Empresarial para garantir a conformidade com a NR-1 e as exigências de gestão de riscos psicossociais. O processo foi extremamente ágil, permitindo que nosso time de 10 colaboradores realizasse o diagnóstico através de questionários estruturados que avaliam fatores como sobrecarga e ambiente organizacional com total confidencialidade.
+
+A plataforma transformou as respostas em inteligência organizacional, indo muito além de um relatório estático. Conseguimos identificar padrões de risco e receber recomendações estratégicas que nos ajudam a prevenir passivos trabalhistas e a fortalecer nossa cultura de saúde mental.
+
+Hoje, a Intensa Mídia opera com segurança jurídica e respaldo técnico, atendendo integralmente às normas regulatórias vigentes. Mais do que cumprir uma obrigação legal, agora utilizamos dados precisos para tomar decisões que garantem o bem-estar do nosso time e a eficiência do nosso negócio.`,
+    
+    'bhcoespace': `A experiência da Bhcoespace com a Terapia Empresarial foi profundamente transformadora, especialmente no que se refere à adequação às exigências da NR-1. O processo nos permitiu compreender, de forma estruturada e técnica, como os riscos psicossociais se manifestam no ambiente organizacional e qual é o papel da empresa na identificação, prevenção e gestão desses fatores.
+
+A partir do trabalho desenvolvido, conseguimos avançar significativamente na conformidade com a NR-1 e com as diretrizes do Programa de Gerenciamento de Riscos (PGR), estruturando um diagnóstico claro sobre aspectos como organização do trabalho, clima organizacional, comunicação interna e fatores de pressão que podem impactar a saúde mental dos colaboradores.
+
+Além de atender às exigências legais, a Terapia Empresarial trouxe ganhos concretos para a empresa: maior consciência organizacional, melhoria no ambiente de trabalho, fortalecimento das práticas de gestão e redução de potenciais riscos trabalhistas relacionados à saúde mental.
+
+Hoje a Bhcoespace possui uma visão muito mais estratégica sobre a gestão de pessoas e sobre a importância do cuidado com os fatores psicossociais dentro da organização.`,
+    
+    'sketch': `Vivenciamos uma evolução importante em nossa gestão organizacional a partir da implementação do mapeamento de riscos psicossociais e da adequação às diretrizes da NR-1. Com uma estrutura composta por 46 colaboradores na rede própria e 106 colaboradores na fábrica, o processo permitiu compreender de forma mais profunda a dinâmica do ambiente de trabalho, identificando fatores relacionados à organização das atividades, comunicação interna e relacionamento entre equipes e lideranças.
+
+O diagnóstico proporcionou uma visão clara sobre aspectos que impactavam o clima organizacional e o bem-estar dos colaboradores, possibilitando a adoção de práticas mais estruturadas de gestão, prevenção e acompanhamento dos riscos psicossociais, em conformidade com as exigências da NR-1.
+
+Os resultados foram perceptíveis em diferentes níveis da organização. Houve melhoria no bem-estar dos colaboradores, fortalecimento do relacionamento entre equipes e líderes, além de reflexos positivos na forma como os profissionais se relacionam com os clientes no dia a dia das operações.
+
+Como consequência desse ambiente organizacional mais saudável e alinhado, a empresa registrou um incremento de aproximadamente 15% nas vendas, demonstrando que a gestão adequada dos fatores psicossociais e a conformidade com a NR-1 não apenas atendem às exigências legais, mas também contribuem diretamente para o desempenho e crescimento do negócio.`
+}
 
 export default function HomePage() {
     const router = useRouter()
@@ -25,6 +50,7 @@ export default function HomePage() {
     const [stepProgress, setStepProgress] = useState(0) // Progresso da Seção 5 (0-100)
     const [isMobile, setIsMobile] = useState(false) // Detectar mobile para carrossel
     const [activeBenefit, setActiveBenefit] = useState(0) // Seção 6 - Benefício ativo no scroll
+    const [hoveredTestimonial, setHoveredTestimonial] = useState<string | null>(null) // Controle de hover nos depoimentos
     const [formData, setFormData] = useState({
         email: '',
         password: '',
@@ -1527,9 +1553,11 @@ export default function HomePage() {
                         whileInView={{opacity: 1, y: 0}}
                         viewport={{once: true, margin: '-50px'}}
                         transition={{duration: 0.6, ease: 'easeOut'}}
+                        onMouseEnter={() => setHoveredTestimonial('sketch')}
+                        onMouseLeave={() => setHoveredTestimonial(null)}
                     >
                         <div 
-                            className="relative bg-white rounded-3xl p-10 lg:p-12 border-2 transition-all duration-300"
+                            className="relative bg-white rounded-3xl p-10 lg:p-12 border-2 transition-all duration-300 cursor-pointer"
                             style={{
                                 borderColor: '#9BC2A6',
                                 background: 'rgba(155, 194, 166, 0.03)'
@@ -1578,6 +1606,69 @@ export default function HomePage() {
                                     />
                                 </div>
                             </div>
+
+                            {/* Tooltip com depoimento completo */}
+                            <AnimatePresence>
+                                {hoveredTestimonial === 'sketch' && (
+                                    <motion.div
+                                        className="absolute inset-0 bg-white rounded-3xl p-10 lg:p-12 border-2 z-10 overflow-y-auto"
+                                        style={{
+                                            borderColor: '#9BC2A6',
+                                            background: 'rgba(255, 255, 255, 0.98)',
+                                            backdropFilter: 'blur(8px)',
+                                            boxShadow: '0 25px 50px rgba(155, 194, 166, 0.3)'
+                                        }}
+                                        initial={{opacity: 0}}
+                                        animate={{opacity: 1}}
+                                        exit={{opacity: 0}}
+                                        transition={{duration: 0.2}}
+                                    >
+                                        {/* Badge Destaque */}
+                                        <div className="inline-flex items-center gap-2 mb-6 px-4 py-2 rounded-full" 
+                                             style={{background: '#9BC2A6'}}>
+                                            <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20" style={{color: '#ffffff'}}>
+                                                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                                            </svg>
+                                            <span className="font-sora text-[11px] font-bold uppercase tracking-wider" 
+                                                  style={{color: '#ffffff'}}>
+                                                Depoimento Completo
+                                            </span>
+                                        </div>
+
+                                        {/* Depoimento completo */}
+                                        <div className="font-sora text-[15px] lg:text-[16px] leading-[1.8] mb-8 whitespace-pre-line" 
+                                             style={{color: '#0d0d0d'}}>
+                                            "{FULL_TESTIMONIALS.sketch}"
+                                        </div>
+
+                                        {/* Divisor */}
+                                        <div className="w-16 h-[2px] mb-6" 
+                                             style={{background: '#9BC2A6'}} />
+
+                                        {/* Autor e Logo */}
+                                        <div className="flex items-end justify-between flex-wrap gap-6">
+                                            <div>
+                                                <p className="font-grotesk text-[17px] font-bold mb-1" 
+                                                   style={{color: '#0d0d0d'}}>
+                                                    Gestão Executiva
+                                                </p>
+                                                <p className="font-sora text-[14px]" 
+                                                   style={{color: '#6b7480'}}>
+                                                    SKETCH Confecções
+                                                </p>
+                                            </div>
+                                            <div className="relative" style={{width: '140px', height: '48px'}}>
+                                                <Image
+                                                    src="/clients/sketch.png"
+                                                    alt="SKETCH Confecções"
+                                                    fill
+                                                    className="object-contain object-right opacity-70"
+                                                />
+                                            </div>
+                                        </div>
+                                    </motion.div>
+                                )}
+                            </AnimatePresence>
                         </div>
                     </motion.div>
 
@@ -1585,7 +1676,7 @@ export default function HomePage() {
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                         {/* Card 1: Intensa Mídia */}
                         <motion.div
-                            className="bg-white rounded-2xl p-8 lg:p-10 border transition-all duration-300 hover:scale-[1.02] group flex flex-col"
+                            className="bg-white rounded-2xl p-8 lg:p-10 border transition-all duration-300 hover:scale-[1.02] group flex flex-col cursor-pointer relative"
                             style={{borderColor: '#e5e7eb'}}
                             initial={{opacity: 0, y: 30}}
                             whileInView={{opacity: 1, y: 0}}
@@ -1595,6 +1686,8 @@ export default function HomePage() {
                                 boxShadow: '0 12px 30px rgba(0, 0, 0, 0.08)',
                                 borderColor: '#d1d5db'
                             }}
+                            onMouseEnter={() => setHoveredTestimonial('intensa')}
+                            onMouseLeave={() => setHoveredTestimonial(null)}
                         >
                             <p className="font-sora text-[15px] lg:text-[16px] leading-[1.65] mb-auto" 
                                style={{color: '#353a40'}}>
@@ -1622,11 +1715,70 @@ export default function HomePage() {
                                     />
                                 </div>
                             </div>
+
+                            {/* Tooltip com depoimento completo */}
+                            <AnimatePresence>
+                                {hoveredTestimonial === 'intensa' && (
+                                    <motion.div
+                                        className="absolute inset-0 bg-white rounded-2xl p-8 lg:p-10 border-2 z-10 overflow-y-auto"
+                                        style={{
+                                            borderColor: '#9BC2A6',
+                                            background: 'rgba(255, 255, 255, 0.98)',
+                                            backdropFilter: 'blur(8px)',
+                                            boxShadow: '0 25px 50px rgba(155, 194, 166, 0.3)'
+                                        }}
+                                        initial={{opacity: 0, scale: 0.95}}
+                                        animate={{opacity: 1, scale: 1}}
+                                        exit={{opacity: 0, scale: 0.95}}
+                                        transition={{duration: 0.2}}
+                                    >
+                                        {/* Badge */}
+                                        <div className="inline-flex items-center gap-2 mb-4 px-3 py-1.5 rounded-full" 
+                                             style={{background: '#9BC2A6'}}>
+                                            <span className="font-sora text-[10px] font-bold uppercase tracking-wider" 
+                                                  style={{color: '#ffffff'}}>
+                                                Depoimento Completo
+                                            </span>
+                                        </div>
+
+                                        {/* Depoimento completo */}
+                                        <div className="font-sora text-[14px] leading-[1.7] mb-6 whitespace-pre-line" 
+                                             style={{color: '#0d0d0d'}}>
+                                            "{FULL_TESTIMONIALS.intensa}"
+                                        </div>
+
+                                        {/* Divisor */}
+                                        <div className="w-12 h-[2px] mb-4" 
+                                             style={{background: '#9BC2A6'}} />
+
+                                        {/* Autor e Logo */}
+                                        <div className="mb-4">
+                                            <p className="font-grotesk text-[15px] font-bold mb-0.5" style={{color: '#0d0d0d'}}>
+                                                Equipe de Gestão
+                                            </p>
+                                            <p className="font-sora text-[13px]" style={{color: '#9ca3af'}}>
+                                                Intensa Mídia
+                                            </p>
+                                        </div>
+
+                                        <div className="h-14 flex items-center justify-start">
+                                            <div className="relative" style={{width: '120px', height: '40px'}}>
+                                                <Image
+                                                    src="/clients/intensa-midia.png"
+                                                    alt="Intensa Mídia"
+                                                    fill
+                                                    className="object-contain object-left opacity-70"
+                                                />
+                                            </div>
+                                        </div>
+                                    </motion.div>
+                                )}
+                            </AnimatePresence>
                         </motion.div>
 
                         {/* Card 2: BHCoSpace */}
                         <motion.div
-                            className="bg-white rounded-2xl p-8 lg:p-10 border transition-all duration-300 hover:scale-[1.02] group flex flex-col"
+                            className="bg-white rounded-2xl p-8 lg:p-10 border transition-all duration-300 hover:scale-[1.02] group flex flex-col cursor-pointer relative"
                             style={{borderColor: '#e5e7eb'}}
                             initial={{opacity: 0, y: 30}}
                             whileInView={{opacity: 1, y: 0}}
@@ -1636,6 +1788,8 @@ export default function HomePage() {
                                 boxShadow: '0 12px 30px rgba(0, 0, 0, 0.08)',
                                 borderColor: '#d1d5db'
                             }}
+                            onMouseEnter={() => setHoveredTestimonial('bhcoespace')}
+                            onMouseLeave={() => setHoveredTestimonial(null)}
                         >
                             <p className="font-sora text-[15px] lg:text-[16px] leading-[1.65] mb-auto" 
                                style={{color: '#353a40'}}>
@@ -1663,6 +1817,65 @@ export default function HomePage() {
                                     />
                                 </div>
                             </div>
+
+                            {/* Tooltip com depoimento completo */}
+                            <AnimatePresence>
+                                {hoveredTestimonial === 'bhcoespace' && (
+                                    <motion.div
+                                        className="absolute inset-0 bg-white rounded-2xl p-8 lg:p-10 border-2 z-10 overflow-y-auto"
+                                        style={{
+                                            borderColor: '#9BC2A6',
+                                            background: 'rgba(255, 255, 255, 0.98)',
+                                            backdropFilter: 'blur(8px)',
+                                            boxShadow: '0 25px 50px rgba(155, 194, 166, 0.3)'
+                                        }}
+                                        initial={{opacity: 0, scale: 0.95}}
+                                        animate={{opacity: 1, scale: 1}}
+                                        exit={{opacity: 0, scale: 0.95}}
+                                        transition={{duration: 0.2}}
+                                    >
+                                        {/* Badge */}
+                                        <div className="inline-flex items-center gap-2 mb-4 px-3 py-1.5 rounded-full" 
+                                             style={{background: '#9BC2A6'}}>
+                                            <span className="font-sora text-[10px] font-bold uppercase tracking-wider" 
+                                                  style={{color: '#ffffff'}}>
+                                                Depoimento Completo
+                                            </span>
+                                        </div>
+
+                                        {/* Depoimento completo */}
+                                        <div className="font-sora text-[14px] leading-[1.7] mb-6 whitespace-pre-line" 
+                                             style={{color: '#0d0d0d'}}>
+                                            "{FULL_TESTIMONIALS.bhcoespace}"
+                                        </div>
+
+                                        {/* Divisor */}
+                                        <div className="w-12 h-[2px] mb-4" 
+                                             style={{background: '#9BC2A6'}} />
+
+                                        {/* Autor e Logo */}
+                                        <div className="mb-4">
+                                            <p className="font-grotesk text-[15px] font-bold mb-0.5" style={{color: '#0d0d0d'}}>
+                                                Equipe de RH
+                                            </p>
+                                            <p className="font-sora text-[13px]" style={{color: '#9ca3af'}}>
+                                                BHCoSpace
+                                            </p>
+                                        </div>
+
+                                        <div className="h-14 flex items-center justify-start">
+                                            <div className="relative" style={{width: '120px', height: '40px'}}>
+                                                <Image
+                                                    src="/clients/bhcoespace.png"
+                                                    alt="BHCoSpace"
+                                                    fill
+                                                    className="object-contain object-left opacity-70"
+                                                />
+                                            </div>
+                                        </div>
+                                    </motion.div>
+                                )}
+                            </AnimatePresence>
                         </motion.div>
 
                         {/* Card 3: CTA Card */}
