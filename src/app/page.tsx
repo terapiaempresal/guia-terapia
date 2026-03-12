@@ -1335,7 +1335,7 @@ export default function HomePage() {
                         </div>
 
                         {/* RIGHT COLUMN: Cards empilhados com MUITO espaçamento (100vh cada) */}
-                        <div className="relative space-y-[100vh]">
+                        <div className="relative space-y-[100vh] pb-[20vh]">
                             {[
                                 { icon: Shield, color: '#9BC2A6' },
                                 { icon: Activity, color: '#9BC2A6' },
@@ -1443,18 +1443,24 @@ export default function HomePage() {
                 </div>
             </section>
 
-            {/* ===== SEÇÃO 7: AUTORIDADE TÉCNICA ===== */}
-            <section className="bg-warm-50 py-20 lg:py-28">
-                <div className="max-w-[960px] mx-auto px-8 lg:px-12">
-                    <div className="text-center mb-12">
-                        <p className="font-sora text-sage-500 text-[11px] font-semibold uppercase tracking-[0.1em] mb-4">Metodologia</p>
-                        <h2 className="font-grotesk text-[clamp(28px,3.5vw,44px)] font-bold text-primary-600 leading-[1.1] mb-8">
+            {/* ===== SEÇÃO 7: AUTORIDADE TÉCNICA (Provas Sociais) ===== */}
+            <section className="relative py-20 lg:py-32" style={{background: '#fafbfc'}}>
+                <div className="max-w-[1400px] mx-auto px-6 lg:px-12">
+                    
+                    {/* Header da seção */}
+                    <div className="text-center mb-12 lg:mb-16 max-w-[900px] mx-auto">
+                        <p className="font-sora text-[11px] font-semibold uppercase tracking-[0.1em] mb-4" 
+                           style={{color: '#5F8A6F'}}>
+                            Metodologia
+                        </p>
+                        <h2 className="font-grotesk text-[clamp(28px,3.5vw,42px)] font-bold leading-[1.15] tracking-[-0.01em] mb-6" 
+                            style={{color: '#0d0d0d'}}>
                             Base técnica e normativa
                         </h2>
-                    </div>
-
-                    <div className="bg-white rounded-3xl p-10 lg:p-14 shadow-sm border border-gray-100">
-                        <div className="space-y-6 font-sora text-gray-500 text-[16px] leading-[1.75]">
+                        
+                        {/* Texto institucional */}
+                        <div className="space-y-4 font-sora text-[16px] lg:text-[17px] leading-[1.7] max-w-[800px] mx-auto" 
+                             style={{color: '#6b7480'}}>
                             <p>
                                 A metodologia utilizada pela Terapia Empresarial foi desenvolvida com base em princípios de gestão organizacional, psicologia do trabalho e normas regulatórias vigentes.
                             </p>
@@ -1462,35 +1468,282 @@ export default function HomePage() {
                                 Nosso diagnóstico considera fatores psicossociais reconhecidos em estudos sobre saúde mental no trabalho e está alinhado às exigências normativas relacionadas à gestão de riscos ocupacionais.
                             </p>
                         </div>
+                    </div>
 
-                        {/* Badges de credibilidade */}
-                        <div className="mt-10 pt-8 border-t border-gray-100">
-                            <div className="flex flex-wrap gap-4 items-center justify-center">
-                                <div className="flex items-center gap-2 px-4 py-2 bg-sage-300/10 rounded-lg">
-                                    <svg className="w-5 h-5 text-sage-500" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24">
-                                        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
-                                    </svg>
-                                    <span className="font-sora text-[13px] font-semibold text-gray-700">NR-1 Alinhado</span>
+                    {/* Subheader: "Escolhida por empresas..." */}
+                    <div className="text-center mb-12 lg:mb-16">
+                        <h3 className="font-grotesk text-[clamp(22px,2.5vw,28px)] font-semibold leading-[1.2] tracking-[-0.01em]" 
+                            style={{color: '#353a40'}}>
+                            Escolhida por empresas que levam a saúde mental a sério
+                        </h3>
+                    </div>
+
+                    {/* Carrossel infinito de logos (marquee → direita) */}
+                    <div className="mb-16 lg:mb-20 overflow-hidden relative py-8">
+                        <motion.div 
+                            className="flex gap-16 items-center"
+                            animate={{x: ['0%', '-50%']}}
+                            transition={{
+                                duration: 40,
+                                repeat: Infinity,
+                                ease: 'linear'
+                            }}
+                        >
+                            {/* Duplicar array 2x para loop infinito suave */}
+                            {[
+                                { name: 'Intensa Mídia', path: '/clients/intensa-midia.png' },
+                                { name: 'BHCoSpace', path: '/clients/bhcoespace.png' },
+                                { name: 'SKETCH', path: '/clients/sketch.png' },
+                                { name: 'Cliente 4', path: '/clients/cliente4.png' },
+                                { name: 'Cliente 5', path: '/clients/cliente5.png' },
+                                { name: 'Cliente 6', path: '/clients/cliente6.png' },
+                                { name: 'Cliente 7', path: '/clients/cliente7.png' }
+                            ].concat([
+                                { name: 'Intensa Mídia', path: '/clients/intensa-midia.png' },
+                                { name: 'BHCoSpace', path: '/clients/bhcoespace.png' },
+                                { name: 'SKETCH', path: '/clients/sketch.png' },
+                                { name: 'Cliente 4', path: '/clients/cliente4.png' },
+                                { name: 'Cliente 5', path: '/clients/cliente5.png' },
+                                { name: 'Cliente 6', path: '/clients/cliente6.png' },
+                                { name: 'Cliente 7', path: '/clients/cliente7.png' }
+                            ]).map((logo, index) => (
+                                <div key={index} className="flex-shrink-0 flex items-center justify-center" style={{width: '140px', height: '48px'}}>
+                                    <Image
+                                        src={logo.path}
+                                        alt={logo.name}
+                                        width={140}
+                                        height={48}
+                                        className="max-h-[48px] max-w-[140px] w-auto h-auto object-contain opacity-40 hover:opacity-100 transition-opacity duration-300"
+                                    />
                                 </div>
-                                <div className="flex items-center gap-2 px-4 py-2 bg-sage-300/10 rounded-lg">
-                                    <svg className="w-5 h-5 text-sage-500" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24">
-                                        <path d="M22 11.08V12a10 10 0 11-5.93-9.14" />
-                                        <polyline points="22 4 12 14.01 9 11.01" />
-                                    </svg>
-                                    <span className="font-sora text-[13px] font-semibold text-gray-700">Psicologia do Trabalho</span>
+                            ))}
+                        </motion.div>
+                    </div>
+
+                    {/* HERO TESTIMONIAL - SKETCH (Destaque) */}
+                    <motion.div
+                        className="mb-12 lg:mb-16"
+                        initial={{opacity: 0, y: 30}}
+                        whileInView={{opacity: 1, y: 0}}
+                        viewport={{once: true, margin: '-50px'}}
+                        transition={{duration: 0.6, ease: 'easeOut'}}
+                    >
+                        <div 
+                            className="relative bg-white rounded-3xl p-10 lg:p-12 border-2 transition-all duration-300"
+                            style={{
+                                borderColor: '#9BC2A6',
+                                background: 'rgba(155, 194, 166, 0.03)'
+                            }}
+                        >
+                            {/* Badge Destaque */}
+                            <div className="inline-flex items-center gap-2 mb-6 px-4 py-2 rounded-full" 
+                                 style={{background: '#9BC2A6'}}>
+                                <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20" style={{color: '#ffffff'}}>
+                                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                                </svg>
+                                <span className="font-sora text-[11px] font-bold uppercase tracking-wider" 
+                                      style={{color: '#ffffff'}}>
+                                    Destaque
+                                </span>
+                            </div>
+
+                            {/* Quote */}
+                            <p className="font-sora text-[17px] lg:text-[19px] leading-[1.7] mb-8" 
+                               style={{color: '#0d0d0d'}}>
+                                "Os resultados foram perceptíveis em diferentes níveis da organização. Houve melhoria no bem-estar dos colaboradores, fortalecimento do relacionamento entre equipes e líderes, além de reflexos positivos na forma como os profissionais se relacionam com os clientes no dia a dia das operações. Como consequência desse ambiente organizacional mais saudável e alinhado, a empresa registrou um incremento de aproximadamente 15% nas vendas."
+                            </p>
+
+                            {/* Divisor */}
+                            <div className="w-16 h-[2px] mb-6" 
+                                 style={{background: '#9BC2A6'}} />
+
+                            {/* Autor e Logo */}
+                            <div className="flex items-end justify-between flex-wrap gap-6">
+                                <div>
+                                    <p className="font-grotesk text-[17px] font-bold mb-1" 
+                                       style={{color: '#0d0d0d'}}>
+                                        Gestão Executiva
+                                    </p>
+                                    <p className="font-sora text-[14px]" 
+                                       style={{color: '#6b7480'}}>
+                                        SKETCH Confecções
+                                    </p>
                                 </div>
-                                <div className="flex items-center gap-2 px-4 py-2 bg-sage-300/10 rounded-lg">
-                                    <svg className="w-5 h-5 text-sage-500" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24">
-                                        <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" />
-                                        <polyline points="14 2 14 8 20 8" />
-                                        <line x1="16" y1="13" x2="8" y2="13" />
-                                        <line x1="16" y1="17" x2="8" y2="17" />
-                                        <polyline points="10 9 9 9 8 9" />
-                                    </svg>
-                                    <span className="font-sora text-[13px] font-semibold text-gray-700">Gestão Organizacional</span>
+                                <div className="relative" style={{width: '140px', height: '48px'}}>
+                                    <Image
+                                        src="/clients/sketch.png"
+                                        alt="SKETCH Confecções"
+                                        fill
+                                        className="object-contain object-right opacity-70"
+                                    />
                                 </div>
                             </div>
                         </div>
+                    </motion.div>
+
+                    {/* Grid de Depoimentos (2 cards normais + 1 CTA card) */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        {/* Card 1: Intensa Mídia */}
+                        <motion.div
+                            className="bg-white rounded-2xl p-8 lg:p-10 border transition-all duration-300 hover:scale-[1.02] group flex flex-col"
+                            style={{borderColor: '#e5e7eb'}}
+                            initial={{opacity: 0, y: 30}}
+                            whileInView={{opacity: 1, y: 0}}
+                            viewport={{once: true, margin: '-50px'}}
+                            transition={{duration: 0.5, delay: 0}}
+                            whileHover={{
+                                boxShadow: '0 12px 30px rgba(0, 0, 0, 0.08)',
+                                borderColor: '#d1d5db'
+                            }}
+                        >
+                            <p className="font-sora text-[15px] lg:text-[16px] leading-[1.65] mb-auto" 
+                               style={{color: '#353a40'}}>
+                                "A plataforma transformou as respostas em inteligência organizacional, indo muito além de um relatório estático. Conseguimos identificar padrões de risco e receber recomendações estratégicas que nos ajudam a prevenir passivos trabalhistas."
+                            </p>
+
+                            <div className="w-12 h-[2px] my-6" style={{background: '#e5e7eb'}} />
+
+                            <div className="mb-6">
+                                <p className="font-grotesk text-[15px] font-bold mb-0.5" style={{color: '#0d0d0d'}}>
+                                    Equipe de Gestão
+                                </p>
+                                <p className="font-sora text-[13px]" style={{color: '#9ca3af'}}>
+                                    Intensa Mídia
+                                </p>
+                            </div>
+
+                            <div className="h-14 flex items-center justify-start">
+                                <div className="relative" style={{width: '120px', height: '40px'}}>
+                                    <Image
+                                        src="/clients/intensa-midia.png"
+                                        alt="Intensa Mídia"
+                                        fill
+                                        className="object-contain object-left opacity-60 group-hover:opacity-100 transition-opacity duration-300"
+                                    />
+                                </div>
+                            </div>
+                        </motion.div>
+
+                        {/* Card 2: BHCoSpace */}
+                        <motion.div
+                            className="bg-white rounded-2xl p-8 lg:p-10 border transition-all duration-300 hover:scale-[1.02] group flex flex-col"
+                            style={{borderColor: '#e5e7eb'}}
+                            initial={{opacity: 0, y: 30}}
+                            whileInView={{opacity: 1, y: 0}}
+                            viewport={{once: true, margin: '-50px'}}
+                            transition={{duration: 0.5, delay: 0.15}}
+                            whileHover={{
+                                boxShadow: '0 12px 30px rgba(0, 0, 0, 0.08)',
+                                borderColor: '#d1d5db'
+                            }}
+                        >
+                            <p className="font-sora text-[15px] lg:text-[16px] leading-[1.65] mb-auto" 
+                               style={{color: '#353a40'}}>
+                                "Conseguimos avançar significativamente na conformidade com a NR-1, estruturando um diagnóstico claro sobre organização do trabalho, clima organizacional e fatores de pressão que podem impactar a saúde mental dos colaboradores."
+                            </p>
+
+                            <div className="w-12 h-[2px] my-6" style={{background: '#e5e7eb'}} />
+
+                            <div className="mb-6">
+                                <p className="font-grotesk text-[15px] font-bold mb-0.5" style={{color: '#0d0d0d'}}>
+                                    Equipe de RH
+                                </p>
+                                <p className="font-sora text-[13px]" style={{color: '#9ca3af'}}>
+                                    BHCoSpace
+                                </p>
+                            </div>
+
+                            <div className="h-14 flex items-center justify-start">
+                                <div className="relative" style={{width: '120px', height: '40px'}}>
+                                    <Image
+                                        src="/clients/bhcoespace.png"
+                                        alt="BHCoSpace"
+                                        fill
+                                        className="object-contain object-left opacity-60 group-hover:opacity-100 transition-opacity duration-300"
+                                    />
+                                </div>
+                            </div>
+                        </motion.div>
+
+                        {/* Card 3: CTA Card */}
+                        <motion.div
+                            className="rounded-2xl p-8 lg:p-10 border-2 flex flex-col items-center justify-center text-center transition-all duration-300 hover:scale-[1.05] group"
+                            style={{
+                                borderColor: '#9BC2A6',
+                                background: 'linear-gradient(135deg, rgba(155, 194, 166, 0.08) 0%, rgba(155, 194, 166, 0.12) 100%)'
+                            }}
+                            initial={{opacity: 0, y: 30}}
+                            whileInView={{opacity: 1, y: 0}}
+                            viewport={{once: true, margin: '-50px'}}
+                            transition={{duration: 0.5, delay: 0.3}}
+                            whileHover={{
+                                boxShadow: '0 20px 40px rgba(155, 194, 166, 0.25)'
+                            }}
+                        >
+                            {/* Ícone */}
+                            <motion.div 
+                                className="w-16 h-16 rounded-2xl flex items-center justify-center mb-6"
+                                style={{background: '#9BC2A6'}}
+                                animate={{y: [0, -5, 0]}}
+                                transition={{duration: 2, repeat: Infinity, ease: 'easeInOut'}}
+                            >
+                                <svg className="w-8 h-8" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24" style={{color: '#ffffff'}}>
+                                    <path d="M12 2L2 7l10 5 10-5-10-5z"/>
+                                    <path d="M2 17l10 5 10-5"/>
+                                    <path d="M2 12l10 5 10-5"/>
+                                </svg>
+                            </motion.div>
+
+                            {/* Título */}
+                            <h3 className="font-grotesk text-[22px] lg:text-[24px] font-bold leading-[1.2] mb-4" 
+                                style={{color: '#0d0d0d'}}>
+                                Veja como sua empresa pode alcançar resultados assim
+                            </h3>
+
+                            {/* Subtítulo */}
+                            <p className="font-sora text-[15px] leading-[1.6] mb-6" 
+                               style={{color: '#6b7480'}}>
+                                Agende uma apresentação e descubra o potencial de transformação da sua organização
+                            </p>
+
+                            {/* Botão CTA */}
+                            <Link
+                                href="https://api.whatsapp.com/send/?phone=5531996955389&text=Ol%C3%A1%2C+gostaria+de+agendar+uma+apresenta%C3%A7%C3%A3o+da+plataforma&type=phone_number&app_absent=0"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="inline-flex items-center gap-2 font-sora font-semibold text-[15px] text-white px-6 py-3.5 rounded-xl transition-all duration-300 mb-4 group-hover:scale-105"
+                                style={{background: '#9BC2A6'}}
+                                onMouseEnter={(e) => {
+                                    e.currentTarget.style.background = '#7A9E89'
+                                }}
+                                onMouseLeave={(e) => {
+                                    e.currentTarget.style.background = '#9BC2A6'
+                                }}
+                            >
+                                <span>Agendar apresentação</span>
+                                <ArrowRight size={18} strokeWidth={2.5} />
+                            </Link>
+
+                            {/* Link secundário */}
+                            <a 
+                                href="#depoimentos" 
+                                className="font-sora text-[13px] font-medium transition-colors duration-200"
+                                style={{
+                                    color: '#5F8A6F',
+                                    textDecoration: 'underline',
+                                    textDecorationStyle: 'dashed',
+                                    textUnderlineOffset: '3px'
+                                }}
+                                onMouseEnter={(e) => {
+                                    e.currentTarget.style.textDecorationStyle = 'solid'
+                                }}
+                                onMouseLeave={(e) => {
+                                    e.currentTarget.style.textDecorationStyle = 'dashed'
+                                }}
+                            >
+                                Ver casos completos →
+                            </a>
+                        </motion.div>
                     </div>
                 </div>
             </section>
