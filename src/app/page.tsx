@@ -83,6 +83,9 @@ export default function HomePage() {
     const [activeBenefit, setActiveBenefit] = useState(0) // Seção 6 - Benefício ativo no scroll
     const [hoveredTestimonial, setHoveredTestimonial] = useState<string | null>(null) // Controle de hover nos depoimentos
     const [activeTestimonial, setActiveTestimonial] = useState(0) // Carrossel de depoimentos (índice ativo)
+    const [isTestimonialAutoPlaying, setIsTestimonialAutoPlaying] = useState(true) // Auto-play do carrossel de depoimentos
+    const [testimonialProgress, setTestimonialProgress] = useState(0) // Progresso do timer de depoimentos (0-100)
+    const [isTestimonialHovered, setIsTestimonialHovered] = useState(false) // Se o mouse está sobre o carrossel
     const [formData, setFormData] = useState({
         email: '',
         password: '',
@@ -176,6 +179,33 @@ export default function HomePage() {
 
         return () => clearInterval(progressInterval)
     }, [isNewsAutoPlaying, activeNewsIndex])
+
+    // Auto-play do carrossel de depoimentos (5 segundos cada) + progresso
+    useEffect(() => {
+        // Pausar se estiver com hover ou auto-play desativado
+        if (!isTestimonialAutoPlaying || isTestimonialHovered) {
+            setTestimonialProgress(0)
+            return
+        }
+
+        const duration = 5000 // 5 segundos
+        const interval = 50 // Atualizar a cada 50ms
+        let elapsed = 0
+
+        setTestimonialProgress(0)
+
+        const progressInterval = setInterval(() => {
+            elapsed += interval
+            const progress = (elapsed / duration) * 100
+            setTestimonialProgress(Math.min(progress, 100))
+
+            if (elapsed >= duration) {
+                setActiveTestimonial(prev => (prev + 1) % TESTIMONIALS_CAROUSEL.length)
+            }
+        }, interval)
+
+        return () => clearInterval(progressInterval)
+    }, [isTestimonialAutoPlaying, activeTestimonial, isTestimonialHovered])
 
     // Navegação por teclado
     useEffect(() => {
@@ -1502,13 +1532,13 @@ export default function HomePage() {
             </section>
 
             {/* ===== SEÇÃO 7: AUTORIDADE TÉCNICA (Provas Sociais) ===== */}
-            <section className="relative py-20 lg:py-32" style={{background: '#fafbfc'}}>
+            <section className="relative py-16 lg:py-24" style={{background: '#EBF3FF'}}>
                 <div className="max-w-[1400px] mx-auto px-6 lg:px-12">
                     
                     {/* Header da seção */}
-                    <div className="text-center mb-12 lg:mb-16 max-w-[900px] mx-auto">
+                    <div className="text-center mb-8 lg:mb-12 max-w-[900px] mx-auto">
                         <p className="font-sora text-[11px] font-semibold uppercase tracking-[0.1em] mb-4" 
-                           style={{color: '#5F8A6F'}}>
+                           style={{color: '#0476D9'}}>
                             Metodologia
                         </p>
                         <h2 className="font-grotesk text-[clamp(28px,3.5vw,42px)] font-bold leading-[1.15] tracking-[-0.01em] mb-6" 
@@ -1579,11 +1609,15 @@ export default function HomePage() {
                     </div>
 
                     {/* Carrossel de Depoimentos */}
-                    <div className="relative max-w-[1200px] mx-auto mb-16">
-                        {/* Container do carrossel */}
-                        <div className="relative px-4 lg:px-0" style={{minHeight: '550px'}}>
-                            <div className="flex items-center justify-center gap-6 lg:gap-8">
-                                {/* Renderizar 3 cards: anterior, atual, próximo */}
+                    <div 
+                        className="relative max-w-[900px] mx-auto mb-10"
+                        onMouseEnter={() => setIsTestimonialHovered(true)}
+                        onMouseLeave={() => setIsTestimonialHovered(false)}
+                    >
+                        {/* Container do carrossel - Cards sobrepostos */}
+                        <div className="relative px-4 lg:px-8 flex items-center justify-center" style={{minHeight: '520px'}}>
+                            <div className="relative w-full max-w-[650px] mx-auto">
+                                {/* Renderizar 3 cards: esquerdo, centro (ativo), direito */}
                                 {[-1, 0, 1].map((offset) => {
                                     const index = (activeTestimonial + offset + TESTIMONIALS_CAROUSEL.length) % TESTIMONIALS_CAROUSEL.length
                                     const testimonial = TESTIMONIALS_CAROUSEL[index]
@@ -1592,36 +1626,35 @@ export default function HomePage() {
                                     return (
                                         <motion.div
                                             key={`${testimonial.id}-${offset}`}
-                                            className="relative cursor-pointer"
+                                            className="absolute inset-0 cursor-pointer"
                                             style={{
-                                                flex: isActive ? '0 0 65%' : '0 0 20%',
-                                                maxWidth: isActive ? '750px' : '280px',
-                                                zIndex: isActive ? 10 : 1
+                                                zIndex: isActive ? 10 : offset === -1 ? 1 : 2
                                             }}
-                                            initial={{opacity: 0, scale: 0.8}}
+                                            initial={{opacity: 0}}
                                             animate={{
-                                                opacity: isActive ? 1 : 0.3,
-                                                scale: isActive ? 1 : 0.85,
-                                                filter: isActive ? 'blur(0px)' : 'blur(4px)'
+                                                opacity: isActive ? 1 : 0.4,
+                                                x: offset * 50,
+                                                scale: isActive ? 1 : 0.9,
+                                                filter: isActive ? 'blur(0px)' : 'blur(2px)'
                                             }}
-                                            transition={{duration: 0.5, ease: 'easeInOut'}}
+                                            transition={{duration: 0.4, ease: 'easeOut'}}
                                             onClick={() => !isActive && setActiveTestimonial(index)}
                                             onMouseEnter={() => isActive && setHoveredTestimonial(testimonial.id)}
                                             onMouseLeave={() => setHoveredTestimonial(null)}
                                         >
                                             <div 
-                                                className="bg-white rounded-3xl p-8 lg:p-12 border-2 transition-all duration-300 relative"
+                                                className="bg-white rounded-3xl p-8 lg:p-10 border-2 transition-all duration-300 relative"
                                                 style={{
-                                                    borderColor: isActive && testimonial.badge ? '#9BC2A6' : '#e5e7eb',
-                                                    background: isActive && testimonial.badge ? 'rgba(155, 194, 166, 0.03)' : '#ffffff',
-                                                    boxShadow: isActive ? '0 20px 40px rgba(0, 0, 0, 0.15)' : '0 4px 8px rgba(0, 0, 0, 0.05)',
+                                                    borderColor: isActive && testimonial.badge ? '#0476D9' : '#D0E4FF',
+                                                    background: '#ffffff',
+                                                    boxShadow: isActive ? '0 20px 50px rgba(4, 118, 217, 0.15)' : '0 4px 12px rgba(0, 0, 0, 0.05)',
                                                     pointerEvents: isActive ? 'auto' : 'none'
                                                 }}
                                             >
                                                 {/* Badge (se existir) */}
                                                 {testimonial.badge && isActive && (
                                                     <div className="inline-flex items-center gap-2 mb-6 px-4 py-2 rounded-full" 
-                                                         style={{background: '#9BC2A6'}}>
+                                                         style={{background: '#0476D9'}}>
                                                         <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20" style={{color: '#ffffff'}}>
                                                             <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
                                                         </svg>
@@ -1644,28 +1677,28 @@ export default function HomePage() {
                                                 )}
 
                                                 {/* Quote */}
-                                                <p className="font-sora text-[15px] lg:text-[17px] leading-[1.7] mb-8" 
+                                                <p className="font-sora text-[15px] lg:text-[16px] leading-[1.7] mb-6" 
                                                    style={{color: '#0d0d0d'}}>
                                                     {testimonial.shortQuote}
                                                 </p>
 
                                                 {/* Divisor */}
                                                 <div className="w-16 h-[2px] mb-6" 
-                                                     style={{background: isActive && testimonial.badge ? '#9BC2A6' : '#e5e7eb'}} />
+                                                     style={{background: isActive && testimonial.badge ? '#0476D9' : '#D0E4FF'}} />
 
                                                 {/* Autor e Logo */}
                                                 <div className="flex items-end justify-between flex-wrap gap-6">
                                                     <div>
-                                                        <p className="font-grotesk text-[16px] lg:text-[17px] font-bold mb-1" 
+                                                        <p className="font-grotesk text-[16px] font-bold mb-1" 
                                                            style={{color: '#0d0d0d'}}>
                                                             {testimonial.name}
                                                         </p>
-                                                        <p className="font-sora text-[13px] lg:text-[14px]" 
+                                                        <p className="font-sora text-[13px]" 
                                                            style={{color: '#6b7480'}}>
                                                             {testimonial.company}
                                                         </p>
                                                     </div>
-                                                    <div className="relative" style={{width: isActive ? '140px' : '100px', height: isActive ? '48px' : '34px'}}>
+                                                    <div className="relative" style={{width: '140px', height: '48px'}}>
                                                         <Image
                                                             src={testimonial.logo}
                                                             alt={testimonial.company}
@@ -1680,12 +1713,12 @@ export default function HomePage() {
                                                     <AnimatePresence>
                                                         {hoveredTestimonial === testimonial.id && (
                                                             <motion.div
-                                                                className="absolute inset-0 bg-white rounded-3xl p-8 lg:p-12 border-2 z-20 overflow-y-auto"
+                                                                className="absolute inset-0 bg-white rounded-3xl p-8 lg:p-10 border-2 z-20 overflow-y-auto"
                                                                 style={{
-                                                                    borderColor: '#9BC2A6',
+                                                                    borderColor: '#0476D9',
                                                                     background: 'rgba(255, 255, 255, 0.98)',
                                                                     backdropFilter: 'blur(8px)',
-                                                                    boxShadow: '0 25px 50px rgba(155, 194, 166, 0.4)'
+                                                                    boxShadow: '0 25px 50px rgba(4, 118, 217, 0.25)'
                                                                 }}
                                                                 initial={{opacity: 0}}
                                                                 animate={{opacity: 1}}
@@ -1694,7 +1727,7 @@ export default function HomePage() {
                                                             >
                                                                 {/* Badge */}
                                                                 <div className="inline-flex items-center gap-2 mb-6 px-4 py-2 rounded-full" 
-                                                                     style={{background: '#9BC2A6'}}>
+                                                                     style={{background: '#0476D9'}}>
                                                                     <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20" style={{color: '#ffffff'}}>
                                                                         <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
                                                                     </svg>
@@ -1705,23 +1738,23 @@ export default function HomePage() {
                                                                 </div>
 
                                                                 {/* Depoimento completo */}
-                                                                <div className="font-sora text-[15px] lg:text-[16px] leading-[1.8] mb-8 whitespace-pre-line" 
+                                                                <div className="font-sora text-[14px] leading-[1.7] mb-6 whitespace-pre-line" 
                                                                      style={{color: '#0d0d0d'}}>
                                                                     "{FULL_TESTIMONIALS[testimonial.id as keyof typeof FULL_TESTIMONIALS]}"
                                                                 </div>
 
                                                                 {/* Divisor */}
                                                                 <div className="w-16 h-[2px] mb-6" 
-                                                                     style={{background: '#9BC2A6'}} />
+                                                                     style={{background: '#0476D9'}} />
 
                                                                 {/* Autor e Logo */}
                                                                 <div className="flex items-end justify-between flex-wrap gap-6">
                                                                     <div>
-                                                                        <p className="font-grotesk text-[17px] font-bold mb-1" 
+                                                                        <p className="font-grotesk text-[16px] font-bold mb-1" 
                                                                            style={{color: '#0d0d0d'}}>
                                                                             {testimonial.name}
                                                                         </p>
-                                                                        <p className="font-sora text-[14px]" 
+                                                                        <p className="font-sora text-[13px]" 
                                                                            style={{color: '#6b7480'}}>
                                                                             {testimonial.company}
                                                                         </p>
@@ -1747,39 +1780,63 @@ export default function HomePage() {
 
                             {/* Setas de navegação */}
                             <button
-                                onClick={() => setActiveTestimonial((prev) => (prev - 1 + TESTIMONIALS_CAROUSEL.length) % TESTIMONIALS_CAROUSEL.length)}
-                                className="absolute left-0 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-white border-2 flex items-center justify-center transition-all duration-300 hover:scale-110 hover:bg-sage-50 z-20 shadow-lg"
-                                style={{borderColor: '#e5e7eb'}}
+                                onClick={() => {
+                                    setActiveTestimonial((prev) => (prev - 1 + TESTIMONIALS_CAROUSEL.length) % TESTIMONIALS_CAROUSEL.length)
+                                    setIsTestimonialAutoPlaying(false)
+                                }}
+                                className="absolute left-0 lg:left-4 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-white border-2 flex items-center justify-center transition-all duration-300 hover:scale-110 z-20 shadow-lg"
+                                style={{borderColor: '#D0E4FF'}}
                                 aria-label="Depoimento anterior"
                             >
-                                <ChevronLeft size={24} strokeWidth={2.5} style={{color: '#5F8A6F'}} />
+                                <ChevronLeft size={24} strokeWidth={2.5} style={{color: '#0476D9'}} />
                             </button>
 
                             <button
-                                onClick={() => setActiveTestimonial((prev) => (prev + 1) % TESTIMONIALS_CAROUSEL.length)}
-                                className="absolute right-0 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-white border-2 flex items-center justify-center transition-all duration-300 hover:scale-110 hover:bg-sage-50 z-20 shadow-lg"
-                                style={{borderColor: '#e5e7eb'}}
+                                onClick={() => {
+                                    setActiveTestimonial((prev) => (prev + 1) % TESTIMONIALS_CAROUSEL.length)
+                                    setIsTestimonialAutoPlaying(false)
+                                }}
+                                className="absolute right-0 lg:right-4 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-white border-2 flex items-center justify-center transition-all duration-300 hover:scale-110 z-20 shadow-lg"
+                                style={{borderColor: '#D0E4FF'}}
                                 aria-label="Próximo depoimento"
                             >
-                                <ChevronRight size={24} strokeWidth={2.5} style={{color: '#5F8A6F'}} />
+                                <ChevronRight size={24} strokeWidth={2.5} style={{color: '#0476D9'}} />
                             </button>
                         </div>
 
-                        {/* Indicadores (dots) */}
-                        <div className="flex items-center justify-center gap-2 mt-8">
+                        {/* Indicadores (dots) com progresso */}
+                        <div className="flex items-center justify-center gap-2 mt-6">
                             {TESTIMONIALS_CAROUSEL.map((_, index) => (
                                 <button
                                     key={index}
-                                    onClick={() => setActiveTestimonial(index)}
-                                    className="transition-all duration-300"
+                                    onClick={() => {
+                                        setActiveTestimonial(index)
+                                        setIsTestimonialAutoPlaying(false)
+                                    }}
+                                    className="relative transition-all duration-300"
                                     style={{
                                         width: activeTestimonial === index ? '32px' : '8px',
                                         height: '8px',
                                         borderRadius: '999px',
-                                        background: activeTestimonial === index ? '#9BC2A6' : '#e5e7eb'
+                                        background: activeTestimonial === index ? '#0476D9' : '#D0E4FF'
                                     }}
                                     aria-label={`Ir para depoimento ${index + 1}`}
-                                />
+                                >
+                                    {/* Barra de progresso */}
+                                    {activeTestimonial === index && (
+                                        <div 
+                                            className="absolute inset-0 rounded-full overflow-hidden"
+                                            style={{background: '#D0E4FF'}}
+                                        >
+                                            <motion.div
+                                                className="h-full"
+                                                style={{background: '#0476D9'}}
+                                                animate={{width: `${testimonialProgress}%`}}
+                                                transition={{duration: 0.05}}
+                                            />
+                                        </div>
+                                    )}
+                                </button>
                             ))}
                         </div>
                     </div>
@@ -1788,21 +1845,21 @@ export default function HomePage() {
                     <motion.div
                         className="max-w-[700px] mx-auto rounded-2xl p-8 lg:p-10 border-2 flex flex-col items-center justify-center text-center transition-all duration-300 hover:scale-[1.02]"
                         style={{
-                            borderColor: '#9BC2A6',
-                            background: 'linear-gradient(135deg, rgba(155, 194, 166, 0.08) 0%, rgba(155, 194, 166, 0.12) 100%)'
+                            borderColor: '#0476D9',
+                            background: 'linear-gradient(135deg, rgba(4, 118, 217, 0.08) 0%, rgba(4, 118, 217, 0.12) 100%)'
                         }}
                         initial={{opacity: 0, y: 30}}
                         whileInView={{opacity: 1, y: 0}}
                         viewport={{once: true, margin: '-50px'}}
                         transition={{duration: 0.5}}
                         whileHover={{
-                            boxShadow: '0 20px 40px rgba(155, 194, 166, 0.25)'
+                            boxShadow: '0 20px 40px rgba(4, 118, 217, 0.25)'
                         }}
                     >
                         {/* Ícone */}
                         <motion.div 
                             className="w-16 h-16 rounded-2xl flex items-center justify-center mb-6"
-                            style={{background: '#9BC2A6'}}
+                            style={{background: '#0476D9'}}
                             animate={{y: [0, -5, 0]}}
                             transition={{duration: 2, repeat: Infinity, ease: 'easeInOut'}}
                         >
@@ -1848,7 +1905,7 @@ export default function HomePage() {
                             href="#depoimentos" 
                             className="font-sora text-[13px] font-medium transition-colors duration-200"
                             style={{
-                                color: '#5F8A6F',
+                                color: '#0476D9',
                                 textDecoration: 'underline',
                                 textDecorationStyle: 'dashed',
                                 textUnderlineOffset: '3px'
