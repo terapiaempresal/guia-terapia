@@ -702,16 +702,22 @@ export default function HomePage() {
                             {/* Social proof — compacto */}
                             <div className="inline-flex items-center gap-4 bg-white/[0.06] backdrop-blur-sm border border-white/[0.06] rounded-2xl px-5 py-3.5 animate-fade-in-up delay-200">
                                 <div className="flex -space-x-2">
-                                    {[...Array(4)].map((_, i) => (
-                                        <div key={i} className="w-7 h-7 rounded-full bg-white/10 border-2 border-primary-800/80 flex items-center justify-center">
-                                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="1.5" opacity="0.4">
-                                                <path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2" /><circle cx="12" cy="7" r="4" />
-                                            </svg>
+                                    {[
+                                        { src: '/images/empresas/bhcospace.png', alt: 'BHCoSpace' },
+                                        { src: '/images/empresas/faculdade-eaula.png', alt: 'Faculdade EAula' },
+                                        { src: '/images/empresas/intensa-digital.png', alt: 'Intensa Digital' },
+                                        { src: '/images/empresas/promosystem.png', alt: 'Promosystem' },
+                                        { src: '/images/empresas/nasp.jpg', alt: 'Nasp' },
+                                        { src: '/images/empresas/instituto-jpr.jpg', alt: 'Instituto JPR' },
+                                        { src: '/images/empresas/sketch.jpg', alt: 'Sketch' },
+                                    ].map((logo, i) => (
+                                        <div key={i} className="w-8 h-8 rounded-full bg-white border-2 border-primary-800/80 overflow-hidden transition-all duration-200 hover:scale-110 hover:-translate-y-1 hover:z-10 relative cursor-default">
+                                            <img src={logo.src} alt={logo.alt} className="w-full h-full object-cover" />
                                         </div>
                                     ))}
                                 </div>
                                 <div className="font-sora text-[13px] leading-[1.4]">
-                                    <span className="text-white/80 font-medium">+200 empresas</span>
+                                    <span className="text-white/80 font-medium">+50 empresas</span>
                                     <span className="text-white/40 ml-1.5">já utilizam</span>
                                 </div>
                             </div>
@@ -1947,8 +1953,8 @@ export default function HomePage() {
 
                     {/* Carrossel horizontal de vídeos */}
                     <div className="relative px-8 lg:px-12">
-                        <div className="flex gap-6 lg:gap-8 justify-center items-center overflow-x-auto pb-6 snap-x snap-mandatory scrollbar-hide" 
-                             style={{scrollbarWidth: 'none', msOverflowStyle: 'none'}}>
+                        <div className="flex gap-6 lg:gap-8 justify-center items-center overflow-x-auto snap-x snap-mandatory scrollbar-hide"
+                             style={{scrollbarWidth: 'none', msOverflowStyle: 'none', paddingBottom: '80px', paddingTop: '16px'}}>
                             
                             {/* Vídeo 1 */}
                             <motion.div
