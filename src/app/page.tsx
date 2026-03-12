@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import Image from 'next/image'
 import { useToast } from '@/components/ToastProvider'
-import { ClipboardList, BarChart3, FileText, ChevronDown, ArrowRight, Shield, Activity, Users, Package, CheckCircle } from 'lucide-react'
+import { ClipboardList, BarChart3, FileText, ChevronDown, ArrowRight, Shield, Activity, Users, Package, CheckCircle, ChevronLeft, ChevronRight } from 'lucide-react'
 import { motion, useScroll, useTransform, AnimatePresence } from 'framer-motion'
 
 // Depoimentos completos para tooltips
@@ -33,6 +33,37 @@ Os resultados foram perceptíveis em diferentes níveis da organização. Houve 
 Como consequência desse ambiente organizacional mais saudável e alinhado, a empresa registrou um incremento de aproximadamente 15% nas vendas, demonstrando que a gestão adequada dos fatores psicossociais e a conformidade com a NR-1 não apenas atendem às exigências legais, mas também contribuem diretamente para o desempenho e crescimento do negócio.`
 }
 
+// Array de depoimentos para o carrossel
+const TESTIMONIALS_CAROUSEL = [
+    {
+        id: 'intensa',
+        name: 'Equipe de Gestão',
+        company: 'Intensa Mídia',
+        logo: '/clients/intensa-midia.png',
+        shortQuote: '"A plataforma transformou as respostas em inteligência organizacional, indo muito além de um relatório estático. Conseguimos identificar padrões de risco e receber recomendações estratégicas que nos ajudam a prevenir passivos trabalhistas."',
+        badge: null,
+        hasStars: true
+    },
+    {
+        id: 'bhcoespace',
+        name: 'Equipe de RH',
+        company: 'BHCoSpace',
+        logo: '/clients/bhcoespace.png',
+        shortQuote: '"Conseguimos avançar significativamente na conformidade com a NR-1, estruturando um diagnóstico claro sobre organização do trabalho, clima organizacional e fatores de pressão que podem impactar a saúde mental dos colaboradores."',
+        badge: null,
+        hasStars: true
+    },
+    {
+        id: 'sketch',
+        name: 'Gestão Executiva',
+        company: 'SKETCH Confecções',
+        logo: '/clients/sketch.png',
+        shortQuote: '"Os resultados foram perceptíveis em diferentes níveis da organização. Houve melhoria no bem-estar dos colaboradores, fortalecimento do relacionamento entre equipes e líderes, além de reflexos positivos na forma como os profissionais se relacionam com os clientes no dia a dia das operações. Como consequência desse ambiente organizacional mais saudável e alinhado, a empresa registrou um incremento de aproximadamente 15% nas vendas."',
+        badge: 'Destaque',
+        hasStars: true
+    }
+]
+
 export default function HomePage() {
     const router = useRouter()
     const { showSuccess, showError, showWarning } = useToast()
@@ -51,6 +82,7 @@ export default function HomePage() {
     const [isMobile, setIsMobile] = useState(false) // Detectar mobile para carrossel
     const [activeBenefit, setActiveBenefit] = useState(0) // Seção 6 - Benefício ativo no scroll
     const [hoveredTestimonial, setHoveredTestimonial] = useState<string | null>(null) // Controle de hover nos depoimentos
+    const [activeTestimonial, setActiveTestimonial] = useState(0) // Carrossel de depoimentos (índice ativo)
     const [formData, setFormData] = useState({
         email: '',
         password: '',
@@ -1546,421 +1578,295 @@ export default function HomePage() {
                         </motion.div>
                     </div>
 
-                    {/* HERO TESTIMONIAL - SKETCH (Destaque) */}
+                    {/* Carrossel de Depoimentos */}
+                    <div className="relative max-w-[1200px] mx-auto mb-16">
+                        {/* Container do carrossel */}
+                        <div className="relative px-4 lg:px-0" style={{minHeight: '550px'}}>
+                            <div className="flex items-center justify-center gap-6 lg:gap-8">
+                                {/* Renderizar 3 cards: anterior, atual, próximo */}
+                                {[-1, 0, 1].map((offset) => {
+                                    const index = (activeTestimonial + offset + TESTIMONIALS_CAROUSEL.length) % TESTIMONIALS_CAROUSEL.length
+                                    const testimonial = TESTIMONIALS_CAROUSEL[index]
+                                    const isActive = offset === 0
+                                    
+                                    return (
+                                        <motion.div
+                                            key={`${testimonial.id}-${offset}`}
+                                            className="relative cursor-pointer"
+                                            style={{
+                                                flex: isActive ? '0 0 65%' : '0 0 20%',
+                                                maxWidth: isActive ? '750px' : '280px',
+                                                zIndex: isActive ? 10 : 1
+                                            }}
+                                            initial={{opacity: 0, scale: 0.8}}
+                                            animate={{
+                                                opacity: isActive ? 1 : 0.3,
+                                                scale: isActive ? 1 : 0.85,
+                                                filter: isActive ? 'blur(0px)' : 'blur(4px)'
+                                            }}
+                                            transition={{duration: 0.5, ease: 'easeInOut'}}
+                                            onClick={() => !isActive && setActiveTestimonial(index)}
+                                            onMouseEnter={() => isActive && setHoveredTestimonial(testimonial.id)}
+                                            onMouseLeave={() => setHoveredTestimonial(null)}
+                                        >
+                                            <div 
+                                                className="bg-white rounded-3xl p-8 lg:p-12 border-2 transition-all duration-300 relative"
+                                                style={{
+                                                    borderColor: isActive && testimonial.badge ? '#9BC2A6' : '#e5e7eb',
+                                                    background: isActive && testimonial.badge ? 'rgba(155, 194, 166, 0.03)' : '#ffffff',
+                                                    boxShadow: isActive ? '0 20px 40px rgba(0, 0, 0, 0.15)' : '0 4px 8px rgba(0, 0, 0, 0.05)',
+                                                    pointerEvents: isActive ? 'auto' : 'none'
+                                                }}
+                                            >
+                                                {/* Badge (se existir) */}
+                                                {testimonial.badge && isActive && (
+                                                    <div className="inline-flex items-center gap-2 mb-6 px-4 py-2 rounded-full" 
+                                                         style={{background: '#9BC2A6'}}>
+                                                        <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20" style={{color: '#ffffff'}}>
+                                                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                                                        </svg>
+                                                        <span className="font-sora text-[11px] font-bold uppercase tracking-wider" 
+                                                              style={{color: '#ffffff'}}>
+                                                            {testimonial.badge}
+                                                        </span>
+                                                    </div>
+                                                )}
+
+                                                {/* Estrelas (rating visual) */}
+                                                {testimonial.hasStars && isActive && (
+                                                    <div className="flex gap-1 mb-6">
+                                                        {[...Array(5)].map((_, i) => (
+                                                            <svg key={i} className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20" style={{color: '#FFC107'}}>
+                                                                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                                                            </svg>
+                                                        ))}
+                                                    </div>
+                                                )}
+
+                                                {/* Quote */}
+                                                <p className="font-sora text-[15px] lg:text-[17px] leading-[1.7] mb-8" 
+                                                   style={{color: '#0d0d0d'}}>
+                                                    {testimonial.shortQuote}
+                                                </p>
+
+                                                {/* Divisor */}
+                                                <div className="w-16 h-[2px] mb-6" 
+                                                     style={{background: isActive && testimonial.badge ? '#9BC2A6' : '#e5e7eb'}} />
+
+                                                {/* Autor e Logo */}
+                                                <div className="flex items-end justify-between flex-wrap gap-6">
+                                                    <div>
+                                                        <p className="font-grotesk text-[16px] lg:text-[17px] font-bold mb-1" 
+                                                           style={{color: '#0d0d0d'}}>
+                                                            {testimonial.name}
+                                                        </p>
+                                                        <p className="font-sora text-[13px] lg:text-[14px]" 
+                                                           style={{color: '#6b7480'}}>
+                                                            {testimonial.company}
+                                                        </p>
+                                                    </div>
+                                                    <div className="relative" style={{width: isActive ? '140px' : '100px', height: isActive ? '48px' : '34px'}}>
+                                                        <Image
+                                                            src={testimonial.logo}
+                                                            alt={testimonial.company}
+                                                            fill
+                                                            className="object-contain object-right opacity-70"
+                                                        />
+                                                    </div>
+                                                </div>
+
+                                                {/* Tooltip com depoimento completo (somente no card ativo) */}
+                                                {isActive && (
+                                                    <AnimatePresence>
+                                                        {hoveredTestimonial === testimonial.id && (
+                                                            <motion.div
+                                                                className="absolute inset-0 bg-white rounded-3xl p-8 lg:p-12 border-2 z-20 overflow-y-auto"
+                                                                style={{
+                                                                    borderColor: '#9BC2A6',
+                                                                    background: 'rgba(255, 255, 255, 0.98)',
+                                                                    backdropFilter: 'blur(8px)',
+                                                                    boxShadow: '0 25px 50px rgba(155, 194, 166, 0.4)'
+                                                                }}
+                                                                initial={{opacity: 0}}
+                                                                animate={{opacity: 1}}
+                                                                exit={{opacity: 0}}
+                                                                transition={{duration: 0.2}}
+                                                            >
+                                                                {/* Badge */}
+                                                                <div className="inline-flex items-center gap-2 mb-6 px-4 py-2 rounded-full" 
+                                                                     style={{background: '#9BC2A6'}}>
+                                                                    <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20" style={{color: '#ffffff'}}>
+                                                                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                                                                    </svg>
+                                                                    <span className="font-sora text-[11px] font-bold uppercase tracking-wider" 
+                                                                          style={{color: '#ffffff'}}>
+                                                                        Depoimento Completo
+                                                                    </span>
+                                                                </div>
+
+                                                                {/* Depoimento completo */}
+                                                                <div className="font-sora text-[15px] lg:text-[16px] leading-[1.8] mb-8 whitespace-pre-line" 
+                                                                     style={{color: '#0d0d0d'}}>
+                                                                    "{FULL_TESTIMONIALS[testimonial.id as keyof typeof FULL_TESTIMONIALS]}"
+                                                                </div>
+
+                                                                {/* Divisor */}
+                                                                <div className="w-16 h-[2px] mb-6" 
+                                                                     style={{background: '#9BC2A6'}} />
+
+                                                                {/* Autor e Logo */}
+                                                                <div className="flex items-end justify-between flex-wrap gap-6">
+                                                                    <div>
+                                                                        <p className="font-grotesk text-[17px] font-bold mb-1" 
+                                                                           style={{color: '#0d0d0d'}}>
+                                                                            {testimonial.name}
+                                                                        </p>
+                                                                        <p className="font-sora text-[14px]" 
+                                                                           style={{color: '#6b7480'}}>
+                                                                            {testimonial.company}
+                                                                        </p>
+                                                                    </div>
+                                                                    <div className="relative" style={{width: '140px', height: '48px'}}>
+                                                                        <Image
+                                                                            src={testimonial.logo}
+                                                                            alt={testimonial.company}
+                                                                            fill
+                                                                            className="object-contain object-right opacity-70"
+                                                                        />
+                                                                    </div>
+                                                                </div>
+                                                            </motion.div>
+                                                        )}
+                                                    </AnimatePresence>
+                                                )}
+                                            </div>
+                                        </motion.div>
+                                    )
+                                })}
+                            </div>
+
+                            {/* Setas de navegação */}
+                            <button
+                                onClick={() => setActiveTestimonial((prev) => (prev - 1 + TESTIMONIALS_CAROUSEL.length) % TESTIMONIALS_CAROUSEL.length)}
+                                className="absolute left-0 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-white border-2 flex items-center justify-center transition-all duration-300 hover:scale-110 hover:bg-sage-50 z-20 shadow-lg"
+                                style={{borderColor: '#e5e7eb'}}
+                                aria-label="Depoimento anterior"
+                            >
+                                <ChevronLeft size={24} strokeWidth={2.5} style={{color: '#5F8A6F'}} />
+                            </button>
+
+                            <button
+                                onClick={() => setActiveTestimonial((prev) => (prev + 1) % TESTIMONIALS_CAROUSEL.length)}
+                                className="absolute right-0 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-white border-2 flex items-center justify-center transition-all duration-300 hover:scale-110 hover:bg-sage-50 z-20 shadow-lg"
+                                style={{borderColor: '#e5e7eb'}}
+                                aria-label="Próximo depoimento"
+                            >
+                                <ChevronRight size={24} strokeWidth={2.5} style={{color: '#5F8A6F'}} />
+                            </button>
+                        </div>
+
+                        {/* Indicadores (dots) */}
+                        <div className="flex items-center justify-center gap-2 mt-8">
+                            {TESTIMONIALS_CAROUSEL.map((_, index) => (
+                                <button
+                                    key={index}
+                                    onClick={() => setActiveTestimonial(index)}
+                                    className="transition-all duration-300"
+                                    style={{
+                                        width: activeTestimonial === index ? '32px' : '8px',
+                                        height: '8px',
+                                        borderRadius: '999px',
+                                        background: activeTestimonial === index ? '#9BC2A6' : '#e5e7eb'
+                                    }}
+                                    aria-label={`Ir para depoimento ${index + 1}`}
+                                />
+                            ))}
+                        </div>
+                    </div>
+
+                    {/* CTA Card */}
                     <motion.div
-                        className="mb-12 lg:mb-16"
+                        className="max-w-[700px] mx-auto rounded-2xl p-8 lg:p-10 border-2 flex flex-col items-center justify-center text-center transition-all duration-300 hover:scale-[1.02]"
+                        style={{
+                            borderColor: '#9BC2A6',
+                            background: 'linear-gradient(135deg, rgba(155, 194, 166, 0.08) 0%, rgba(155, 194, 166, 0.12) 100%)'
+                        }}
                         initial={{opacity: 0, y: 30}}
                         whileInView={{opacity: 1, y: 0}}
                         viewport={{once: true, margin: '-50px'}}
-                        transition={{duration: 0.6, ease: 'easeOut'}}
-                        onMouseEnter={() => setHoveredTestimonial('sketch')}
-                        onMouseLeave={() => setHoveredTestimonial(null)}
+                        transition={{duration: 0.5}}
+                        whileHover={{
+                            boxShadow: '0 20px 40px rgba(155, 194, 166, 0.25)'
+                        }}
                     >
-                        <div 
-                            className="relative bg-white rounded-3xl p-10 lg:p-12 border-2 transition-all duration-300 cursor-pointer"
-                            style={{
-                                borderColor: '#9BC2A6',
-                                background: 'rgba(155, 194, 166, 0.03)'
+                        {/* Ícone */}
+                        <motion.div 
+                            className="w-16 h-16 rounded-2xl flex items-center justify-center mb-6"
+                            style={{background: '#9BC2A6'}}
+                            animate={{y: [0, -5, 0]}}
+                            transition={{duration: 2, repeat: Infinity, ease: 'easeInOut'}}
+                        >
+                            <svg className="w-8 h-8" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24" style={{color: '#ffffff'}}>
+                                <path d="M12 2L2 7l10 5 10-5-10-5z"/>
+                                <path d="M2 17l10 5 10-5"/>
+                                <path d="M2 12l10 5 10-5"/>
+                            </svg>
+                        </motion.div>
+
+                        {/* Título */}
+                        <h3 className="font-grotesk text-[22px] lg:text-[24px] font-bold leading-[1.2] mb-4" 
+                            style={{color: '#0d0d0d'}}>
+                            Veja como sua empresa pode alcançar resultados assim
+                        </h3>
+
+                        {/* Subtítulo */}
+                        <p className="font-sora text-[15px] leading-[1.6] mb-6" 
+                           style={{color: '#6b7480'}}>
+                            Agende uma apresentação e descubra o potencial de transformação da sua organização
+                        </p>
+
+                        {/* Botão CTA */}
+                        <Link
+                            href="https://api.whatsapp.com/send/?phone=5531996955389&text=Ol%C3%A1%2C+gostaria+de+agendar+uma+apresenta%C3%A7%C3%A3o+da+plataforma&type=phone_number&app_absent=0"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center gap-2 font-sora font-semibold text-[15px] text-white px-6 py-3.5 rounded-xl transition-all duration-300 mb-4 hover:scale-105"
+                            style={{background: '#9BC2A6'}}
+                            onMouseEnter={(e) => {
+                                e.currentTarget.style.background = '#7A9E89'
+                            }}
+                            onMouseLeave={(e) => {
+                                e.currentTarget.style.background = '#9BC2A6'
                             }}
                         >
-                            {/* Badge Destaque */}
-                            <div className="inline-flex items-center gap-2 mb-6 px-4 py-2 rounded-full" 
-                                 style={{background: '#9BC2A6'}}>
-                                <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20" style={{color: '#ffffff'}}>
-                                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
-                                </svg>
-                                <span className="font-sora text-[11px] font-bold uppercase tracking-wider" 
-                                      style={{color: '#ffffff'}}>
-                                    Destaque
-                                </span>
-                            </div>
+                            <span>Agendar apresentação</span>
+                            <ArrowRight size={18} strokeWidth={2.5} />
+                        </Link>
 
-                            {/* Quote */}
-                            <p className="font-sora text-[17px] lg:text-[19px] leading-[1.7] mb-8" 
-                               style={{color: '#0d0d0d'}}>
-                                "Os resultados foram perceptíveis em diferentes níveis da organização. Houve melhoria no bem-estar dos colaboradores, fortalecimento do relacionamento entre equipes e líderes, além de reflexos positivos na forma como os profissionais se relacionam com os clientes no dia a dia das operações. Como consequência desse ambiente organizacional mais saudável e alinhado, a empresa registrou um incremento de aproximadamente 15% nas vendas."
-                            </p>
-
-                            {/* Divisor */}
-                            <div className="w-16 h-[2px] mb-6" 
-                                 style={{background: '#9BC2A6'}} />
-
-                            {/* Autor e Logo */}
-                            <div className="flex items-end justify-between flex-wrap gap-6">
-                                <div>
-                                    <p className="font-grotesk text-[17px] font-bold mb-1" 
-                                       style={{color: '#0d0d0d'}}>
-                                        Gestão Executiva
-                                    </p>
-                                    <p className="font-sora text-[14px]" 
-                                       style={{color: '#6b7480'}}>
-                                        SKETCH Confecções
-                                    </p>
-                                </div>
-                                <div className="relative" style={{width: '140px', height: '48px'}}>
-                                    <Image
-                                        src="/clients/sketch.png"
-                                        alt="SKETCH Confecções"
-                                        fill
-                                        className="object-contain object-right opacity-70"
-                                    />
-                                </div>
-                            </div>
-
-                            {/* Tooltip com depoimento completo */}
-                            <AnimatePresence>
-                                {hoveredTestimonial === 'sketch' && (
-                                    <motion.div
-                                        className="absolute inset-0 bg-white rounded-3xl p-10 lg:p-12 border-2 z-10 overflow-y-auto"
-                                        style={{
-                                            borderColor: '#9BC2A6',
-                                            background: 'rgba(255, 255, 255, 0.98)',
-                                            backdropFilter: 'blur(8px)',
-                                            boxShadow: '0 25px 50px rgba(155, 194, 166, 0.3)'
-                                        }}
-                                        initial={{opacity: 0}}
-                                        animate={{opacity: 1}}
-                                        exit={{opacity: 0}}
-                                        transition={{duration: 0.2}}
-                                    >
-                                        {/* Badge Destaque */}
-                                        <div className="inline-flex items-center gap-2 mb-6 px-4 py-2 rounded-full" 
-                                             style={{background: '#9BC2A6'}}>
-                                            <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20" style={{color: '#ffffff'}}>
-                                                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
-                                            </svg>
-                                            <span className="font-sora text-[11px] font-bold uppercase tracking-wider" 
-                                                  style={{color: '#ffffff'}}>
-                                                Depoimento Completo
-                                            </span>
-                                        </div>
-
-                                        {/* Depoimento completo */}
-                                        <div className="font-sora text-[15px] lg:text-[16px] leading-[1.8] mb-8 whitespace-pre-line" 
-                                             style={{color: '#0d0d0d'}}>
-                                            "{FULL_TESTIMONIALS.sketch}"
-                                        </div>
-
-                                        {/* Divisor */}
-                                        <div className="w-16 h-[2px] mb-6" 
-                                             style={{background: '#9BC2A6'}} />
-
-                                        {/* Autor e Logo */}
-                                        <div className="flex items-end justify-between flex-wrap gap-6">
-                                            <div>
-                                                <p className="font-grotesk text-[17px] font-bold mb-1" 
-                                                   style={{color: '#0d0d0d'}}>
-                                                    Gestão Executiva
-                                                </p>
-                                                <p className="font-sora text-[14px]" 
-                                                   style={{color: '#6b7480'}}>
-                                                    SKETCH Confecções
-                                                </p>
-                                            </div>
-                                            <div className="relative" style={{width: '140px', height: '48px'}}>
-                                                <Image
-                                                    src="/clients/sketch.png"
-                                                    alt="SKETCH Confecções"
-                                                    fill
-                                                    className="object-contain object-right opacity-70"
-                                                />
-                                            </div>
-                                        </div>
-                                    </motion.div>
-                                )}
-                            </AnimatePresence>
-                        </div>
+                        {/* Link secundário */}
+                        <a 
+                            href="#depoimentos" 
+                            className="font-sora text-[13px] font-medium transition-colors duration-200"
+                            style={{
+                                color: '#5F8A6F',
+                                textDecoration: 'underline',
+                                textDecorationStyle: 'dashed',
+                                textUnderlineOffset: '3px'
+                            }}
+                            onMouseEnter={(e) => {
+                                e.currentTarget.style.textDecorationStyle = 'solid'
+                            }}
+                            onMouseLeave={(e) => {
+                                e.currentTarget.style.textDecorationStyle = 'dashed'
+                            }}
+                        >
+                            Ver casos completos →
+                        </a>
                     </motion.div>
-
-                    {/* Grid de Depoimentos (2 cards normais + 1 CTA card) */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                        {/* Card 1: Intensa Mídia */}
-                        <motion.div
-                            className="bg-white rounded-2xl p-8 lg:p-10 border transition-all duration-300 hover:scale-[1.02] group flex flex-col cursor-pointer relative"
-                            style={{borderColor: '#e5e7eb'}}
-                            initial={{opacity: 0, y: 30}}
-                            whileInView={{opacity: 1, y: 0}}
-                            viewport={{once: true, margin: '-50px'}}
-                            transition={{duration: 0.5, delay: 0}}
-                            whileHover={{
-                                boxShadow: '0 12px 30px rgba(0, 0, 0, 0.08)',
-                                borderColor: '#d1d5db'
-                            }}
-                            onMouseEnter={() => setHoveredTestimonial('intensa')}
-                            onMouseLeave={() => setHoveredTestimonial(null)}
-                        >
-                            <p className="font-sora text-[15px] lg:text-[16px] leading-[1.65] mb-auto" 
-                               style={{color: '#353a40'}}>
-                                "A plataforma transformou as respostas em inteligência organizacional, indo muito além de um relatório estático. Conseguimos identificar padrões de risco e receber recomendações estratégicas que nos ajudam a prevenir passivos trabalhistas."
-                            </p>
-
-                            <div className="w-12 h-[2px] my-6" style={{background: '#e5e7eb'}} />
-
-                            <div className="mb-6">
-                                <p className="font-grotesk text-[15px] font-bold mb-0.5" style={{color: '#0d0d0d'}}>
-                                    Equipe de Gestão
-                                </p>
-                                <p className="font-sora text-[13px]" style={{color: '#9ca3af'}}>
-                                    Intensa Mídia
-                                </p>
-                            </div>
-
-                            <div className="h-14 flex items-center justify-start">
-                                <div className="relative" style={{width: '120px', height: '40px'}}>
-                                    <Image
-                                        src="/clients/intensa-midia.png"
-                                        alt="Intensa Mídia"
-                                        fill
-                                        className="object-contain object-left opacity-60 group-hover:opacity-100 transition-opacity duration-300"
-                                    />
-                                </div>
-                            </div>
-
-                            {/* Tooltip com depoimento completo */}
-                            <AnimatePresence>
-                                {hoveredTestimonial === 'intensa' && (
-                                    <motion.div
-                                        className="absolute inset-0 bg-white rounded-2xl p-8 lg:p-10 border-2 z-10 overflow-y-auto"
-                                        style={{
-                                            borderColor: '#9BC2A6',
-                                            background: 'rgba(255, 255, 255, 0.98)',
-                                            backdropFilter: 'blur(8px)',
-                                            boxShadow: '0 25px 50px rgba(155, 194, 166, 0.3)'
-                                        }}
-                                        initial={{opacity: 0, scale: 0.95}}
-                                        animate={{opacity: 1, scale: 1}}
-                                        exit={{opacity: 0, scale: 0.95}}
-                                        transition={{duration: 0.2}}
-                                    >
-                                        {/* Badge */}
-                                        <div className="inline-flex items-center gap-2 mb-4 px-3 py-1.5 rounded-full" 
-                                             style={{background: '#9BC2A6'}}>
-                                            <span className="font-sora text-[10px] font-bold uppercase tracking-wider" 
-                                                  style={{color: '#ffffff'}}>
-                                                Depoimento Completo
-                                            </span>
-                                        </div>
-
-                                        {/* Depoimento completo */}
-                                        <div className="font-sora text-[14px] leading-[1.7] mb-6 whitespace-pre-line" 
-                                             style={{color: '#0d0d0d'}}>
-                                            "{FULL_TESTIMONIALS.intensa}"
-                                        </div>
-
-                                        {/* Divisor */}
-                                        <div className="w-12 h-[2px] mb-4" 
-                                             style={{background: '#9BC2A6'}} />
-
-                                        {/* Autor e Logo */}
-                                        <div className="mb-4">
-                                            <p className="font-grotesk text-[15px] font-bold mb-0.5" style={{color: '#0d0d0d'}}>
-                                                Equipe de Gestão
-                                            </p>
-                                            <p className="font-sora text-[13px]" style={{color: '#9ca3af'}}>
-                                                Intensa Mídia
-                                            </p>
-                                        </div>
-
-                                        <div className="h-14 flex items-center justify-start">
-                                            <div className="relative" style={{width: '120px', height: '40px'}}>
-                                                <Image
-                                                    src="/clients/intensa-midia.png"
-                                                    alt="Intensa Mídia"
-                                                    fill
-                                                    className="object-contain object-left opacity-70"
-                                                />
-                                            </div>
-                                        </div>
-                                    </motion.div>
-                                )}
-                            </AnimatePresence>
-                        </motion.div>
-
-                        {/* Card 2: BHCoSpace */}
-                        <motion.div
-                            className="bg-white rounded-2xl p-8 lg:p-10 border transition-all duration-300 hover:scale-[1.02] group flex flex-col cursor-pointer relative"
-                            style={{borderColor: '#e5e7eb'}}
-                            initial={{opacity: 0, y: 30}}
-                            whileInView={{opacity: 1, y: 0}}
-                            viewport={{once: true, margin: '-50px'}}
-                            transition={{duration: 0.5, delay: 0.15}}
-                            whileHover={{
-                                boxShadow: '0 12px 30px rgba(0, 0, 0, 0.08)',
-                                borderColor: '#d1d5db'
-                            }}
-                            onMouseEnter={() => setHoveredTestimonial('bhcoespace')}
-                            onMouseLeave={() => setHoveredTestimonial(null)}
-                        >
-                            <p className="font-sora text-[15px] lg:text-[16px] leading-[1.65] mb-auto" 
-                               style={{color: '#353a40'}}>
-                                "Conseguimos avançar significativamente na conformidade com a NR-1, estruturando um diagnóstico claro sobre organização do trabalho, clima organizacional e fatores de pressão que podem impactar a saúde mental dos colaboradores."
-                            </p>
-
-                            <div className="w-12 h-[2px] my-6" style={{background: '#e5e7eb'}} />
-
-                            <div className="mb-6">
-                                <p className="font-grotesk text-[15px] font-bold mb-0.5" style={{color: '#0d0d0d'}}>
-                                    Equipe de RH
-                                </p>
-                                <p className="font-sora text-[13px]" style={{color: '#9ca3af'}}>
-                                    BHCoSpace
-                                </p>
-                            </div>
-
-                            <div className="h-14 flex items-center justify-start">
-                                <div className="relative" style={{width: '120px', height: '40px'}}>
-                                    <Image
-                                        src="/clients/bhcoespace.png"
-                                        alt="BHCoSpace"
-                                        fill
-                                        className="object-contain object-left opacity-60 group-hover:opacity-100 transition-opacity duration-300"
-                                    />
-                                </div>
-                            </div>
-
-                            {/* Tooltip com depoimento completo */}
-                            <AnimatePresence>
-                                {hoveredTestimonial === 'bhcoespace' && (
-                                    <motion.div
-                                        className="absolute inset-0 bg-white rounded-2xl p-8 lg:p-10 border-2 z-10 overflow-y-auto"
-                                        style={{
-                                            borderColor: '#9BC2A6',
-                                            background: 'rgba(255, 255, 255, 0.98)',
-                                            backdropFilter: 'blur(8px)',
-                                            boxShadow: '0 25px 50px rgba(155, 194, 166, 0.3)'
-                                        }}
-                                        initial={{opacity: 0, scale: 0.95}}
-                                        animate={{opacity: 1, scale: 1}}
-                                        exit={{opacity: 0, scale: 0.95}}
-                                        transition={{duration: 0.2}}
-                                    >
-                                        {/* Badge */}
-                                        <div className="inline-flex items-center gap-2 mb-4 px-3 py-1.5 rounded-full" 
-                                             style={{background: '#9BC2A6'}}>
-                                            <span className="font-sora text-[10px] font-bold uppercase tracking-wider" 
-                                                  style={{color: '#ffffff'}}>
-                                                Depoimento Completo
-                                            </span>
-                                        </div>
-
-                                        {/* Depoimento completo */}
-                                        <div className="font-sora text-[14px] leading-[1.7] mb-6 whitespace-pre-line" 
-                                             style={{color: '#0d0d0d'}}>
-                                            "{FULL_TESTIMONIALS.bhcoespace}"
-                                        </div>
-
-                                        {/* Divisor */}
-                                        <div className="w-12 h-[2px] mb-4" 
-                                             style={{background: '#9BC2A6'}} />
-
-                                        {/* Autor e Logo */}
-                                        <div className="mb-4">
-                                            <p className="font-grotesk text-[15px] font-bold mb-0.5" style={{color: '#0d0d0d'}}>
-                                                Equipe de RH
-                                            </p>
-                                            <p className="font-sora text-[13px]" style={{color: '#9ca3af'}}>
-                                                BHCoSpace
-                                            </p>
-                                        </div>
-
-                                        <div className="h-14 flex items-center justify-start">
-                                            <div className="relative" style={{width: '120px', height: '40px'}}>
-                                                <Image
-                                                    src="/clients/bhcoespace.png"
-                                                    alt="BHCoSpace"
-                                                    fill
-                                                    className="object-contain object-left opacity-70"
-                                                />
-                                            </div>
-                                        </div>
-                                    </motion.div>
-                                )}
-                            </AnimatePresence>
-                        </motion.div>
-
-                        {/* Card 3: CTA Card */}
-                        <motion.div
-                            className="rounded-2xl p-8 lg:p-10 border-2 flex flex-col items-center justify-center text-center transition-all duration-300 hover:scale-[1.05] group"
-                            style={{
-                                borderColor: '#9BC2A6',
-                                background: 'linear-gradient(135deg, rgba(155, 194, 166, 0.08) 0%, rgba(155, 194, 166, 0.12) 100%)'
-                            }}
-                            initial={{opacity: 0, y: 30}}
-                            whileInView={{opacity: 1, y: 0}}
-                            viewport={{once: true, margin: '-50px'}}
-                            transition={{duration: 0.5, delay: 0.3}}
-                            whileHover={{
-                                boxShadow: '0 20px 40px rgba(155, 194, 166, 0.25)'
-                            }}
-                        >
-                            {/* Ícone */}
-                            <motion.div 
-                                className="w-16 h-16 rounded-2xl flex items-center justify-center mb-6"
-                                style={{background: '#9BC2A6'}}
-                                animate={{y: [0, -5, 0]}}
-                                transition={{duration: 2, repeat: Infinity, ease: 'easeInOut'}}
-                            >
-                                <svg className="w-8 h-8" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24" style={{color: '#ffffff'}}>
-                                    <path d="M12 2L2 7l10 5 10-5-10-5z"/>
-                                    <path d="M2 17l10 5 10-5"/>
-                                    <path d="M2 12l10 5 10-5"/>
-                                </svg>
-                            </motion.div>
-
-                            {/* Título */}
-                            <h3 className="font-grotesk text-[22px] lg:text-[24px] font-bold leading-[1.2] mb-4" 
-                                style={{color: '#0d0d0d'}}>
-                                Veja como sua empresa pode alcançar resultados assim
-                            </h3>
-
-                            {/* Subtítulo */}
-                            <p className="font-sora text-[15px] leading-[1.6] mb-6" 
-                               style={{color: '#6b7480'}}>
-                                Agende uma apresentação e descubra o potencial de transformação da sua organização
-                            </p>
-
-                            {/* Botão CTA */}
-                            <Link
-                                href="https://api.whatsapp.com/send/?phone=5531996955389&text=Ol%C3%A1%2C+gostaria+de+agendar+uma+apresenta%C3%A7%C3%A3o+da+plataforma&type=phone_number&app_absent=0"
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="inline-flex items-center gap-2 font-sora font-semibold text-[15px] text-white px-6 py-3.5 rounded-xl transition-all duration-300 mb-4 group-hover:scale-105"
-                                style={{background: '#9BC2A6'}}
-                                onMouseEnter={(e) => {
-                                    e.currentTarget.style.background = '#7A9E89'
-                                }}
-                                onMouseLeave={(e) => {
-                                    e.currentTarget.style.background = '#9BC2A6'
-                                }}
-                            >
-                                <span>Agendar apresentação</span>
-                                <ArrowRight size={18} strokeWidth={2.5} />
-                            </Link>
-
-                            {/* Link secundário */}
-                            <a 
-                                href="#depoimentos" 
-                                className="font-sora text-[13px] font-medium transition-colors duration-200"
-                                style={{
-                                    color: '#5F8A6F',
-                                    textDecoration: 'underline',
-                                    textDecorationStyle: 'dashed',
-                                    textUnderlineOffset: '3px'
-                                }}
-                                onMouseEnter={(e) => {
-                                    e.currentTarget.style.textDecorationStyle = 'solid'
-                                }}
-                                onMouseLeave={(e) => {
-                                    e.currentTarget.style.textDecorationStyle = 'dashed'
-                                }}
-                            >
-                                Ver casos completos →
-                            </a>
-                        </motion.div>
-                    </div>
                 </div>
             </section>
 
+            {/* ===== SEÇÃO 8: FAQ ===== */}
             {/* ===== SEÇÃO 8: FAQ ===== */}
             <section className="bg-white py-20 lg:py-28">
                 <div className="max-w-[960px] mx-auto px-8 lg:px-12">
