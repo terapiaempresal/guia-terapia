@@ -18,6 +18,11 @@ const spaceGrotesk = Space_Grotesk({
 export const metadata: Metadata = {
     title: 'Terapia Empresarial - Inteligencia Organizacional com Conformidade Legal',
     description: 'Mais que um laudo. Uma solucao estrategica para saude mental corporativa. Atendimento a NR-1, mapeamento de riscos psicossociais e plataforma pratica.',
+    icons: {
+        icon: '/favicon.png',
+        shortcut: '/favicon.png',
+        apple: '/favicon.png',
+    },
 }
 
 export default function RootLayout({

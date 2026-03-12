@@ -7,6 +7,10 @@
 @import '../styles/animations.css';
 
 @layer base {
+    html {
+        scroll-behavior: smooth;
+    }
+    
     body {
         @apply text-primary-600 bg-white antialiased;
         -webkit-font-smoothing: antialiased;

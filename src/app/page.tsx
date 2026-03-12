@@ -1044,7 +1044,7 @@ export default function HomePage() {
             </section>
 
             {/* ===== SEÇÃO 5: COMO FUNCIONA O PRODUTO ===== */}
-            <section className="relative pt-20 pb-12 lg:pt-32 lg:pb-16 overflow-hidden" style={{background: '#ffffff'}}>
+            <section id="diagnostico" className="relative pt-20 pb-12 lg:pt-32 lg:pb-16 overflow-hidden" style={{background: '#ffffff'}}>
                 <div className="max-w-[1360px] mx-auto px-8 lg:px-12 relative z-10">
                     {/* Header da seção */}
                     <div className="mb-16 text-center lg:text-left">
@@ -1320,7 +1320,7 @@ export default function HomePage() {
             </section>
 
             {/* ===== SEÇÃO 6: BENEFÍCIOS (Scroll Progressivo estilo Humble) ===== */}
-            <section className="relative pt-12 pb-20 lg:pt-16 lg:pb-32" style={{background: '#ffffff'}}>
+            <section id="jornada" className="relative pt-12 pb-20 lg:pt-16 lg:pb-32" style={{background: '#ffffff'}}>
                 <div className="max-w-[1400px] mx-auto px-6 lg:px-12">
                     {/* Header da seção */}
                     <div className="mb-16 lg:mb-24 text-center">
@@ -1532,13 +1532,13 @@ export default function HomePage() {
             </section>
 
             {/* ===== SEÇÃO 7: AUTORIDADE TÉCNICA (Provas Sociais) ===== */}
-            <section className="relative py-16 lg:py-24" style={{background: '#EBF3FF'}}>
+            <section id="depoimentos" className="relative py-16 lg:py-24" style={{background: '#fafbfc'}}>
                 <div className="max-w-[1400px] mx-auto px-6 lg:px-12">
                     
                     {/* Header da seção */}
                     <div className="text-center mb-8 lg:mb-12 max-w-[900px] mx-auto">
                         <p className="font-sora text-[11px] font-semibold uppercase tracking-[0.1em] mb-4" 
-                           style={{color: '#0476D9'}}>
+                           style={{color: '#5F8A6F'}}>
                             Metodologia
                         </p>
                         <h2 className="font-grotesk text-[clamp(28px,3.5vw,42px)] font-bold leading-[1.15] tracking-[-0.01em] mb-6" 
@@ -1567,7 +1567,7 @@ export default function HomePage() {
                     </div>
 
                     {/* Carrossel infinito de logos (marquee → direita) */}
-                    <div className="mb-16 lg:mb-20 overflow-hidden relative py-8">
+                    <div className="mb-10 lg:mb-12 overflow-hidden relative py-8">
                         <motion.div 
                             className="flex gap-16 items-center"
                             animate={{x: ['0%', '-50%']}}
@@ -1610,14 +1610,14 @@ export default function HomePage() {
 
                     {/* Carrossel de Depoimentos */}
                     <div 
-                        className="relative max-w-[900px] mx-auto mb-10"
+                        className="relative max-w-[1100px] mx-auto mb-10"
                         onMouseEnter={() => setIsTestimonialHovered(true)}
                         onMouseLeave={() => setIsTestimonialHovered(false)}
                     >
-                        {/* Container do carrossel - Cards sobrepostos */}
-                        <div className="relative px-4 lg:px-8 flex items-center justify-center" style={{minHeight: '520px'}}>
-                            <div className="relative w-full max-w-[650px] mx-auto">
-                                {/* Renderizar 3 cards: esquerdo, centro (ativo), direito */}
+                        {/* Container do carrossel - 3 cards (esquerdo blur, centro ativo, direito blur) */}
+                        <div className="relative px-4 lg:px-16 overflow-hidden" style={{minHeight: '480px'}}>
+                            <div className="relative w-full flex items-center justify-center" style={{minHeight: '480px'}}>
+                                {/* Renderizar 3 cards: anterior, ativo, próximo */}
                                 {[-1, 0, 1].map((offset) => {
                                     const index = (activeTestimonial + offset + TESTIMONIALS_CAROUSEL.length) % TESTIMONIALS_CAROUSEL.length
                                     const testimonial = TESTIMONIALS_CAROUSEL[index]
@@ -1626,35 +1626,39 @@ export default function HomePage() {
                                     return (
                                         <motion.div
                                             key={`${testimonial.id}-${offset}`}
-                                            className="absolute inset-0 cursor-pointer"
+                                            className="absolute"
                                             style={{
-                                                zIndex: isActive ? 10 : offset === -1 ? 1 : 2
+                                                zIndex: isActive ? 10 : 5,
+                                                pointerEvents: isActive ? 'auto' : 'none',
+                                                width: '100%',
+                                                maxWidth: '650px',
+                                                left: '50%',
+                                                top: '50%'
                                             }}
-                                            initial={{opacity: 0}}
+                                            initial={{opacity: 0, x: '-50%', y: '-50%'}}
                                             animate={{
-                                                opacity: isActive ? 1 : 0.4,
-                                                x: offset * 50,
-                                                scale: isActive ? 1 : 0.9,
-                                                filter: isActive ? 'blur(0px)' : 'blur(2px)'
+                                                opacity: isActive ? 1 : 0.3,
+                                                scale: isActive ? 1 : 0.85,
+                                                x: `calc(-50% + ${offset * 320}px)`,
+                                                y: '-50%',
+                                                filter: isActive ? 'blur(0px)' : 'blur(4px)'
                                             }}
                                             transition={{duration: 0.4, ease: 'easeOut'}}
-                                            onClick={() => !isActive && setActiveTestimonial(index)}
                                             onMouseEnter={() => isActive && setHoveredTestimonial(testimonial.id)}
                                             onMouseLeave={() => setHoveredTestimonial(null)}
                                         >
                                             <div 
                                                 className="bg-white rounded-3xl p-8 lg:p-10 border-2 transition-all duration-300 relative"
                                                 style={{
-                                                    borderColor: isActive && testimonial.badge ? '#0476D9' : '#D0E4FF',
+                                                    borderColor: testimonial.badge ? '#9BC2A6' : '#dfe2e6',
                                                     background: '#ffffff',
-                                                    boxShadow: isActive ? '0 20px 50px rgba(4, 118, 217, 0.15)' : '0 4px 12px rgba(0, 0, 0, 0.05)',
-                                                    pointerEvents: isActive ? 'auto' : 'none'
+                                                    boxShadow: '0 20px 50px rgba(155, 194, 166, 0.15)'
                                                 }}
                                             >
                                                 {/* Badge (se existir) */}
-                                                {testimonial.badge && isActive && (
+                                                {testimonial.badge && (
                                                     <div className="inline-flex items-center gap-2 mb-6 px-4 py-2 rounded-full" 
-                                                         style={{background: '#0476D9'}}>
+                                                         style={{background: '#9BC2A6'}}>
                                                         <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20" style={{color: '#ffffff'}}>
                                                             <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
                                                         </svg>
@@ -1666,7 +1670,7 @@ export default function HomePage() {
                                                 )}
 
                                                 {/* Estrelas (rating visual) */}
-                                                {testimonial.hasStars && isActive && (
+                                                {testimonial.hasStars && (
                                                     <div className="flex gap-1 mb-6">
                                                         {[...Array(5)].map((_, i) => (
                                                             <svg key={i} className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20" style={{color: '#FFC107'}}>
@@ -1684,7 +1688,7 @@ export default function HomePage() {
 
                                                 {/* Divisor */}
                                                 <div className="w-16 h-[2px] mb-6" 
-                                                     style={{background: isActive && testimonial.badge ? '#0476D9' : '#D0E4FF'}} />
+                                                     style={{background: testimonial.badge ? '#9BC2A6' : '#dfe2e6'}} />
 
                                                 {/* Autor e Logo */}
                                                 <div className="flex items-end justify-between flex-wrap gap-6">
@@ -1708,70 +1712,68 @@ export default function HomePage() {
                                                     </div>
                                                 </div>
 
-                                                {/* Tooltip com depoimento completo (somente no card ativo) */}
-                                                {isActive && (
-                                                    <AnimatePresence>
-                                                        {hoveredTestimonial === testimonial.id && (
-                                                            <motion.div
-                                                                className="absolute inset-0 bg-white rounded-3xl p-8 lg:p-10 border-2 z-20 overflow-y-auto"
-                                                                style={{
-                                                                    borderColor: '#0476D9',
-                                                                    background: 'rgba(255, 255, 255, 0.98)',
-                                                                    backdropFilter: 'blur(8px)',
-                                                                    boxShadow: '0 25px 50px rgba(4, 118, 217, 0.25)'
-                                                                }}
-                                                                initial={{opacity: 0}}
-                                                                animate={{opacity: 1}}
-                                                                exit={{opacity: 0}}
-                                                                transition={{duration: 0.2}}
-                                                            >
-                                                                {/* Badge */}
-                                                                <div className="inline-flex items-center gap-2 mb-6 px-4 py-2 rounded-full" 
-                                                                     style={{background: '#0476D9'}}>
-                                                                    <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20" style={{color: '#ffffff'}}>
-                                                                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
-                                                                    </svg>
-                                                                    <span className="font-sora text-[11px] font-bold uppercase tracking-wider" 
-                                                                          style={{color: '#ffffff'}}>
-                                                                        Depoimento Completo
-                                                                    </span>
-                                                                </div>
+                                                {/* Tooltip com depoimento completo */}
+                                                <AnimatePresence>
+                                                    {hoveredTestimonial === testimonial.id && (
+                                                        <motion.div
+                                                            className="absolute inset-0 bg-white rounded-3xl p-8 lg:p-10 border-2 z-20 overflow-y-auto"
+                                                            style={{
+                                                                borderColor: '#9BC2A6',
+                                                                background: 'rgba(255, 255, 255, 0.98)',
+                                                                backdropFilter: 'blur(8px)',
+                                                                boxShadow: '0 25px 50px rgba(155, 194, 166, 0.25)'
+                                                            }}
+                                                            initial={{opacity: 0}}
+                                                            animate={{opacity: 1}}
+                                                            exit={{opacity: 0}}
+                                                            transition={{duration: 0.2}}
+                                                        >
+                                                            {/* Badge */}
+                                                            <div className="inline-flex items-center gap-2 mb-6 px-4 py-2 rounded-full" 
+                                                                 style={{background: '#9BC2A6'}}>
+                                                                <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20" style={{color: '#ffffff'}}>
+                                                                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                                                                </svg>
+                                                                <span className="font-sora text-[11px] font-bold uppercase tracking-wider" 
+                                                                      style={{color: '#ffffff'}}>
+                                                                    Depoimento Completo
+                                                                </span>
+                                                            </div>
 
-                                                                {/* Depoimento completo */}
-                                                                <div className="font-sora text-[14px] leading-[1.7] mb-6 whitespace-pre-line" 
-                                                                     style={{color: '#0d0d0d'}}>
-                                                                    "{FULL_TESTIMONIALS[testimonial.id as keyof typeof FULL_TESTIMONIALS]}"
-                                                                </div>
+                                                            {/* Depoimento completo */}
+                                                            <div className="font-sora text-[14px] leading-[1.7] mb-6 whitespace-pre-line" 
+                                                                 style={{color: '#0d0d0d'}}>
+                                                                "{FULL_TESTIMONIALS[testimonial.id as keyof typeof FULL_TESTIMONIALS]}"
+                                                            </div>
 
-                                                                {/* Divisor */}
-                                                                <div className="w-16 h-[2px] mb-6" 
-                                                                     style={{background: '#0476D9'}} />
+                                                            {/* Divisor */}
+                                                            <div className="w-16 h-[2px] mb-6" 
+                                                                 style={{background: '#9BC2A6'}} />
 
-                                                                {/* Autor e Logo */}
-                                                                <div className="flex items-end justify-between flex-wrap gap-6">
-                                                                    <div>
-                                                                        <p className="font-grotesk text-[16px] font-bold mb-1" 
-                                                                           style={{color: '#0d0d0d'}}>
-                                                                            {testimonial.name}
-                                                                        </p>
-                                                                        <p className="font-sora text-[13px]" 
-                                                                           style={{color: '#6b7480'}}>
-                                                                            {testimonial.company}
-                                                                        </p>
-                                                                    </div>
-                                                                    <div className="relative" style={{width: '140px', height: '48px'}}>
-                                                                        <Image
-                                                                            src={testimonial.logo}
-                                                                            alt={testimonial.company}
-                                                                            fill
-                                                                            className="object-contain object-right opacity-70"
-                                                                        />
-                                                                    </div>
+                                                            {/* Autor e Logo */}
+                                                            <div className="flex items-end justify-between flex-wrap gap-6">
+                                                                <div>
+                                                                    <p className="font-grotesk text-[16px] font-bold mb-1" 
+                                                                       style={{color: '#0d0d0d'}}>
+                                                                        {testimonial.name}
+                                                                    </p>
+                                                                    <p className="font-sora text-[13px]" 
+                                                                       style={{color: '#6b7480'}}>
+                                                                        {testimonial.company}
+                                                                    </p>
                                                                 </div>
-                                                            </motion.div>
-                                                        )}
-                                                    </AnimatePresence>
-                                                )}
+                                                                <div className="relative" style={{width: '140px', height: '48px'}}>
+                                                                    <Image
+                                                                        src={testimonial.logo}
+                                                                        alt={testimonial.company}
+                                                                        fill
+                                                                        className="object-contain object-right opacity-70"
+                                                                    />
+                                                                </div>
+                                                            </div>
+                                                        </motion.div>
+                                                    )}
+                                                </AnimatePresence>
                                             </div>
                                         </motion.div>
                                     )
@@ -1784,11 +1786,11 @@ export default function HomePage() {
                                     setActiveTestimonial((prev) => (prev - 1 + TESTIMONIALS_CAROUSEL.length) % TESTIMONIALS_CAROUSEL.length)
                                     setIsTestimonialAutoPlaying(false)
                                 }}
-                                className="absolute left-0 lg:left-4 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-white border-2 flex items-center justify-center transition-all duration-300 hover:scale-110 z-20 shadow-lg"
-                                style={{borderColor: '#D0E4FF'}}
+                                className="absolute -left-6 lg:left-0 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-white border-2 flex items-center justify-center transition-all duration-300 hover:scale-110 z-20 shadow-lg"
+                                style={{borderColor: '#dfe2e6'}}
                                 aria-label="Depoimento anterior"
                             >
-                                <ChevronLeft size={24} strokeWidth={2.5} style={{color: '#0476D9'}} />
+                                <ChevronLeft size={24} strokeWidth={2.5} style={{color: '#5F8A6F'}} />
                             </button>
 
                             <button
@@ -1796,11 +1798,11 @@ export default function HomePage() {
                                     setActiveTestimonial((prev) => (prev + 1) % TESTIMONIALS_CAROUSEL.length)
                                     setIsTestimonialAutoPlaying(false)
                                 }}
-                                className="absolute right-0 lg:right-4 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-white border-2 flex items-center justify-center transition-all duration-300 hover:scale-110 z-20 shadow-lg"
-                                style={{borderColor: '#D0E4FF'}}
+                                className="absolute -right-6 lg:right-0 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-white border-2 flex items-center justify-center transition-all duration-300 hover:scale-110 z-20 shadow-lg"
+                                style={{borderColor: '#dfe2e6'}}
                                 aria-label="Próximo depoimento"
                             >
-                                <ChevronRight size={24} strokeWidth={2.5} style={{color: '#0476D9'}} />
+                                <ChevronRight size={24} strokeWidth={2.5} style={{color: '#5F8A6F'}} />
                             </button>
                         </div>
 
@@ -1818,7 +1820,7 @@ export default function HomePage() {
                                         width: activeTestimonial === index ? '32px' : '8px',
                                         height: '8px',
                                         borderRadius: '999px',
-                                        background: activeTestimonial === index ? '#0476D9' : '#D0E4FF'
+                                        background: activeTestimonial === index ? '#9BC2A6' : '#dfe2e6'
                                     }}
                                     aria-label={`Ir para depoimento ${index + 1}`}
                                 >
@@ -1826,11 +1828,11 @@ export default function HomePage() {
                                     {activeTestimonial === index && (
                                         <div 
                                             className="absolute inset-0 rounded-full overflow-hidden"
-                                            style={{background: '#D0E4FF'}}
+                                            style={{background: '#dfe2e6'}}
                                         >
                                             <motion.div
                                                 className="h-full"
-                                                style={{background: '#0476D9'}}
+                                                style={{background: '#9BC2A6'}}
                                                 animate={{width: `${testimonialProgress}%`}}
                                                 transition={{duration: 0.05}}
                                             />
@@ -1845,21 +1847,21 @@ export default function HomePage() {
                     <motion.div
                         className="max-w-[700px] mx-auto rounded-2xl p-8 lg:p-10 border-2 flex flex-col items-center justify-center text-center transition-all duration-300 hover:scale-[1.02]"
                         style={{
-                            borderColor: '#0476D9',
-                            background: 'linear-gradient(135deg, rgba(4, 118, 217, 0.08) 0%, rgba(4, 118, 217, 0.12) 100%)'
+                            borderColor: '#9BC2A6',
+                            background: 'linear-gradient(135deg, rgba(155, 194, 166, 0.08) 0%, rgba(155, 194, 166, 0.12) 100%)'
                         }}
                         initial={{opacity: 0, y: 30}}
                         whileInView={{opacity: 1, y: 0}}
                         viewport={{once: true, margin: '-50px'}}
                         transition={{duration: 0.5}}
                         whileHover={{
-                            boxShadow: '0 20px 40px rgba(4, 118, 217, 0.25)'
+                            boxShadow: '0 20px 40px rgba(155, 194, 166, 0.25)'
                         }}
                     >
                         {/* Ícone */}
                         <motion.div 
                             className="w-16 h-16 rounded-2xl flex items-center justify-center mb-6"
-                            style={{background: '#0476D9'}}
+                            style={{background: '#9BC2A6'}}
                             animate={{y: [0, -5, 0]}}
                             transition={{duration: 2, repeat: Infinity, ease: 'easeInOut'}}
                         >
@@ -1905,7 +1907,7 @@ export default function HomePage() {
                             href="#depoimentos" 
                             className="font-sora text-[13px] font-medium transition-colors duration-200"
                             style={{
-                                color: '#0476D9',
+                                color: '#5F8A6F',
                                 textDecoration: 'underline',
                                 textDecorationStyle: 'dashed',
                                 textUnderlineOffset: '3px'
@@ -1923,50 +1925,262 @@ export default function HomePage() {
                 </div>
             </section>
 
-            {/* ===== SEÇÃO 8: FAQ ===== */}
-            {/* ===== SEÇÃO 8: FAQ ===== */}
-            <section className="bg-white py-20 lg:py-28">
-                <div className="max-w-[960px] mx-auto px-8 lg:px-12">
-                    <div className="text-center mb-12">
-                        <p className="font-sora text-sage-500 text-[11px] font-semibold uppercase tracking-[0.1em] mb-4">Perguntas Frequentes</p>
-                        <h2 className="font-grotesk text-[clamp(28px,3.5vw,44px)] font-bold text-primary-600 leading-[1.1]">
-                            Dúvidas comuns
+            {/* ===== SEÇÃO 7.5: VÍDEOS ===== */}
+            <section className="relative py-12 lg:py-16 overflow-hidden" style={{background: '#fafbfc'}}>
+                <div className="max-w-[1400px] mx-auto">
+                    
+                    {/* Header da seção */}
+                    <div className="text-center mb-12 lg:mb-16 max-w-[900px] mx-auto px-8 lg:px-12">
+                        <p className="font-sora text-[11px] font-semibold uppercase tracking-[0.1em] mb-4" 
+                           style={{color: '#5F8A6F'}}>
+                            Conteúdo Educacional
+                        </p>
+                        <h2 className="font-grotesk text-[clamp(28px,3.5vw,42px)] font-bold leading-[1.15] tracking-[-0.01em] mb-6" 
+                            style={{color: '#0d0d0d'}}>
+                            Veja como funciona na prática
                         </h2>
+                        <p className="font-sora text-[16px] lg:text-[17px] leading-[1.6]" 
+                           style={{color: '#6b7480'}}>
+                            Depoimentos em vídeo de quem já implementou a metodologia
+                        </p>
                     </div>
 
-                    <div className="space-y-4">
+                    {/* Carrossel horizontal de vídeos */}
+                    <div className="relative px-8 lg:px-12">
+                        <div className="flex gap-6 lg:gap-8 justify-center items-center overflow-x-auto pb-6 snap-x snap-mandatory scrollbar-hide" 
+                             style={{scrollbarWidth: 'none', msOverflowStyle: 'none'}}>
+                            
+                            {/* Vídeo 1 */}
+                            <motion.div
+                                className="flex-shrink-0 w-[280px] lg:w-[320px] snap-center"
+                                initial={{opacity: 0, x: -30}}
+                                whileInView={{opacity: 1, x: 0}}
+                                viewport={{once: true, margin: '-50px'}}
+                                transition={{duration: 0.5, delay: 0}}
+                            >
+                                <div className="group relative bg-white rounded-2xl overflow-hidden transition-all duration-300 hover:shadow-2xl" 
+                                     style={{aspectRatio: '9/16'}}>
+                                    {/* Container do iframe com aspect ratio vertical */}
+                                    <div className="absolute inset-0 bg-black">
+                                        <iframe
+                                            className="absolute inset-0 w-full h-full"
+                                            src="https://www.youtube.com/embed/jOTfOHdkX3E?modestbranding=1&showinfo=0&rel=0&iv_load_policy=3&controls=1&fs=1&autohide=1"
+                                            title=""
+                                            frameBorder="0"
+                                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                                            allowFullScreen
+                                        />
+                                    </div>
+                                    
+                                    {/* Overlay sutil no hover */}
+                                    <div className="absolute inset-0 border-2 border-transparent group-hover:border-sage-300 transition-all duration-300 rounded-2xl pointer-events-none" />
+                                </div>
+                            </motion.div>
+
+                            {/* Vídeo 2 */}
+                            <motion.div
+                                className="flex-shrink-0 w-[280px] lg:w-[320px] snap-center"
+                                initial={{opacity: 0, x: -30}}
+                                whileInView={{opacity: 1, x: 0}}
+                                viewport={{once: true, margin: '-50px'}}
+                                transition={{duration: 0.5, delay: 0.1}}
+                            >
+                                <div className="group relative bg-white rounded-2xl overflow-hidden transition-all duration-300 hover:shadow-2xl" 
+                                     style={{aspectRatio: '9/16'}}>
+                                    <div className="absolute inset-0 bg-black">
+                                        <iframe
+                                            className="absolute inset-0 w-full h-full"
+                                            src="https://www.youtube.com/embed/tRZxxYmuzpA?modestbranding=1&showinfo=0&rel=0&iv_load_policy=3&controls=1&fs=1&autohide=1"
+                                            title=""
+                                            frameBorder="0"
+                                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                                            allowFullScreen
+                                        />
+                                    </div>
+                                    <div className="absolute inset-0 border-2 border-transparent group-hover:border-sage-300 transition-all duration-300 rounded-2xl pointer-events-none" />
+                                </div>
+                            </motion.div>
+
+                            {/* Vídeo 3 */}
+                            <motion.div
+                                className="flex-shrink-0 w-[280px] lg:w-[320px] snap-center"
+                                initial={{opacity: 0, x: -30}}
+                                whileInView={{opacity: 1, x: 0}}
+                                viewport={{once: true, margin: '-50px'}}
+                                transition={{duration: 0.5, delay: 0.2}}
+                            >
+                                <div className="group relative bg-white rounded-2xl overflow-hidden transition-all duration-300 hover:shadow-2xl" 
+                                     style={{aspectRatio: '9/16'}}>
+                                    <div className="absolute inset-0 bg-black">
+                                        <iframe
+                                            className="absolute inset-0 w-full h-full"
+                                            src="https://www.youtube.com/embed/7Jg3Hj1euuc?modestbranding=1&showinfo=0&rel=0&iv_load_policy=3&controls=1&fs=1&autohide=1"
+                                            title=""
+                                            frameBorder="0"
+                                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                                            allowFullScreen
+                                        />
+                                    </div>
+                                    <div className="absolute inset-0 border-2 border-transparent group-hover:border-sage-300 transition-all duration-300 rounded-2xl pointer-events-none" />
+                                </div>
+                            </motion.div>
+                        </div>
+
+                        {/* Indicador de scroll (opcional) - só aparece no mobile */}
+                        <div className="text-center mt-8 lg:hidden">
+                            <p className="font-sora text-[13px]" style={{color: '#6b7480'}}>
+                                ← Arraste para ver mais vídeos →
+                            </p>
+                        </div>
+                    </div>
+
+                    {/* CTA no final dos vídeos */}
+                    <motion.div 
+                        className="text-center mt-12 lg:mt-16 px-8 lg:px-12"
+                        initial={{opacity: 0, y: 20}}
+                        whileInView={{opacity: 1, y: 0}}
+                        viewport={{once: true, margin: '-50px'}}
+                        transition={{duration: 0.5, delay: 0.4}}
+                    >
+                        <Link
+                            href="/cadastro-gestor"
+                            className="inline-flex items-center gap-2 font-sora font-semibold text-[15px] text-white px-8 py-4 rounded-xl transition-all duration-300 hover:scale-105"
+                            style={{background: '#9BC2A6'}}
+                            onMouseEnter={(e) => {
+                                e.currentTarget.style.background = '#7A9E89'
+                            }}
+                            onMouseLeave={(e) => {
+                                e.currentTarget.style.background = '#9BC2A6'
+                            }}
+                        >
+                            Comece sua jornada agora
+                            <ArrowRight size={18} strokeWidth={2.5} />
+                        </Link>
+                    </motion.div>
+                </div>
+
+                {/* CSS para esconder scrollbar */}
+                <style jsx>{`
+                    .scrollbar-hide::-webkit-scrollbar {
+                        display: none;
+                    }
+                `}</style>
+            </section>
+
+            {/* ===== SEÇÃO 8: FAQ ===== */}
+            <section id="faq" className="pt-12 lg:pt-16 pb-20 lg:pb-28" style={{background: '#fafbfc'}}>
+                <div className="max-w-[960px] mx-auto px-8 lg:px-12">
+                    {/* Header da seção */}
+                    <motion.div 
+                        className="text-center mb-12 lg:mb-16"
+                        initial={{opacity: 0, y: 20}}
+                        whileInView={{opacity: 1, y: 0}}
+                        viewport={{once: true, margin: '-50px'}}
+                        transition={{duration: 0.5}}
+                    >
+                        <p className="font-sora text-[11px] font-semibold uppercase tracking-[0.1em] mb-4" 
+                           style={{color: '#5F8A6F'}}>
+                            Perguntas Frequentes
+                        </p>
+                        <h2 className="font-grotesk text-[clamp(28px,3.5vw,44px)] font-bold leading-[1.1] mb-6"
+                            style={{color: '#0d0d0d'}}>
+                            Dúvidas comuns
+                        </h2>
+                        <p className="font-sora text-[16px] lg:text-[17px] leading-[1.6] max-w-[700px] mx-auto" 
+                           style={{color: '#6b7480'}}>
+                            Encontre respostas rápidas sobre a plataforma, implementação e conformidade com as normas regulatórias
+                        </p>
+                    </motion.div>
+
+                    {/* FAQs com ícones */}
+                    <div className="space-y-5">
                         {[
                             {
                                 question: 'O mapeamento psicossocial é obrigatório?',
-                                answer: 'A NR-1 estabelece diretrizes para gestão de riscos ocupacionais, incluindo riscos psicossociais relacionados à organização do trabalho.'
+                                answer: 'A NR-1 estabelece diretrizes para gestão de riscos ocupacionais, incluindo riscos psicossociais relacionados à organização do trabalho.',
+                                icon: (
+                                    <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24">
+                                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                                        <polyline points="14 2 14 8 20 8"></polyline>
+                                        <line x1="9" y1="15" x2="15" y2="15"></line>
+                                        <line x1="12" y1="12" x2="12" y2="18"></line>
+                                    </svg>
+                                )
                             },
                             {
                                 question: 'Quem precisa aplicar esse diagnóstico?',
-                                answer: 'Empresas que buscam adequação às exigências normativas e prevenção de passivos trabalhistas podem se beneficiar da aplicação do diagnóstico.'
+                                answer: 'Empresas que buscam adequação às exigências normativas e prevenção de passivos trabalhistas podem se beneficiar da aplicação do diagnóstico.',
+                                icon: (
+                                    <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24">
+                                        <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                                        <polyline points="9 22 9 12 15 12 15 22"></polyline>
+                                    </svg>
+                                )
                             },
                             {
                                 question: 'Os dados dos colaboradores são confidenciais?',
-                                answer: 'Sim. A plataforma foi desenvolvida para garantir confidencialidade e proteção das informações coletadas.'
+                                answer: 'Sim. A plataforma foi desenvolvida para garantir confidencialidade e proteção das informações coletadas.',
+                                icon: (
+                                    <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24">
+                                        <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                                        <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                                    </svg>
+                                )
                             },
                             {
                                 question: 'Quanto tempo leva o diagnóstico?',
-                                answer: 'O tempo depende do tamanho da organização e da quantidade de colaboradores participantes.'
+                                answer: 'O tempo depende do tamanho da organização e da quantidade de colaboradores participantes.',
+                                icon: (
+                                    <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24">
+                                        <circle cx="12" cy="12" r="10"></circle>
+                                        <polyline points="12 6 12 12 16 14"></polyline>
+                                    </svg>
+                                )
                             }
                         ].map((faq, index) => (
-                            <div 
-                                key={index} 
-                                className="bg-white border border-gray-200 rounded-2xl overflow-hidden transition-all duration-300 hover:border-sage-300/50 hover:shadow-sm"
+                            <motion.div 
+                                key={index}
+                                initial={{opacity: 0, y: 20}}
+                                whileInView={{opacity: 1, y: 0}}
+                                viewport={{once: true, margin: '-50px'}}
+                                transition={{duration: 0.4, delay: index * 0.1}}
+                                className="bg-white rounded-2xl overflow-hidden transition-all duration-300 hover:scale-[1.01]"
+                                style={{
+                                    border: openFaqIndex === index ? '2px solid #9BC2A6' : '2px solid #dfe2e6',
+                                    boxShadow: openFaqIndex === index ? '0 10px 30px rgba(155, 194, 166, 0.15)' : 'none'
+                                }}
                             >
                                 <button
                                     onClick={() => setOpenFaqIndex(openFaqIndex === index ? null : index)}
-                                    className="w-full px-8 py-6 flex items-center justify-between text-left transition-colors duration-200"
+                                    className="w-full px-6 lg:px-8 py-6 flex items-center gap-4 text-left transition-colors duration-200"
                                 >
-                                    <h3 className="font-grotesk font-semibold text-[16px] lg:text-[17px] text-primary-600 pr-4">
-                                        {faq.question}
-                                    </h3>
-                                    <div className={`flex-shrink-0 w-8 h-8 rounded-full bg-sage-300/10 flex items-center justify-center transition-all duration-300 ${openFaqIndex === index ? 'rotate-180 bg-sage-300' : ''}`}>
+                                    {/* Ícone */}
+                                    <div 
+                                        className="flex-shrink-0 w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-300"
+                                        style={{
+                                            background: openFaqIndex === index ? '#9BC2A6' : 'rgba(155, 194, 166, 0.1)',
+                                            color: openFaqIndex === index ? '#ffffff' : '#5F8A6F'
+                                        }}
+                                    >
+                                        {faq.icon}
+                                    </div>
+
+                                    {/* Pergunta */}
+                                    <div className="flex-1 min-w-0 py-1">
+                                        <h3 className="font-grotesk font-semibold text-[16px] lg:text-[17px] pr-4 leading-[1.4]"
+                                            style={{color: '#0d0d0d'}}>
+                                            {faq.question}
+                                        </h3>
+                                    </div>
+
+                                    {/* Chevron */}
+                                    <div className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center transition-all duration-300 ${openFaqIndex === index ? 'rotate-180' : ''}`}
+                                         style={{
+                                             background: openFaqIndex === index ? '#9BC2A6' : 'rgba(155, 194, 166, 0.1)'
+                                         }}>
                                         <svg 
-                                            className={`w-4 h-4 transition-colors duration-200 ${openFaqIndex === index ? 'text-white' : 'text-sage-500'}`} 
+                                            className="w-4 h-4 transition-colors duration-200" 
+                                            style={{color: openFaqIndex === index ? '#ffffff' : '#5F8A6F'}}
                                             fill="none" 
                                             stroke="currentColor" 
                                             strokeWidth="2" 
@@ -1979,80 +2193,323 @@ export default function HomePage() {
                                     </div>
                                 </button>
                                 
-                                <div 
-                                    className={`overflow-hidden transition-all duration-300 ease-in-out ${openFaqIndex === index ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'}`}
-                                >
-                                    <div className="px-8 pb-6">
-                                        <div className="pt-2 border-t border-gray-100">
-                                            <p className="font-sora text-gray-500 text-[15px] leading-[1.7] mt-4">
-                                                {faq.answer}
-                                            </p>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
+                                {/* Resposta com animação */}
+                                <AnimatePresence>
+                                    {openFaqIndex === index && (
+                                        <motion.div
+                                            initial={{height: 0, opacity: 0}}
+                                            animate={{height: 'auto', opacity: 1}}
+                                            exit={{height: 0, opacity: 0}}
+                                            transition={{duration: 0.3, ease: 'easeInOut'}}
+                                            className="overflow-hidden"
+                                        >
+                                            <div className="px-6 lg:px-8 pb-6 pl-[64px] lg:pl-[80px]">
+                                                <div className="pt-4 border-t" style={{borderColor: '#dfe2e6'}}>
+                                                    <p className="font-sora text-[15px] leading-[1.7]" 
+                                                       style={{color: '#6b7480'}}>
+                                                        {faq.answer}
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        </motion.div>
+                                    )}
+                                </AnimatePresence>
+                            </motion.div>
                         ))}
                     </div>
 
                     {/* CTA final */}
-                    <div className="mt-12 text-center">
-                        <p className="font-sora text-gray-500 text-[14px] mb-6">
+                    <motion.div 
+                        className="mt-12 lg:mt-16 text-center"
+                        initial={{opacity: 0, y: 20}}
+                        whileInView={{opacity: 1, y: 0}}
+                        viewport={{once: true, margin: '-50px'}}
+                        transition={{duration: 0.5, delay: 0.5}}
+                    >
+                        <p className="font-sora text-[14px] mb-6" 
+                           style={{color: '#6b7480'}}>
                             Ainda tem dúvidas? Entre em contato conosco
                         </p>
                         <Link
                             href="https://api.whatsapp.com/send/?phone=5531996955389&text=Ol%C3%A1%2C+tenho+d%C3%BAvidas+sobre+a+plataforma&type=phone_number&app_absent=0"
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="inline-flex items-center gap-2 px-6 py-3 bg-sage-300 hover:bg-sage-400 text-white font-sora font-semibold text-[14px] rounded-xl transition-all duration-300 shadow-lg shadow-sage-300/20 hover:shadow-xl hover:shadow-sage-300/30"
+                            className="inline-flex items-center gap-2 px-8 py-4 font-sora font-semibold text-[15px] rounded-xl transition-all duration-300 hover:scale-105 shadow-lg"
+                            style={{
+                                background: '#9BC2A6',
+                                color: '#ffffff',
+                                boxShadow: '0 10px 30px rgba(155, 194, 166, 0.3)'
+                            }}
+                            onMouseEnter={(e) => {
+                                e.currentTarget.style.background = '#7A9E89'
+                                e.currentTarget.style.boxShadow = '0 15px 40px rgba(155, 194, 166, 0.4)'
+                            }}
+                            onMouseLeave={(e) => {
+                                e.currentTarget.style.background = '#9BC2A6'
+                                e.currentTarget.style.boxShadow = '0 10px 30px rgba(155, 194, 166, 0.3)'
+                            }}
                         >
                             <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
                                 <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/>
                             </svg>
                             <span>Falar no WhatsApp</span>
                         </Link>
-                    </div>
+                    </motion.div>
                 </div>
             </section>
 
             {/* ===== FOOTER ===== */}
-            <footer className="bg-primary-800 text-white border-t border-white/5">
-                <div className="max-w-[1360px] mx-auto px-8 lg:px-12 py-12">
-                    <div className="grid md:grid-cols-3 gap-10">
-                        <div>
-                            <Image src="/logo.png" alt="Terapia Empresarial" width={160} height={40} className="h-7 w-auto mb-4 opacity-80" />
-                            <p className="font-sora text-white/30 text-[13px] leading-relaxed max-w-[260px]">
-                                Inteligencia organizacional com conformidade legal para saude mental corporativa.
+            <footer className="text-white border-t" style={{background: '#002135', borderColor: 'rgba(255, 255, 255, 0.05)'}}>
+                <div className="max-w-[1360px] mx-auto px-8 lg:px-12 py-16 lg:py-20">
+                    {/* Grid principal */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-12">
+                        {/* Coluna 1: Logo + Descrição + Redes Sociais */}
+                        <div className="lg:col-span-1">
+                            <Image 
+                                src="/logo.png" 
+                                alt="Terapia Empresarial" 
+                                width={180} 
+                                height={45} 
+                                className="h-8 w-auto mb-5 opacity-90" 
+                            />
+                            <p className="font-sora text-[14px] leading-relaxed mb-6" 
+                               style={{color: 'rgba(255, 255, 255, 0.5)'}}>
+                                Inteligência organizacional com conformidade legal para saúde mental corporativa.
                             </p>
-                        </div>
-                        <div>
-                            <h4 className="font-sora text-[12px] font-semibold text-white/40 uppercase tracking-[0.12em] mb-4">Contato</h4>
-                            <div className="font-sora space-y-2 text-[13px] text-white/30">
-                                <p>contato@terapiaempresarial.com.br</p>
-                                <p>(31) 99695-5389</p>
-                                <p>Av. Amazonas 687, 16o andar — BH/MG</p>
+                            
+                            {/* Badge LGPD */}
+                            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full mb-6" 
+                                 style={{background: 'rgba(155, 194, 166, 0.1)', border: '1px solid rgba(155, 194, 166, 0.2)'}}>
+                                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24" style={{color: '#9BC2A6'}}>
+                                    <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z" />
+                                </svg>
+                                <span className="font-sora text-[11px] font-medium" style={{color: '#9BC2A6'}}>
+                                    LGPD Compliant
+                                </span>
+                            </div>
+
+                            {/* Redes Sociais */}
+                            <div className="flex items-center gap-3">
+                                <Link 
+                                    href="https://instagram.com/terapia_empresarial" 
+                                    target="_blank" 
+                                    rel="noopener noreferrer" 
+                                    className="w-9 h-9 rounded-lg flex items-center justify-center transition-all duration-300"
+                                    style={{background: 'rgba(255, 255, 255, 0.05)'}}
+                                    onMouseEnter={(e) => {
+                                        e.currentTarget.style.background = 'rgba(155, 194, 166, 0.15)'
+                                        e.currentTarget.style.transform = 'translateY(-2px)'
+                                    }}
+                                    onMouseLeave={(e) => {
+                                        e.currentTarget.style.background = 'rgba(255, 255, 255, 0.05)'
+                                        e.currentTarget.style.transform = 'translateY(0)'
+                                    }}
+                                >
+                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{color: 'rgba(255, 255, 255, 0.6)'}}>
+                                        <rect x="2" y="2" width="20" height="20" rx="5" ry="5" />
+                                        <path d="M16 11.37A4 4 0 1112.63 8 4 4 0 0116 11.37z" />
+                                        <line x1="17.5" y1="6.5" x2="17.51" y2="6.5" />
+                                    </svg>
+                                </Link>
+                                
+                                <Link 
+                                    href="https://wa.me/553196955389" 
+                                    target="_blank" 
+                                    rel="noopener noreferrer" 
+                                    className="w-9 h-9 rounded-lg flex items-center justify-center transition-all duration-300"
+                                    style={{background: 'rgba(255, 255, 255, 0.05)'}}
+                                    onMouseEnter={(e) => {
+                                        e.currentTarget.style.background = 'rgba(155, 194, 166, 0.15)'
+                                        e.currentTarget.style.transform = 'translateY(-2px)'
+                                    }}
+                                    onMouseLeave={(e) => {
+                                        e.currentTarget.style.background = 'rgba(255, 255, 255, 0.05)'
+                                        e.currentTarget.style.transform = 'translateY(0)'
+                                    }}
+                                >
+                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" style={{color: 'rgba(255, 255, 255, 0.6)'}}>
+                                        <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/>
+                                    </svg>
+                                </Link>
+
+                                <Link 
+                                    href="https://linkedin.com/company/terapia-empresarial" 
+                                    target="_blank" 
+                                    rel="noopener noreferrer" 
+                                    className="w-9 h-9 rounded-lg flex items-center justify-center transition-all duration-300"
+                                    style={{background: 'rgba(255, 255, 255, 0.05)'}}
+                                    onMouseEnter={(e) => {
+                                        e.currentTarget.style.background = 'rgba(155, 194, 166, 0.15)'
+                                        e.currentTarget.style.transform = 'translateY(-2px)'
+                                    }}
+                                    onMouseLeave={(e) => {
+                                        e.currentTarget.style.background = 'rgba(255, 255, 255, 0.05)'
+                                        e.currentTarget.style.transform = 'translateY(0)'
+                                    }}
+                                >
+                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{color: 'rgba(255, 255, 255, 0.6)'}}>
+                                        <path d="M16 8a6 6 0 016 6v7h-4v-7a2 2 0 00-2-2 2 2 0 00-2 2v7h-4v-7a6 6 0 016-6zM2 9h4v12H2z" />
+                                        <circle cx="4" cy="4" r="2" />
+                                    </svg>
+                                </Link>
                             </div>
                         </div>
+
+                        {/* Coluna 2: Plataforma */}
                         <div>
-                            <h4 className="font-sora text-[12px] font-semibold text-white/40 uppercase tracking-[0.12em] mb-4">Legal</h4>
-                            <div className="font-sora space-y-2 text-[13px]">
-                                <Link href="/termos" className="block text-white/30 hover:text-white/60 transition-colors">Termos de uso</Link>
-                                <Link href="/privacidade" className="block text-white/30 hover:text-white/60 transition-colors">Politica de privacidade</Link>
-                                <Link href="https://wa.me/553196955389" target="_blank" rel="noopener noreferrer" className="block text-white/30 hover:text-white/60 transition-colors">Contato</Link>
+                            <h4 className="font-sora text-[12px] font-semibold uppercase tracking-[0.12em] mb-5" 
+                                style={{color: 'rgba(255, 255, 255, 0.4)'}}>
+                                Plataforma
+                            </h4>
+                            <div className="space-y-3">
+                                <Link href="/login" className="block font-sora text-[14px] transition-colors duration-200" 
+                                      style={{color: 'rgba(255, 255, 255, 0.5)'}}
+                                      onMouseEnter={(e) => e.currentTarget.style.color = '#9BC2A6'}
+                                      onMouseLeave={(e) => e.currentTarget.style.color = 'rgba(255, 255, 255, 0.5)'}>
+                                    Login Gestor
+                                </Link>
+                                <Link href="/login/funcionario" className="block font-sora text-[14px] transition-colors duration-200" 
+                                      style={{color: 'rgba(255, 255, 255, 0.5)'}}
+                                      onMouseEnter={(e) => e.currentTarget.style.color = '#9BC2A6'}
+                                      onMouseLeave={(e) => e.currentTarget.style.color = 'rgba(255, 255, 255, 0.5)'}>
+                                    Login Funcionário
+                                </Link>
+                                <Link href="/cadastro-gestor" className="block font-sora text-[14px] transition-colors duration-200" 
+                                      style={{color: 'rgba(255, 255, 255, 0.5)'}}
+                                      onMouseEnter={(e) => e.currentTarget.style.color = '#9BC2A6'}
+                                      onMouseLeave={(e) => e.currentTarget.style.color = 'rgba(255, 255, 255, 0.5)'}>
+                                    Criar Conta
+                                </Link>
+                                <Link href="/acesso" className="block font-sora text-[14px] transition-colors duration-200" 
+                                      style={{color: 'rgba(255, 255, 255, 0.5)'}}
+                                      onMouseEnter={(e) => e.currentTarget.style.color = '#9BC2A6'}
+                                      onMouseLeave={(e) => e.currentTarget.style.color = 'rgba(255, 255, 255, 0.5)'}>
+                                    Portal de Acesso
+                                </Link>
+                            </div>
+                        </div>
+
+                        {/* Coluna 3: Recursos */}
+                        <div>
+                            <h4 className="font-sora text-[12px] font-semibold uppercase tracking-[0.12em] mb-5" 
+                                style={{color: 'rgba(255, 255, 255, 0.4)'}}>
+                                Recursos
+                            </h4>
+                            <div className="space-y-3">
+                                <button 
+                                    onClick={() => {
+                                        document.getElementById('diagnostico')?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+                                    }}
+                                    className="block w-full text-left font-sora text-[14px] transition-colors duration-200" 
+                                    style={{color: 'rgba(255, 255, 255, 0.5)'}}
+                                    onMouseEnter={(e) => e.currentTarget.style.color = '#9BC2A6'}
+                                    onMouseLeave={(e) => e.currentTarget.style.color = 'rgba(255, 255, 255, 0.5)'}>
+                                    Diagnóstico Psicossocial
+                                </button>
+                                <button 
+                                    onClick={() => {
+                                        document.getElementById('jornada')?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+                                    }}
+                                    className="block w-full text-left font-sora text-[14px] transition-colors duration-200" 
+                                    style={{color: 'rgba(255, 255, 255, 0.5)'}}
+                                    onMouseEnter={(e) => e.currentTarget.style.color = '#9BC2A6'}
+                                    onMouseLeave={(e) => e.currentTarget.style.color = 'rgba(255, 255, 255, 0.5)'}>
+                                    Jornada de Equipe
+                                </button>
+                                <button 
+                                    onClick={() => {
+                                        document.getElementById('depoimentos')?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+                                    }}
+                                    className="block w-full text-left font-sora text-[14px] transition-colors duration-200" 
+                                    style={{color: 'rgba(255, 255, 255, 0.5)'}}
+                                    onMouseEnter={(e) => e.currentTarget.style.color = '#9BC2A6'}
+                                    onMouseLeave={(e) => e.currentTarget.style.color = 'rgba(255, 255, 255, 0.5)'}>
+                                    Casos de Sucesso
+                                </button>
+                                <button 
+                                    onClick={() => {
+                                        document.getElementById('faq')?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+                                    }}
+                                    className="block w-full text-left font-sora text-[14px] transition-colors duration-200" 
+                                    style={{color: 'rgba(255, 255, 255, 0.5)'}}
+                                    onMouseEnter={(e) => e.currentTarget.style.color = '#9BC2A6'}
+                                    onMouseLeave={(e) => e.currentTarget.style.color = 'rgba(255, 255, 255, 0.5)'}>
+                                    Perguntas Frequentes
+                                </button>
+                            </div>
+                        </div>
+
+                        {/* Coluna 4: Contato */}
+                        <div>
+                            <h4 className="font-sora text-[12px] font-semibold uppercase tracking-[0.12em] mb-5" 
+                                style={{color: 'rgba(255, 255, 255, 0.4)'}}>
+                                Contato
+                            </h4>
+                            <div className="space-y-4">
+                                {/* Email */}
+                                <a href="mailto:contato@terapiaempresarial.com.br" 
+                                   className="flex items-start gap-3 font-sora text-[14px] transition-colors duration-200 group">
+                                    <svg className="w-5 h-5 flex-shrink-0 mt-0.5 transition-colors duration-200" 
+                                         fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24"
+                                         style={{color: '#9BC2A6'}}>
+                                        <path strokeLinecap="round" strokeLinejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75" />
+                                    </svg>
+                                    <span className="group-hover:text-[#9BC2A6] transition-colors" style={{color: 'rgba(255, 255, 255, 0.5)'}}>
+                                        contato@terapiaempresarial.com.br
+                                    </span>
+                                </a>
+
+                                {/* Telefone */}
+                                <a href="tel:+553196955389" 
+                                   className="flex items-start gap-3 font-sora text-[14px] transition-colors duration-200 group">
+                                    <svg className="w-5 h-5 flex-shrink-0 mt-0.5 transition-colors duration-200" 
+                                         fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24"
+                                         style={{color: '#9BC2A6'}}>
+                                        <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 6.75c0 8.284 6.716 15 15 15h2.25a2.25 2.25 0 002.25-2.25v-1.372c0-.516-.351-.966-.852-1.091l-4.423-1.106c-.44-.11-.902.055-1.173.417l-.97 1.293c-.282.376-.769.542-1.21.38a12.035 12.035 0 01-7.143-7.143c-.162-.441.004-.928.38-1.21l1.293-.97c.363-.271.527-.734.417-1.173L6.963 3.102a1.125 1.125 0 00-1.091-.852H4.5A2.25 2.25 0 002.25 4.5v2.25z" />
+                                    </svg>
+                                    <span className="group-hover:text-[#9BC2A6] transition-colors" style={{color: 'rgba(255, 255, 255, 0.5)'}}>
+                                        (31) 99695-5389
+                                    </span>
+                                </a>
+
+                                {/* Endereço */}
+                                <div className="flex items-start gap-3 font-sora text-[14px]">
+                                    <svg className="w-5 h-5 flex-shrink-0 mt-0.5" 
+                                         fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24"
+                                         style={{color: '#9BC2A6'}}>
+                                        <path strokeLinecap="round" strokeLinejoin="round" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z" />
+                                        <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z" />
+                                    </svg>
+                                    <span style={{color: 'rgba(255, 255, 255, 0.5)'}}>
+                                        Av. Amazonas 687, 16º andar<br />Belo Horizonte/MG
+                                    </span>
+                                </div>
                             </div>
                         </div>
                     </div>
-                    <div className="mt-10 pt-8 border-t border-white/5 flex flex-col sm:flex-row justify-between items-center gap-4">
-                        <p className="font-sora text-white/20 text-[12px]">&copy; {new Date().getFullYear()} Terapia Empresarial. Todos os direitos reservados.</p>
-                        <div className="flex items-center gap-5">
-                            {[
-                                { href: 'https://instagram.com/terapia_empresarial', icon: <><rect x="2" y="2" width="20" height="20" rx="5" ry="5" /><path d="M16 11.37A4 4 0 1112.63 8 4 4 0 0116 11.37z" /><line x1="17.5" y1="6.5" x2="17.51" y2="6.5" /></> },
-                                { href: 'https://facebook.com', icon: <path d="M18 2h-3a5 5 0 00-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 011-1h3z" /> },
-                                { href: 'https://youtube.com', icon: <><path d="M22.54 6.42a2.78 2.78 0 00-1.94-2C18.88 4 12 4 12 4s-6.88 0-8.6.46a2.78 2.78 0 00-1.94 2A29 29 0 001 11.75a29 29 0 00.46 5.33A2.78 2.78 0 003.4 19.1c1.72.46 8.6.46 8.6.46s6.88 0 8.6-.46a2.78 2.78 0 001.94-2 29 29 0 00.46-5.25 29 29 0 00-.46-5.43z" /><polygon points="9.75 15.02 15.5 11.75 9.75 8.48 9.75 15.02" /></> },
-                            ].map((social) => (
-                                <Link key={social.href} href={social.href} target="_blank" rel="noopener noreferrer" className="text-white/20 hover:text-white/40 transition-colors">
-                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">{social.icon}</svg>
-                                </Link>
-                            ))}
+
+                    {/* Divisor */}
+                    <div className="border-t mb-8" style={{borderColor: 'rgba(255, 255, 255, 0.05)'}} />
+
+                    {/* Bottom bar */}
+                    <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
+                        <p className="font-sora text-[12px] text-center sm:text-left" 
+                           style={{color: 'rgba(255, 255, 255, 0.3)'}}>
+                            &copy; {new Date().getFullYear()} Terapia Empresarial. Todos os direitos reservados.
+                        </p>
+                        <div className="flex items-center gap-6">
+                            <Link href="/termos" className="font-sora text-[12px] transition-colors duration-200" 
+                                  style={{color: 'rgba(255, 255, 255, 0.3)'}}
+                                  onMouseEnter={(e) => e.currentTarget.style.color = '#9BC2A6'}
+                                  onMouseLeave={(e) => e.currentTarget.style.color = 'rgba(255, 255, 255, 0.3)'}>
+                                Termos de Uso
+                            </Link>
+                            <Link href="/privacidade" className="font-sora text-[12px] transition-colors duration-200" 
+                                  style={{color: 'rgba(255, 255, 255, 0.3)'}}
+                                  onMouseEnter={(e) => e.currentTarget.style.color = '#9BC2A6'}
+                                  onMouseLeave={(e) => e.currentTarget.style.color = 'rgba(255, 255, 255, 0.3)'}>
+                                Privacidade
+                            </Link>
                         </div>
                     </div>
                 </div>
