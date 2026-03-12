@@ -1,0 +1,127 @@
+/**
+ * Design Tokens - Terapia Empresarial
+ * Baseado no design system Hotmart-inspired
+ */
+
+:root {
+    /* ===== PRIMARY: Deep Navy (authority, trust, professionalism) ===== */
+    --primary-50:  #E6EDF2;
+    --primary-100: #C0D3E0;
+    --primary-200: #8FAFCA;
+    --primary-300: #5A8AB1;
+    --primary-400: #2D6896;
+    --primary-500: #1C3D5A;
+    --primary-600: #012840;  /* main/deepest brand color */
+    --primary-700: #002135;
+    --primary-800: #0F172A;
+    --primary-900: #090E1B;
+
+    /* ===== SAGE GREEN: Wellness (calm, nature, health) ===== */
+    --sage-50:  #EFF5F1;
+    --sage-100: #D5E6DA;
+    --sage-200: #B8D4C0;
+    --sage-300: #9BC2A6;
+    --sage-400: #7A9E89;  /* main sage from brand */
+    --sage-500: #5F8A6F;
+    --sage-600: #4A7259;
+    --sage-700: #375A44;
+    --sage-800: #264230;
+    --sage-900: #162A1E;
+
+    /* ===== WARM: Beige/Cream (human touch, warmth) ===== */
+    --warm-50:  #FDF9F4;
+    --warm-100: #F7F0E5;
+    --warm-200: #F0E4D2;
+    --warm-300: #E7DCCB;  /* main warm from brand */
+    --warm-400: #D9C9B0;
+    --warm-500: #C4AD8E;
+    --warm-600: #A8916F;
+    --warm-700: #8A7354;
+    --warm-800: #6B573C;
+    --warm-900: #4C3D2A;
+
+    /* ===== BLUE ACCENTS: Technology (innovation, digital) ===== */
+    --blue-50:  #EBF3FF;
+    --blue-100: #D0E4FF;
+    --blue-200: #A8CCFF;
+    --blue-300: #5AB2FF;  /* light blue from brand */
+    --blue-400: #3484F7;  /* bright blue from brand */
+    --blue-500: #0476D9;  /* deep blue from brand */
+    --blue-600: #035AA6;
+    --blue-700: #024580;
+    --blue-800: #01315A;
+    --blue-900: #001E38;
+
+    /* ===== NEUTRALS ===== */
+    --gray-50:  #F7F8FA;
+    --gray-100: #EFF1F5;
+    --gray-200: #E2E5EB;
+    --gray-300: #CDD2DA;
+    --gray-400: #A0A8B8;
+    --gray-500: #636363;  /* body text from brand */
+    --gray-600: #4B5563;
+    --gray-700: #374151;
+    --gray-800: #1F2937;
+    --gray-900: #111827;
+
+    /* ===== SEMANTIC COLORS ===== */
+    --success: #22C55E;
+    --warning: #FFBC7D;  /* peachy orange from brand */
+    --error:   #EF4444;
+    --info:    var(--blue-400);
+
+    /* ===== SURFACES ===== */
+    --bg-page:       #FFFFFF;
+    --bg-section:    var(--gray-50);
+    --bg-warm:       var(--warm-50);
+    --bg-sage:       var(--sage-50);
+    --bg-dark:       var(--primary-600);
+    --bg-darker:     var(--primary-900);
+    --bg-dark-card:  var(--primary-500);
+
+    /* ===== TEXT COLORS ===== */
+    --text-primary:   var(--primary-600);
+    --text-secondary: var(--gray-500);
+    --text-muted:     var(--gray-400);
+    --text-on-dark:   #FFFFFF;
+    --text-on-warm:   var(--primary-600);
+
+    /* ===== SHADOWS ===== */
+    --shadow-sm:  0 1px 3px rgba(1,40,64,0.06), 0 1px 2px rgba(1,40,64,0.04);
+    --shadow-md:  0 4px 12px rgba(1,40,64,0.08), 0 2px 4px rgba(1,40,64,0.04);
+    --shadow-lg:  0 12px 32px rgba(1,40,64,0.10), 0 4px 8px rgba(1,40,64,0.04);
+    --shadow-xl:  0 24px 56px rgba(1,40,64,0.14), 0 8px 16px rgba(1,40,64,0.06);
+
+    /* ===== BORDER RADIUS ===== */
+    --radius-sm:   6px;
+    --radius-md:   10px;
+    --radius-lg:   16px;
+    --radius-xl:   24px;
+    --radius-2xl:  32px;
+    --radius-full: 9999px;
+
+    /* ===== SPACING SCALE ===== */
+    --sp-1:  4px;
+    --sp-2:  8px;
+    --sp-3:  12px;
+    --sp-4:  16px;
+    --sp-5:  20px;
+    --sp-6:  24px;
+    --sp-8:  32px;
+    --sp-10: 40px;
+    --sp-12: 48px;
+    --sp-16: 64px;
+    --sp-20: 80px;
+    --sp-24: 96px;
+
+    /* ===== CONTAINER ===== */
+    --container-max: 1216px;
+    --container-padding: 24px;
+
+    /* ===== TRANSITIONS ===== */
+    --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+    --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+    --duration-fast:   0.2s;
+    --duration-normal: 0.35s;
+    --duration-slow:   0.5s;
+}

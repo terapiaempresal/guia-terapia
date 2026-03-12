@@ -2,14 +2,9 @@
 @tailwind components;
 @tailwind utilities;
 
-@keyframes marquee {
-    0% {
-        transform: translateX(0%);
-    }
-    100% {
-        transform: translateX(-50%);
-    }
-}
+/* Import Design System */
+@import '../styles/design-tokens.css';
+@import '../styles/animations.css';
 
 @layer base {
     body {
