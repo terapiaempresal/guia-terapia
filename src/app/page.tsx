@@ -1589,7 +1589,6 @@ export default function HomePage() {
                                 { name: 'SKETCH', path: '/clients/sketch.png' },
                                 { name: 'Cliente 4', path: '/clients/cliente4.png' },
                                 { name: 'Cliente 5', path: '/clients/cliente5.png' },
-                                { name: 'Cliente 6', path: '/clients/cliente6.png' },
                                 { name: 'Cliente 7', path: '/clients/cliente7.png' }
                             ].concat([
                                 { name: 'Intensa Mídia', path: '/clients/intensa-midia.png' },
@@ -1597,7 +1596,6 @@ export default function HomePage() {
                                 { name: 'SKETCH', path: '/clients/sketch.png' },
                                 { name: 'Cliente 4', path: '/clients/cliente4.png' },
                                 { name: 'Cliente 5', path: '/clients/cliente5.png' },
-                                { name: 'Cliente 6', path: '/clients/cliente6.png' },
                                 { name: 'Cliente 7', path: '/clients/cliente7.png' }
                             ]).map((logo, index) => (
                                 <div key={index} className="flex-shrink-0 flex items-center justify-center" style={{width: '140px', height: '48px'}}>
